@@ -1,0 +1,15 @@
+{
+  "name": "assemblo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:only": "node --test --test-name-pattern"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

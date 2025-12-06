@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pseudo-Code Analyzer</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.css"
+        />
+        <link rel="stylesheet" href="./styles.css" />
+    </head>
+    <body>
+        <header>
+            <h1>Assemblo</h1>
+        </header>
+        <div class="editor-controls">
+            <button id="runButton">▶️ Run Code</button>
+            <button id="debugButton">💾 debug code</button>
+            <button hidden="true" id="nextLineButton">-> Next Line</button>
+        </div>
+        <div class="main-container">
+            <div class="editor-container" id="editor-container"></div>
+            <div class="output-container">
+                <h2>Analysis Metrics</h2>
+                <table class="metrics-table" id="generic-metrics">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      <tr id="code-line">
+                        <td>Line</td>
+                        <td></td>
+                      </tr>
+                        <tr id="running">
+                          <td>Status</td>
+                          <td></td>
+                        </tr>
+                        <tr id="input-q">
+                          <td>Input Stack</td>
+                          <td></td>
+                        </tr>
+                        <tr id="output-q">
+                          <td>Output</td>
+                          <td></td>
+                        </tr>
+                        <tr id="CPU-cycles">
+                            <td>CPU Cycles</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="metrics-table" id="registers-table">
+                  <thead>
+                      <tr>
+                          <th>REG #1</th>
+                          <th>REG #2</th>
+                          <th>REG #3</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr id="reg-table">
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                  </tbody>
+              </table>
+                <table class="metrics-table" id="memory-table">
+                  <thead>
+                      <tr>
+                          <th>MEM ADD #1</th>
+                          <th>MEM ADD #2</th>
+                          <th>MEM ADD #3</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr id="mem-table">
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Code Analyzer</p>
+        </footer>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/addon/mode/simple.min.js"></script>
+        <script type="module" src="script.js"></script>
+    </body>
+</html>

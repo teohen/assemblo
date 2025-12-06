@@ -1,0 +1,238 @@
+import tokens from "./tokens.mjs";
+import Argument from "./argument.mjs";
+
+class Runner {
+  lines;
+  registers;
+  memory;
+  inQ;
+  outQ;
+  line;
+  operations;
+
+
+  constructor(inQ, outQ, registers, memory) {
+    if (!Array.isArray(inQ) && inQ.length == 0) {
+      throw new Error("InQ should be a non empty array")
+    }
+
+    this.end = false;
+
+    this.registers = registers;
+    this.memory = memory;
+
+    this.inQ = inQ;
+    this.outQ = outQ;
+
+    this.popFn = this.popFn.bind(this);
+    this.cpyFn = this.cpyFn.bind(this);
+    this.addFn = this.addFn.bind(this);
+    this.pushFn = this.pushFn.bind(this);
+    this.loadFn = this.loadFn.bind(this);
+    this.subFn = this.subFn.bind(this);
+    this.printFn = this.printFn.bind(this);
+    this.startFn = this.startFn.bind(this);
+    this.endFn = this.endFn.bind(this);
+
+
+    this.jmpNegFn = this.jmpNegFn.bind(this);
+    this.jmpPosFn = this.jmpPosFn.bind(this);
+    this.jmpZeroFn = this.jmpZeroFn.bind(this);
+    this.jmpUndFn = this.jmpUndFn.bind(this);
+  }
+
+  popFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+
+    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.INP, ln);
+
+    const result = this.inQ.pop();
+
+    this.registers.set(arg1.intern, result);
+
+    return 0;
+  }
+
+  cpyFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+
+    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+    Argument.validateType(arg1, tokens.ARG_TYPES.MEM, ln);
+
+    const result = this.registers.get(arg2.intern);
+    this.memory.set(arg1.intern, result);
+
+    return 0;
+  }
+
+  jmpNegFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+    Argument.validateType(arg1, tokens.ARG_TYPES.NUM, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+
+    if (arg1.literal > this.operations.length || arg1.literal < 0) {
+      throw new Error(
+        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
+      );
+    }
+
+    const val = this.registers.get(arg2.intern);
+
+    if (val < 0) return arg1.literal - 1;
+
+    return ln;
+  }
+
+  jmpPosFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+    Argument.validateType(arg1, tokens.ARG_TYPES.NUM, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+
+    if (arg1.literal > this.operations.length || arg1.literal < 0) {
+      throw new Error(
+        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
+      );
+    }
+
+    const val = this.registers.get(arg2.intern);
+
+    if (val > 0) return arg1.literal - 1;
+
+    return ln;
+  }
+
+  jmpZeroFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+    Argument.validateType(arg1, tokens.ARG_TYPES.NUM, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+
+    if (arg1.literal > this.operations.length || arg1.literal < 0) {
+      throw new Error(
+        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
+      );
+    }
+
+    const val = this.registers.get(arg2.intern);
+
+    if (val == 0) return arg1.literal - 1;
+
+    return ln;
+  }
+
+  jmpUndFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+    Argument.validateType(arg1, tokens.ARG_TYPES.NUM, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+
+    if (arg1.literal > this.operations.length || arg1.literal < 0) {
+      throw new Error(
+        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
+      );
+    }
+
+    const val = this.registers.get(arg2.intern);
+
+    if (val == undefined) return arg1.literal - 1;
+
+    return ln;
+  }
+
+  addFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+
+    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+
+    const result =
+      this.registers.get(arg1.intern) + this.registers.get(arg2.intern);
+    this.registers.set(arg1.intern, result);
+
+    return 0;
+  }
+
+  pushFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+
+    Argument.validateType(arg1, tokens.ARG_TYPES.OUT, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+
+    const result = this.registers.get(arg2.intern);
+    this.outQ.push(result);
+
+    return 0;
+  }
+
+  loadFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+
+    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.MEM, ln);
+
+    const result = this.registers.get(arg2.intern);
+    this.registers.set(arg1.intern, result);
+    return 0;
+  }
+
+  subFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+
+    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+
+    const result =
+      this.registers.get(arg1.intern) - this.registers.get(arg2.intern);
+    this.registers.set(arg1.intern, result);
+
+    return 0;
+  }
+
+  printFn(args, ln) {
+    const arg1 = args[0];
+
+    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
+
+    const result = this.registers.get(arg1.intern);
+
+    console.log("PRINT: ", result);
+
+    return 0;
+  }
+
+  startFn(args, ln) {
+    return ln;
+  }
+
+  endFn(args, ln) {
+    return -2;
+  }
+
+tick(line) {
+    const op = this.operations[line - 1];
+    const f = this[op.funcName];
+
+    switch (op.type) {
+      case tokens.FUNCTION_TYPES.FLOW:
+        line = f(op.args, op.line);
+        break;
+
+      case tokens.FUNCTION_TYPES.PROC:
+        f(op.args, op.line)
+        break;
+    }
+
+    return line;
+  }
+}
+
+export default Runner;
