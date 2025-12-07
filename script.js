@@ -86,12 +86,15 @@ debugBtn.addEventListener('click', function () {
   if (!p.debugging) {
     p.prepareEval(editor.getValue());
   } else {
+
+    for (let i = 0; i < p.runner.operations.length; i++) {
+      editor.removeLineClass(i, "background", "highlighted-line");
+    }
     p.resetProgram()
-    updateUi(p)
   }
+  p.debugging = !p.debugging
 
   updateUi(p)
-  p.debugging = !p.debugging
   nextLineBtn.hidden = !nextLineBtn.hidden
   runBtn.hidden = !runBtn.hidden
   editor.setOption("readOnly", !editor.options.readOnly)
@@ -104,7 +107,8 @@ nextLineBtn.addEventListener("click", () => {
 
 function updateUi(p) {
 
-  editor.addLineClass(p.line- 1, "background", "highlighted-line");
+  // TODO: FIX THE HIGHLIGHTING PROBLEM
+  editor.addLineClass(p.line - 1, "background", "highlighted-line");
   editor.removeLineClass(p.line - 2, "background", "highlighted-line");
 
   document.getElementById('codeLine').innerHTML = p.line;
