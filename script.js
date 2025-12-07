@@ -60,10 +60,12 @@ const deb = `START
  PRT: r0
  END`;
 
+const urlParams = new URLSearchParams(window.location.search);
+const cParam = urlParams.get('code');
 
-editor.setValue(deb);
-
-
+if (cParam) {
+  editor.setValue(cParam)
+}
 
 const q = [1, -2, 3, -4, 5];
 const p = new Program(q)
@@ -125,10 +127,3 @@ function updateUi(p) {
   document.getElementById("registersTable").lastElementChild.children[1].innerHTML = p.registers.get("R1X") || ""
   document.getElementById("registersTable").lastElementChild.children[2].innerHTML = p.registers.get("R2X") || ""
 }
-
-
-    const urlParams = new URLSearchParams(window.location.search);
-
-
-        const productName = urlParams.get('code');
-        console.log(productName);
