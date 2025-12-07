@@ -15,6 +15,7 @@
   --vscode-accent: #007acc;
   --vscode-border: #3e3e42;
   --vscode-green: #4ec9b0;
+  --vscode-red: #dc3545;
   --vscode-yellow: #dcdcaa;
   --vscode-blue: #569cd6;
   --vscode-purple: #c586c0;
@@ -140,6 +141,118 @@ textarea:focus {
   position: relative;
   height: 100%;
 }
+
+        /* Console Section */
+        .console-section {
+          height: 200px;
+          background-color: var(--console-bg);
+          border-top: 1px solid var(--vscode-border);
+          display: flex;
+          flex-direction: column;
+      }
+
+      .console-header {
+          background-color: var(--vscode-sidebar);
+          padding: 8px 16px;
+          border-bottom: 1px solid var(--vscode-border);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+      }
+
+      .console-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          font-weight: 500;
+      }
+
+      .console-title i {
+          color: var(--vscode-green);
+      }
+
+      .console-actions {
+          display: flex;
+          gap: 8px;
+      }
+
+      .console-btn {
+          background: transparent;
+          border: none;
+          color: var(--vscode-text-muted);
+          cursor: pointer;
+          padding: 4px 8px;
+          border-radius: 3px;
+          font-size: 12px;
+          transition: all 0.2s;
+      }
+
+      .console-btn:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: var(--vscode-text);
+      }
+
+      .console-output {
+          flex: 1;
+          padding: 12px 16px;
+          overflow-y: auto;
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 13px;
+          line-height: 1.4;
+      }
+
+      .console-line {
+          margin-bottom: 4px;
+          white-space: pre-wrap;
+          word-break: break-all;
+      }
+
+      .console-line.info {
+          color: #d4d4d4;
+      }
+
+      .console-line.log {
+          color: #d4d4d4;
+      }
+
+      .console-line.warn {
+          color: var(--vscode-yellow);
+      }
+
+      .console-line.error {
+          color: var(--vscode-red);
+      }
+
+      .console-line.success {
+          color: var(--vscode-green);
+      }
+
+      .console-line.blue {
+          color: var(--vscode-blue);
+      }
+
+      .console-input-area {
+          display: flex;
+          border-top: 1px solid var(--vscode-border);
+          padding: 8px 16px;
+          align-items: center;
+      }
+
+      .console-prompt {
+          color: var(--vscode-green);
+          margin-right: 8px;
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 14px;
+      }
+
+      .console-error {
+        color: var(--vscode-red);
+        margin-right: 8px;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 14px;
+    }
+
 
 /* Metrics Panel */
 .metrics-panel {
