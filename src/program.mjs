@@ -22,6 +22,20 @@ class Program {
   constructor() {
   }
 
+  test(expectedOutput) {
+    for (let i = 0; i < expectedOutput.length; i++) {
+      const exp = expectedOutput[i]
+      const out = this.outQ[i];
+
+      if (exp != out) {
+        this.logger.push({ type: 'error', value: "incorrect answer" })
+        return
+      }
+    }
+    this.logger.push({ type: 'message', value: "PASSED!!!" })
+    
+  }
+
   reset(inQ) {
     this.line = 0;
     this.status = STATUS.READY;
