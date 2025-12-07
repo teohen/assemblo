@@ -3,9 +3,9 @@ import Parser from "./parser.mjs";
 import Evaluator from "./evaluator.mjs";
 
 const STATUS = {
-  READY:"ready",
-  RUNNING:"running",
-  ENDED:"ended",
+  READY: "ready",
+  RUNNING: "running",
+  ENDED: "ended",
 }
 
 class Program {
@@ -17,6 +17,7 @@ class Program {
   outQ;
   running;
   status;
+  logger;
 
   constructor() {
   }
@@ -24,6 +25,8 @@ class Program {
   reset(inQ) {
     this.line = 0;
     this.status = STATUS.READY;
+
+    this.logger = [];
 
     this.debugging = false;
     this.registers = new Map();
@@ -41,12 +44,24 @@ class Program {
     this.memory.set(tokens.MEMORY.mx2, undefined);
 
     this.parser = new Parser();
-    this.evaluator = new Evaluator(this.inQ, this.outQ, this.registers, this.memory);
+    this.evaluator = new Evaluator(
+      this.inQ,
+      this.outQ,
+      this.registers,
+      this.memory,
+      this.logger
+    );
   }
 
   prepareEval(code) {
-    const operations = this.parser.parse(code)
-    this.evaluator.operations = operations
+    try {
+      const operations = this.parser.parse(code)
+      this.evaluator.operations = operations
+    } catch (error) {
+      console.log("ERROE")
+      throw error
+    }
+
   }
 
   run(code) {
@@ -55,13 +70,20 @@ class Program {
     this.line = 1
 
     while (true) {
-      this.line = this.evaluator.tick(this.line)
-      if (this.line < 0) {
+      try {
+        this.line = this.evaluator.tick(this.line)
+        if (this.line < 0) {
+          this.status = STATUS.ENDED;
+          break;
+        }
+        this.line += 1;
+      } catch (error) {
+        this.logger.push({ type: 'error', value: error.message })
         this.status = STATUS.ENDED;
         break;
       }
-      this.line += 1;
     }
+
     this.status = STATUS.ENDED;
   }
 

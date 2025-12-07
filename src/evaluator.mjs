@@ -1,7 +1,7 @@
 import tokens from "./tokens.mjs";
 import Argument from "./argument.mjs";
 
-class Runner {
+class Evaluator {
   lines;
   registers;
   memory;
@@ -11,15 +11,14 @@ class Runner {
   operations;
 
 
-  constructor(inQ, outQ, registers, memory) {
+  constructor(inQ, outQ, registers, memory, logger) {
     if (!Array.isArray(inQ) && inQ.length == 0) {
       throw new Error("InQ should be a non empty array")
     }
 
-    this.end = false;
-
     this.registers = registers;
     this.memory = memory;
+    this.logger = logger;
 
     this.inQ = inQ;
     this.outQ = outQ;
@@ -204,8 +203,8 @@ class Runner {
 
     const result = this.registers.get(arg1.intern);
 
-    console.log("PRINT: ", result);
 
+    this.logger.push({type: 'message', value: result})
     return 0;
   }
 
@@ -217,9 +216,13 @@ class Runner {
     return -2;
   }
 
-tick(line) {
+  tick(line) {
     const op = this.operations[line - 1];
     const f = this[op.funcName];
+
+    if (!f) {
+      throw new Error(`Unexpected Error. Function (${op.funcName}) not found`)
+    }
 
     switch (op.type) {
       case tokens.FUNCTION_TYPES.FLOW:
@@ -235,4 +238,4 @@ tick(line) {
   }
 }
 
-export default Runner;
+export default Evaluator;

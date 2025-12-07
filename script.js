@@ -5,6 +5,7 @@ import Program from "./src/program.mjs";
 const runBtn = document.getElementById('runBtn');
 const debugBtn = document.getElementById('debugBtn');
 const nextLineBtn = document.getElementById('nextLineBtn');
+const consoleElem = document.getElementById("consoleOutput")
 
 CodeMirror.defineSimpleMode("your-custom-mode", {
   start: [
@@ -59,7 +60,15 @@ const codes = {
  CPY: mx1, r1
  CPY: mx2, r2
  PRT: r0
- END`
+ END`,
+ printAll: `START
+POP: r0, INPUT
+JMP_U: 8, r0
+PRT: r0
+JMP_N: 2, r0
+JMP_P: 2, r0
+JMP_Z: 2, r0
+END`
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -114,8 +123,8 @@ nextLineBtn.addEventListener("click", () => {
 function updateUi(p) {
 
   // TODO: FIX THE HIGHLIGHTING PROBLEM
-  editor.addLineClass(p.line - 1, "background", "highlighted-line");
-  editor.removeLineClass(p.line - 2, "background", "highlighted-line");
+  // editor.addLineClass(p.line - 1, "background", "highlighted-line");
+  // editor.removeLineClass(p.line - 2, "background", "highlighted-line");
 
   document.getElementById('codeLine').innerHTML = p.line;
   document.getElementById('statusMetric').innerHTML = p.status;
@@ -130,4 +139,19 @@ function updateUi(p) {
   document.getElementById("registersTable").lastElementChild.children[0].innerHTML = p.registers.get("R0X") || ""
   document.getElementById("registersTable").lastElementChild.children[1].innerHTML = p.registers.get("R1X") || ""
   document.getElementById("registersTable").lastElementChild.children[2].innerHTML = p.registers.get("R2X") || ""
+
+  consoleElem.replaceChildren();
+  for (const log of p.logger) {
+    consoleElem.appendChild(newConsoleOuput(log))
+  }
+
+  consoleElem.scrollTop = consoleElem.scrollHeight;
+}
+
+function newConsoleOuput(log) {
+  const output = document.createElement("div")
+  output.className = log.type == 'error' ? "console-error" : "console-prompt"
+  output.innerText = "> " + log.value
+  
+  return output
 }
