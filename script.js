@@ -125,3 +125,10 @@ function updateUi(p) {
   document.getElementById("registersTable").lastElementChild.children[1].innerHTML = p.registers.get("R1X") || ""
   document.getElementById("registersTable").lastElementChild.children[2].innerHTML = p.registers.get("R2X") || ""
 }
+
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+
+        const productName = urlParams.get('code');
+        console.log(productName);
