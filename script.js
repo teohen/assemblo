@@ -40,17 +40,18 @@ var editor = CodeMirror(document.getElementById("editor-code-mirror"), {
 });
 
 
-const noNegatives = `START
-POP: r0, INPUT
-JMP_U: 9, r0
-JMP_N: 2, r0
-PUSH: OUTPUT, r0
-PRT: r0
-JMP_P: 2, r0
-JMP_Z: 2, r0
-END`
+const codes = {
+  noNegatives: `START
+  POP: r0, INPUT
+  JMP_U: 9, r0
+  JMP_N: 2, r0
+  PUSH: OUTPUT, r0
+  PRT: r0
+  JMP_P: 2, r0
+  JMP_Z: 2, r0
+  END`,
 
-const deb = `START
+  deb: `START
  POP: r0, INPUT
  POP: r1, INPUT
  POP: r2, INPUT
@@ -58,15 +59,18 @@ const deb = `START
  CPY: mx1, r1
  CPY: mx2, r2
  PRT: r0
- END`;
+ END`
+}
 
 const urlParams = new URLSearchParams(window.location.search);
 const cParam = urlParams.get('code');
 
 if (cParam) {
-  editor.setValue(cParam)
-} else {
-  editor.setValue(noNegatives)
+  if (codes[cParam]) {
+    editor.setValue(codes[cParam])
+  }else {
+    editor.setValue(cParam)
+  }
 }
 
 const q = [1, -2, 3, -4, 5];
@@ -89,7 +93,7 @@ runBtn.addEventListener('click', function () {
 
 debugBtn.addEventListener('click', function () {
   p.reset(q)
-  
+
   if (!p.debugging) {
     p.prepareEval(editor.getValue());
   }
