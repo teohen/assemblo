@@ -1,34 +1,36 @@
 import tokens from "./tokens.mjs";
-import Argument from "./argument.mjs";
 import Parser from "./parser.mjs";
-import Runner from "./runner.mjs";
+import Evaluator from "./evaluator.mjs";
+
+const STATUS = {
+  READY:"ready",
+  RUNNING:"running",
+  ENDED:"ended",
+}
 
 class Program {
   parser;
-  runner;
+  evaluator;
   registers;
   memory;
   inQ;
   outQ;
   running;
+  status;
 
-  constructor(inQ) {
-    if (!Array.isArray(inQ) || inQ.length == 0) {
-      throw new Error("InQ should be a non empty array")
-    }
+  constructor() {
+  }
 
+  reset(inQ) {
     this.line = 0;
-    this.running = false;
-    this.debugging = false;
+    this.status = STATUS.READY;
 
+    this.debugging = false;
     this.registers = new Map();
     this.memory = new Map();
 
     this.inQ = inQ;
     this.outQ = [];
-
-    this.registers = new Map();
-    this.memory = new Map();
 
     this.registers.set(tokens.REGISTERS.r0, undefined);
     this.registers.set(tokens.REGISTERS.r1, undefined);
@@ -39,49 +41,41 @@ class Program {
     this.memory.set(tokens.MEMORY.mx2, undefined);
 
     this.parser = new Parser();
-    this.runner = new Runner(this.inQ, this.outQ, this.registers, this.memory, this.running);
-  }
-
-  resetProgram() {
-    this.runner = []
-    this.runner.operations = [];
-    this.running = false;
-    this.line = 1
+    this.evaluator = new Evaluator(this.inQ, this.outQ, this.registers, this.memory);
   }
 
   prepareEval(code) {
     const operations = this.parser.parse(code)
-    this.runner.operations = operations
-    this.running = true
-    this.line = 1
+    this.evaluator.operations = operations
   }
-
 
   run(code) {
     this.prepareEval(code)
+    this.status = STATUS.RUNNING;
+    this.line = 1
 
     while (true) {
-      this.line = this.runner.tick(this.line)
+      this.line = this.evaluator.tick(this.line)
       if (this.line < 0) {
-        this.running = false;
+        this.status = STATUS.ENDED;
         break;
       }
       this.line += 1;
     }
-    this.running = false
+    this.status = STATUS.ENDED;
   }
 
-  nextLine(code) {
-    if (code) this.prepareEval(code)
+  nextLine() {
+    if (this.status == STATUS.ENDED) return;
 
+    this.line += 1
+    this.status = STATUS.RUNNING;
+    this.line = this.evaluator.tick(this.line)
     if (this.line < 0) {
-      this.running = false;
+      this.status = STATUS.ENDED;
       return;
     }
 
-    this.line = this.runner.tick(this.line)
-    
-    this.line += 1
   }
 }
 

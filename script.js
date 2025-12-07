@@ -40,17 +40,18 @@ var editor = CodeMirror(document.getElementById("editor-code-mirror"), {
 });
 
 
-const noNegatives = `START
-POP: r0, INPUT
-JMP_U: 9, r0
-JMP_N: 2, r0
-PUSH: OUTPUT, r0
-PRT: r0
-JMP_P: 2, r0
-JMP_Z: 2, r0
-END`
+const codes = {
+  noNegatives: `START
+  POP: r0, INPUT
+  JMP_U: 9, r0
+  JMP_N: 2, r0
+  PUSH: OUTPUT, r0
+  PRT: r0
+  JMP_P: 2, r0
+  JMP_Z: 2, r0
+  END`,
 
-const deb = `START
+  deb: `START
  POP: r0, INPUT
  POP: r1, INPUT
  POP: r2, INPUT
@@ -58,13 +59,18 @@ const deb = `START
  CPY: mx1, r1
  CPY: mx2, r2
  PRT: r0
- END`;
+ END`
+}
 
 const urlParams = new URLSearchParams(window.location.search);
 const cParam = urlParams.get('code');
 
 if (cParam) {
-  editor.setValue(cParam)
+  if (codes[cParam]) {
+    editor.setValue(codes[cParam])
+  }else {
+    editor.setValue(cParam)
+  }
 }
 
 const q = [1, -2, 3, -4, 5];
@@ -75,7 +81,8 @@ const p = new Program(q)
 runBtn.addEventListener('click', function () {
   this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Running...';
   const q = [1, -2, 3, -4, 5];
-  const p = new Program(q)
+  const p = new Program();
+  p.reset(q);
   p.run(editor.getValue())
 
   updateUi(p);
@@ -85,15 +92,12 @@ runBtn.addEventListener('click', function () {
 });
 
 debugBtn.addEventListener('click', function () {
+  p.reset(q)
+
   if (!p.debugging) {
     p.prepareEval(editor.getValue());
-  } else {
-
-    for (let i = 0; i < p.runner.operations.length; i++) {
-      editor.removeLineClass(i, "background", "highlighted-line");
-    }
-    p.resetProgram()
   }
+
   p.debugging = !p.debugging
 
   updateUi(p)
@@ -114,7 +118,7 @@ function updateUi(p) {
   editor.removeLineClass(p.line - 2, "background", "highlighted-line");
 
   document.getElementById('codeLine').innerHTML = p.line;
-  document.getElementById('statusMetric').innerHTML = p.running ? "running" : "stopped";
+  document.getElementById('statusMetric').innerHTML = p.status;
   document.getElementById('cpuCycles').innerHTML = 0;
   document.getElementById('inputMetric').innerHTML = p.inQ;
   document.getElementById('outputMetric').innerHTML = p.outQ;
