@@ -61,7 +61,7 @@ const codes = {
  CPY: mx2, r2
  PRT: r0
  END`,
- printAll: `START
+  printAll: `START
 POP: r0, INPUT
 JMP_U: 8, r0
 PRT: r0
@@ -77,13 +77,13 @@ const cParam = urlParams.get('code');
 if (cParam) {
   if (codes[cParam]) {
     editor.setValue(codes[cParam])
-  }else {
+  } else {
     editor.setValue(cParam)
   }
 }
 
 const q = [1, -2, 3, -4, 5];
-const p = new Program(q)
+const p = new Program()
 
 
 // Button actions
@@ -93,6 +93,7 @@ runBtn.addEventListener('click', function () {
   const p = new Program();
   p.reset(q);
   p.run(editor.getValue())
+  p.test([5, 3, 1])
 
   updateUi(p);
 
@@ -152,6 +153,6 @@ function newConsoleOuput(log) {
   const output = document.createElement("div")
   output.className = log.type == 'error' ? "console-error" : "console-prompt"
   output.innerText = "> " + log.value
-  
+
   return output
 }
