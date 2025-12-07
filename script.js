@@ -60,10 +60,12 @@ const deb = `START
  PRT: r0
  END`;
 
+const urlParams = new URLSearchParams(window.location.search);
+const cParam = urlParams.get('code');
 
-editor.setValue(deb);
-
-
+if (cParam) {
+  editor.setValue(cParam)
+}
 
 const q = [1, -2, 3, -4, 5];
 const p = new Program(q)
