@@ -221,7 +221,7 @@ class Evaluator {
     const f = this[op.funcName];
 
     if (!f) {
-      throw new Error('Program failed')
+      throw new Error(`Unexpected Error. Function (${op.funcName}) not found`)
     }
 
     switch (op.type) {
