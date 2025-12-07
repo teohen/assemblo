@@ -87,10 +87,10 @@ debugBtn.addEventListener('click', function () {
     p.prepareEval(editor.getValue());
   } else {
 
-    for (let i = 0; i < p.runner.operations.length; i++) {
+    for (let i = 0; i < p.evaluator.operations.length; i++) {
       editor.removeLineClass(i, "background", "highlighted-line");
     }
-    p.resetProgram()
+    p.reset()
   }
   p.debugging = !p.debugging
 
