@@ -65,6 +65,8 @@ const cParam = urlParams.get('code');
 
 if (cParam) {
   editor.setValue(cParam)
+} else {
+  editor.setValue(noNegatives)
 }
 
 const q = [1, -2, 3, -4, 5];
@@ -75,7 +77,8 @@ const p = new Program(q)
 runBtn.addEventListener('click', function () {
   this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Running...';
   const q = [1, -2, 3, -4, 5];
-  const p = new Program(q)
+  const p = new Program();
+  p.reset(q);
   p.run(editor.getValue())
 
   updateUi(p);
@@ -85,15 +88,12 @@ runBtn.addEventListener('click', function () {
 });
 
 debugBtn.addEventListener('click', function () {
+  p.reset(q)
+  
   if (!p.debugging) {
     p.prepareEval(editor.getValue());
-  } else {
-
-    for (let i = 0; i < p.evaluator.operations.length; i++) {
-      editor.removeLineClass(i, "background", "highlighted-line");
-    }
-    p.reset()
   }
+
   p.debugging = !p.debugging
 
   updateUi(p)
@@ -114,7 +114,7 @@ function updateUi(p) {
   editor.removeLineClass(p.line - 2, "background", "highlighted-line");
 
   document.getElementById('codeLine').innerHTML = p.line;
-  document.getElementById('statusMetric').innerHTML = p.running ? "running" : "stopped";
+  document.getElementById('statusMetric').innerHTML = p.status;
   document.getElementById('cpuCycles').innerHTML = 0;
   document.getElementById('inputMetric').innerHTML = p.inQ;
   document.getElementById('outputMetric').innerHTML = p.outQ;

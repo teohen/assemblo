@@ -18,12 +18,7 @@ class Program {
   running;
   status;
 
-  constructor(inQ) {
-    if (!Array.isArray(inQ) || inQ.length == 0) {
-      throw new Error("InQ should be a non empty array")
-    }
-
-    this.reset(inQ)
+  constructor() {
   }
 
   reset(inQ) {
@@ -52,13 +47,12 @@ class Program {
   prepareEval(code) {
     const operations = this.parser.parse(code)
     this.evaluator.operations = operations
-    this.status = STATUS.RUNNING;
-    this.line = 1
   }
-
 
   run(code) {
     this.prepareEval(code)
+    this.status = STATUS.RUNNING;
+    this.line = 1
 
     while (true) {
       this.line = this.evaluator.tick(this.line)
@@ -71,18 +65,17 @@ class Program {
     this.status = STATUS.ENDED;
   }
 
-  nextLine(code) {
-    if (code) this.prepareEval(code)
-
+  nextLine() {
     if (this.status == STATUS.ENDED) return;
 
+    this.line += 1
+    this.status = STATUS.RUNNING;
     this.line = this.evaluator.tick(this.line)
     if (this.line < 0) {
       this.status = STATUS.ENDED;
       return;
     }
-    
-    this.line += 1
+
   }
 }
 
