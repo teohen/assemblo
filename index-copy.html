@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Editor with Metrics - VS Code Style</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.css" />
+  <link rel="stylesheet" href="styles-copy.css">
+</head>
+
+<body>
+  <div class="container">
+    <!-- Left Panel: Code Editor -->
+    <div class="editor-panel">
+      <div class="editor-header">
+        <div class="file-tabs">
+        </div>
+        <div class="editor-actions">
+          <button class="editor-btn" id="runBtn">
+            <i class="fas fa-play"></i> Run
+          </button>
+          <button class="editor-btn" id="debugBtn">
+            <i class="fas fa-debug"></i> Debug
+          </button>
+          <button hidden="true" class="editor-btn" id="nextLineBtn">
+            <i class="fas fa-play"></i> NextLine
+          </button>
+
+        </div>
+      </div>
+
+      <div class="editor-container">
+        <div class="editor-wrapper">
+          <div id="editor-code-mirror"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Metrics Dashboard -->
+    <div class="metrics-panel">
+      <div class="metrics-header">
+        <h2><i class="fas fa-chart-bar"></i> Code Metrics & Analysis</h2>
+      </div>
+
+      <div class="metrics-container">
+        <!-- Code Metrics Section -->
+        <div class="metric-section">
+          <div class="section-title">
+            <i class="fas fa-calculator"></i> Code Metrics
+          </div>
+
+          <div class="metric-card blue">
+            <div class="metric-name">Line</div>
+            <div class="metric-value" id="codeLine"></div>
+          </div>
+
+          <div class="metric-card green">
+            <div class="metric-name">Status</div>
+            <div class="metric-value" id="statusMetric"></div>
+          </div>
+
+          <div class="metric-card yellow">
+            <div class="metric-name">Estimated CPU Cycles</div>
+            <div class="metric-value" id="cpuCycles"></div>
+          </div>
+
+          <div class="metric-card purple">
+            <div class="metric-name">Input</div>
+            <div class="metric-value" id="inputMetric"></div>
+          </div>
+
+          <div class="metric-card purple">
+            <div class="metric-name">Output</div>
+            <div class="metric-value" id="outputMetric"></div>
+          </div>
+        </div>
+
+        <!-- Registers Section -->
+        <div class="metric-section">
+          <div class="section-title">
+            <i class="fas fa-microchip"></i> CPU Registers
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>REG #1</th>
+                <th>REG #2</th>
+                <th>REG #3</th>
+            </thead>
+            <tbody id="registersTable">
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Memory Slots Section -->
+        <div class="metric-section">
+          <div class="section-title">
+            <i class="fas fa-memory"></i> Memory Slots
+          </div>
+
+          <table>
+            <thead>
+              <th>MEM ADDR #1</th>
+              <th>MEM ADDR #2</th>
+              <th>MEM ADDR #3</th>
+            </thead>
+            <tbody id="memoryTable">
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="status-item">
+          <i class="fas fa-circle" style="color: #4ec9b0;"></i>
+          <span>ASM</span>
+        </div>
+        <div class="status-item">
+          <i class="fas fa-clock"></i>
+          <span>Metrics update in real-time</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/addon/mode/simple.min.js"></script>
+  <script type="module" src="./script-copy.js"> </script>
+</body>
+
+</html>
