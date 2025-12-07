@@ -1,5 +1,10 @@
 import Program from "./src/program.mjs";
 
+// DOM Elements
+
+const runBtn = document.getElementById('runBtn');
+const debugBtn = document.getElementById('debugBtn');
+const nextLineBtn = document.getElementById('nextLineBtn');
 
 CodeMirror.defineSimpleMode("your-custom-mode", {
   start: [
@@ -29,11 +34,10 @@ CodeMirror.defineSimpleMode("your-custom-mode", {
   ],
 });
 
-var editor = CodeMirror(document.getElementById("editor-container"), {
+var editor = CodeMirror(document.getElementById("editor-code-mirror"), {
   lineNumbers: true,
   mode: "your-custom-mode",
 });
-
 
 
 const noNegatives = `START
@@ -64,19 +68,21 @@ editor.setValue(deb);
 const q = [1, -2, 3, -4, 5];
 const p = new Program(q)
 
-const runButton = document.getElementById("runButton")
-const debugButton = document.getElementById("debugButton")
-const nextLineButton = document.getElementById("nextLineButton")
 
-runButton.addEventListener("click", () => {
+// Button actions
+runBtn.addEventListener('click', function () {
+  this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Running...';
   const q = [1, -2, 3, -4, 5];
   const p = new Program(q)
   p.run(editor.getValue())
 
   updateUi(p);
+
+
+  this.innerHTML = '<i class="fas fa-play"></i> Run';
 });
 
-debugButton.addEventListener("click", () => {
+debugBtn.addEventListener('click', function () {
   if (!p.debugging) {
     p.prepareEval(editor.getValue());
   } else {
@@ -84,32 +90,34 @@ debugButton.addEventListener("click", () => {
     updateUi(p)
   }
 
+  updateUi(p)
   p.debugging = !p.debugging
-  nextLineButton.hidden = !nextLineButton.hidden
-  runButton.hidden = !runButton.hidden
+  nextLineBtn.hidden = !nextLineBtn.hidden
+  runBtn.hidden = !runBtn.hidden
   editor.setOption("readOnly", !editor.options.readOnly)
 });
 
-nextLineButton.addEventListener("click", () => {
+nextLineBtn.addEventListener("click", () => {
   p.nextLine()
   updateUi(p)
 });
 
 function updateUi(p) {
-  editor.addLineClass(p.line - 1, "background", "highlighted-line");
+
+  editor.addLineClass(p.line- 1, "background", "highlighted-line");
   editor.removeLineClass(p.line - 2, "background", "highlighted-line");
 
-  document.getElementById("code-line").lastElementChild.innerHTML = p.line
-  document.getElementById("running").lastElementChild.innerHTML = p.running
-  document.getElementById("input-q").lastElementChild.innerHTML = p.inQ
-  document.getElementById("output-q").lastElementChild.innerHTML = p.outQ
-  
-  document.getElementById("reg-table").children[0].innerHTML = p.registers.get("R0X")
-  document.getElementById("reg-table").children[1].innerHTML = p.registers.get("R1X")
-  document.getElementById("reg-table").children[2].innerHTML = p.registers.get("R2X")
+  document.getElementById('codeLine').innerHTML = p.line;
+  document.getElementById('statusMetric').innerHTML = p.running ? "running" : "stopped";
+  document.getElementById('cpuCycles').innerHTML = 0;
+  document.getElementById('inputMetric').innerHTML = p.inQ;
+  document.getElementById('outputMetric').innerHTML = p.outQ;
 
-  document.getElementById("mem-table").children[0].innerHTML = p.memory.get("MX0")
-  document.getElementById("mem-table").children[1].innerHTML = p.memory.get("MX1")
-  document.getElementById("mem-table").children[2].innerHTML = p.memory.get("MX2")
+  document.getElementById("memoryTable").lastElementChild.children[0].innerHTML = p.memory.get("MX0") || ""
+  document.getElementById("memoryTable").lastElementChild.children[1].innerHTML = p.memory.get("MX1") || ""
+  document.getElementById("memoryTable").lastElementChild.children[2].innerHTML = p.memory.get("MX2") || ""
 
+  document.getElementById("registersTable").lastElementChild.children[0].innerHTML = p.registers.get("R0X") || ""
+  document.getElementById("registersTable").lastElementChild.children[1].innerHTML = p.registers.get("R1X") || ""
+  document.getElementById("registersTable").lastElementChild.children[2].innerHTML = p.registers.get("R2X") || ""
 }
