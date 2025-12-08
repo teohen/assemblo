@@ -42,7 +42,6 @@ class Program {
 
     this.logger = [];
 
-    // this.debugging = false;
     this.registers = new Map();
     this.memory = new Map();
 
