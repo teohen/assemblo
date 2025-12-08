@@ -22,7 +22,7 @@ function createListItem(ch) {
   elDiv.appendChild(elH5)
 
   const elA = document.createElement("a");
-  elA.href = `/coder?challenge=${ch.id}`;
+  elA.href = `coder?challenge=${ch.id}`;
   elA.className = "list-group-item list-group-item-action"
   elA.appendChild(elDiv)
   elA.appendChild(elP)
