@@ -32,7 +32,7 @@ class Program {
         return
       }
     }
-    this.logger.push({ type: 'message', value: "PASSED!!!" })
+    this.logger.push({ type: 'success', value: "PASSED!!!" })
     
   }
 
