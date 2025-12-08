@@ -42,7 +42,7 @@ class Program {
 
     this.logger = [];
 
-    this.debugging = false;
+    // this.debugging = false;
     this.registers = new Map();
     this.memory = new Map();
 
@@ -79,6 +79,7 @@ class Program {
   }
 
   run(code) {
+    if (!code) return;
     this.prepareEval(code)
     this.status = STATUS.RUNNING;
     this.line = 1
@@ -102,7 +103,7 @@ class Program {
   }
 
   nextLine() {
-    if (this.status == STATUS.ENDED) return;
+    if (this.status == STATUS.ENDED || this.parser.code == "") return;
 
     this.line += 1
     this.status = STATUS.RUNNING;

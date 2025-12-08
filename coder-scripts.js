@@ -18,18 +18,6 @@ let p;
 let inputStack;
 let expected;
 
-const noNegatives = `START
-  POP: r0, INPUT
-  JMP_U: 9, r0
-  JMP_N: 2, r0
-  PUSH: OUTPUT, r0
-  PRT: r0
-  JMP_P: 2, r0
-  JMP_Z: 2, r0
-  END`;
-
-editor.setValue(noNegatives)
-
 if (paramChallenge) {
   const challenge = challenges[paramChallenge]
   inputStack = challenge.input
@@ -43,8 +31,6 @@ if (paramChallenge) {
   }
 }
 
-
-// Button actions
 runBtn.addEventListener('click', function () {
   const code = editor.getValue();
 
@@ -54,13 +40,13 @@ runBtn.addEventListener('click', function () {
   // p.test(expected)
 
   updateUi(p);
-
-
   this.innerHTML = '<i class="fas fa-play"></i> Run';
 });
 
 debugBtn.addEventListener('click', function () {
   p.reset(inputStack)
+
+
 
   if (!p.debugging) {
     p.prepareEval(editor.getValue());
@@ -72,6 +58,8 @@ debugBtn.addEventListener('click', function () {
   nextLineBtn.hidden = !nextLineBtn.hidden
   runBtn.hidden = !runBtn.hidden
   editor.setOption("readOnly", !editor.options.readOnly)
+  if (p.debugging !== undefined && p.debugging) debugBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Debugging...';
+  else debugBtn.innerHTML = '<i class="fas fa-bug"></i> Debug';
 });
 
 nextLineBtn.addEventListener("click", () => {
@@ -107,12 +95,9 @@ function createChallengeInfo(c) {
   const elemTitle = document.createElement("h3")
   elemTitle.innerText = c.title
 
-  const elemDescription = document.createElement("h4")
-  elemDescription.innerText = c.description
-
   const elemText = document.createElement("p")
   elemText.innerText = c.text
-  return [elemTitle, elemDescription, elemText]
+  return [elemTitle, elemText]
 }
 
 function createConsoleOuput(log) {
@@ -120,7 +105,7 @@ function createConsoleOuput(log) {
   output.classList.add('alert')
   output.role = "alert"
 
-  switch(log.type) {
+  switch (log.type) {
     case "error":
       output.classList.add('alert-danger')
       break;

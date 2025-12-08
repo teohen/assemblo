@@ -4,155 +4,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Code Editor with Metrics - VS Code Style</title>
+  <title>Assemblo</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.css" />
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 
 <body>
   <div class="container">
-    <!-- Left Panel: Code Editor -->
-    <div class="editor-panel">
-      <div class="editor-header">
-        <div class="file-tabs">
-        </div>
-        <div class="editor-actions">
-          <button class="editor-btn" id="runBtn">
-            <i class="fas fa-play"></i> Run
-          </button>
-          <button class="editor-btn" id="debugBtn">
-            <i class="fas fa-debug"></i> Debug
-          </button>
-          <button hidden="true" class="editor-btn" id="nextLineBtn">
-            <i class="fas fa-play"></i> NextLine
-          </button>
-
-        </div>
-      </div>
-
-      <div class="editor-container">
-        <div class="editor-wrapper">
-          <div id="editor-code-mirror"></div>
-        </div>
-      </div>
-
-      <!-- Console Output Section -->
-      <div class="console-section">
-        <div class="console-header">
-          <div class="console-title">
-            <i class="fas fa-terminal"></i> CONSOLE
-          </div>
-          <div class="console-actions">
-          </div>
-        </div>
-
-        <div class="console-output" id="consoleOutput">
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Panel: Metrics Dashboard -->
-    <div class="metrics-panel">
-      <div class="metrics-header">
-        <h2><i class="fas fa-chart-bar"></i> Code Metrics & Analysis</h2>
-      </div>
-
-      <div class="metrics-container">
-        <!-- Code Metrics Section -->
-        <div class="metric-section">
-          <div class="section-title">
-            <i class="fas fa-calculator"></i> Code Metrics
-          </div>
-
-          <div class="metric-card blue">
-            <div class="metric-name">Line</div>
-            <div class="metric-value" id="codeLine"></div>
-          </div>
-
-          <div class="metric-card green">
-            <div class="metric-name">Status</div>
-            <div class="metric-value" id="statusMetric"></div>
-          </div>
-
-          <div class="metric-card yellow">
-            <div class="metric-name">Estimated CPU Cycles</div>
-            <div class="metric-value" id="cpuCycles"></div>
-          </div>
-
-          <div class="metric-card purple">
-            <div class="metric-name">Input</div>
-            <div class="metric-value" id="inputMetric"></div>
-          </div>
-
-          <div class="metric-card purple">
-            <div class="metric-name">Output</div>
-            <div class="metric-value" id="outputMetric"></div>
-          </div>
-        </div>
-
-        <!-- Registers Section -->
-        <div class="metric-section">
-          <div class="section-title">
-            <i class="fas fa-microchip"></i> CPU Registers
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>REG #0</th>
-                <th>REG #1</th>
-                <th>REG #2</th>
-            </thead>
-            <tbody id="registersTable">
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Memory Slots Section -->
-        <div class="metric-section">
-          <div class="section-title">
-            <i class="fas fa-memory"></i> Memory Slots
-          </div>
-
-          <table>
-            <thead>
-              <th>MEM ADDR #1</th>
-              <th>MEM ADDR #2</th>
-              <th>MEM ADDR #3</th>
-            </thead>
-            <tbody id="memoryTable">
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="footer">
-        <div class="status-item">
-          <i class="fas fa-circle" style="color: #4ec9b0;"></i>
-          <span>ASM</span>
-        </div>
-        <div class="status-item">
-          <i class="fas fa-clock"></i>
-          <span>Metrics update in real-time</span>
-        </div>
-      </div>
-    </div>
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom"> <a href="/"
+        class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"> <span
+          class="fs-4"><i class="fas fa-code"></i> Assemblo</span> </a>
+      <ul class="nav nav-pills">
+        <li class="nav-item"><a href="/index.html" class="nav-link" aria-current="page"><i class="fas fa-home"></i>
+            Home</a></li>
+        <li class="nav-item"><a href="/coder.html" class="nav-link"><i class="fas fa-file-code"></i> Coder</a></li>
+      </ul>
+    </header>
   </div>
+  <div class="container">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/addon/mode/simple.min.js"></script>
-  <script type="module" src="./script.js"> </script>
+    <div class="row">
+      <h1 class="h2">Introduction</h1>
+      Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's
+      standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a
+      type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
+      remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing
+      Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions
+      of Lorem Ipsum.
+    </div>
+
+    <div class="row">
+      <h2>Challenges</h2>
+      <div id="challengeList" class="list-group scrollable-list border rounded">
+      </div>
+    </div>
+
+  </div>
+  <div class="container">
+    <footer class="py-4 mt-5">
+      <div class="row">
+        
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <h5 class="mb-3"><i class="fas fa-code"></i> Assemblo</h5>
+          <p class="text-muted">A platform for coding challenges and developer resources. Build, learn, and grow with
+            our community.</p>
+        </div>
+        <div class="col-lg-6 col-md-6">
+          <h5 class="mb-3">Connect With The Developer</h5>
+          <p class="text-muted mb-3">Contact me on social media for updates, coding tips, and community discussions.</p>
+
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <a href="https://github.com/teohen" class="social-link" target="_blank" title="GitHub">
+              <i class="fab fa-github"></i>
+            </a>
+            <a href="https://twitter.com/teteodev" class="social-link" target="_blank" title="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/teodoro-sampaio-957aa3128/" class="social-link" target="_blank" title="LinkedIn">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4 pt-3 border-top">
+        <div class="col-md-6 text-center text-md-start">
+          <p class="text-muted mb-0">2025 Assemblo</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script type="module" src="./script.mjs"></script>
 </body>
 
 </html>
