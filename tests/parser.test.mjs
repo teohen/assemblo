@@ -18,7 +18,7 @@ describe("parser suite", () => {
   }
 
   describe("SUCCESS INSTRUCTIONS", () => {
-    it(".only should parse the POP instructions", () => {
+    it("should parse the POP instructions", () => {
       const tests = [
         { in: `POP: r0, INPUT`, expArg1Lit: "r0" },
         { in: `POP: r1, INPUT`, expArg1Lit: "r1" },
@@ -26,27 +26,27 @@ describe("parser suite", () => {
       ]
 
       for (const t of tests) {
-        const p = new Parser(t.in);
+        const p = new Parser();
         const operations = p.parse(t.in)
 
         assert.equal(operations.length, 1);
         const op = operations[0]
 
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, "POP");
+        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.POP);
 
         const arg1 = op.args[0];
         testArgument(arg1, tokens.ARG_TYPES.REG, t.expArg1Lit);
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.INP, "INPUT");
+        testArgument(arg2, tokens.ARG_TYPES.LIST, "INPUT");
       }
     });
 
     it("should parse the PUSH instructions", () => {
       const tests = [
-        { in: `PUSH: OUTPUT, r0`, expArg1Lit: "r0" },
-        { in: `PUSH: OUTPUT, r1`, expArg1Lit: "r1" },
-        { in: `PUSH: OUTPUT, r2`, expArg1Lit: "r2" },
+        { in: `PUSH: OUTPUT, r0`, expArg2Lit: "r0" },
+        { in: `PUSH: OUTPUT, r1`, expArg2Lit: "r1" },
+        { in: `PUSH: OUTPUT, r2`, expArg2Lit: "r2" },
       ];
 
       for (const t of tests) {
@@ -56,13 +56,13 @@ describe("parser suite", () => {
         assert.equal(operations.length, 1);
         const op = operations[0]
 
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, "PUSH");
+        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.PUSH);
 
         const arg1 = op.args[0];
-        testArgument(arg1, tokens.ARG_TYPES.OUT, "OUTPUT");
+        testArgument(arg1, tokens.ARG_TYPES.LIST, "OUTPUT");
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.REG, t.expArg1Lit);
+        testArgument(arg2, tokens.ARG_TYPES.REG, t.expArg2Lit);
       }
     });
 
@@ -88,7 +88,7 @@ describe("parser suite", () => {
         assert.equal(operations.length, 1);
         const op = operations[0]
 
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, "CPY");
+        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.CPY);
 
         const arg1 = op.args[0];
         testArgument(arg1, tokens.ARG_TYPES.MEM, t.expArg1Lit);
@@ -100,18 +100,18 @@ describe("parser suite", () => {
 
     it("should parse the JMP instructions", () => {
       const tests = [
-        { in: "JMP_N: 7, r0", fn: "JMP_N", arg2Lit: "r0" },
-        { in: "JMP_N: 7, r1", fn: "JMP_N", arg2Lit: "r1" },
-        { in: "JMP_N: 7, r2", fn: "JMP_N", arg2Lit: "r2" },
-        { in: "JMP_P: 7, r0", fn: "JMP_P", arg2Lit: "r0" },
-        { in: "JMP_P: 7, r1", fn: "JMP_P", arg2Lit: "r1" },
-        { in: "JMP_P: 7, r2", fn: "JMP_P", arg2Lit: "r2" },
-        { in: "JMP_Z: 7, r0", fn: "JMP_Z", arg2Lit: "r0" },
-        { in: "JMP_Z: 7, r1", fn: "JMP_Z", arg2Lit: "r1" },
-        { in: "JMP_Z: 7, r2", fn: "JMP_Z", arg2Lit: "r2" },
-        { in: "JMP_U: 7, r0", fn: "JMP_U", arg2Lit: "r0" },
-        { in: "JMP_U: 7, r1", fn: "JMP_U", arg2Lit: "r1" },
-        { in: "JMP_U: 7, r2", fn: "JMP_U", arg2Lit: "r2" },
+        { in: "JMP_N: 7, r0", fn: tokens.FUNCTIONS.JMP_N, arg2Lit: "r0" },
+        { in: "JMP_N: 7, r1", fn: tokens.FUNCTIONS.JMP_N, arg2Lit: "r1" },
+        { in: "JMP_N: 7, r2", fn: tokens.FUNCTIONS.JMP_N, arg2Lit: "r2" },
+        { in: "JMP_P: 7, r0", fn: tokens.FUNCTIONS.JMP_P, arg2Lit: "r0" },
+        { in: "JMP_P: 7, r1", fn: tokens.FUNCTIONS.JMP_P, arg2Lit: "r1" },
+        { in: "JMP_P: 7, r2", fn: tokens.FUNCTIONS.JMP_P, arg2Lit: "r2" },
+        { in: "JMP_Z: 7, r0", fn: tokens.FUNCTIONS.JMP_Z, arg2Lit: "r0" },
+        { in: "JMP_Z: 7, r1", fn: tokens.FUNCTIONS.JMP_Z, arg2Lit: "r1" },
+        { in: "JMP_Z: 7, r2", fn: tokens.FUNCTIONS.JMP_Z, arg2Lit: "r2" },
+        { in: "JMP_U: 7, r0", fn: tokens.FUNCTIONS.JMP_U, arg2Lit: "r0" },
+        { in: "JMP_U: 7, r1", fn: tokens.FUNCTIONS.JMP_U, arg2Lit: "r1" },
+        { in: "JMP_U: 7, r2", fn: tokens.FUNCTIONS.JMP_U, arg2Lit: "r2" },
       ];
 
 
@@ -153,7 +153,7 @@ describe("parser suite", () => {
 
         assert.equal(operations.length, 1);
         const op = p.operations[0];
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, "ADD");
+        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.ADD);
 
         const arg1 = op.args[0];
         testArgument(arg1, tokens.ARG_TYPES.REG, t.arg1Lit);
@@ -185,7 +185,7 @@ describe("parser suite", () => {
         assert.equal(operations.length, 1);
         const op = operations[0]
 
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, "LOAD");
+        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.LOAD);
 
         const arg1 = op.args[0];
         testArgument(arg1, tokens.ARG_TYPES.REG, t.expArg1Lit);
@@ -215,7 +215,7 @@ describe("parser suite", () => {
         assert.equal(operations.length, 1);
 
         const op = p.operations[0];
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, "SUB");
+        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.SUB);
 
         const arg1 = op.args[0];
         testArgument(arg1, tokens.ARG_TYPES.REG, t.arg1Lit);
@@ -225,7 +225,7 @@ describe("parser suite", () => {
       }
     });
 
-    it(" should parse the START instructions", () => {
+    it("should parse the START instructions", () => {
       const tests = [
         { in: "START"},
       ];
@@ -237,7 +237,7 @@ describe("parser suite", () => {
         assert.equal(operations.length, 1);
 
         const op = p.operations[0];
-        testOperation(op, 1, tokens.FUNCTION_TYPES.FLOW, 0, "startFn");
+        testOperation(op, 1, tokens.FUNCTION_TYPES.FLOW, 0, tokens.FUNCTIONS.START);
       }
     });
 
