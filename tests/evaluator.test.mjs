@@ -532,7 +532,7 @@ describe("Evaluator suite", () => {
   });
 
   describe("ERROR", () => {
-    it(".only should throw if function doesnt exist", () => {
+    it(" should throw if function doesnt exist", () => {
       const randonFName = chance.word();
 
       const input = [];
@@ -570,7 +570,7 @@ describe("Evaluator suite", () => {
       assert.equal(error.message, `Unexpected Error. Function (${randonFName}) not found`)
     });
 
-    it(".only should throw if line number is invalid for all JMP operations", () => {
+    it(" should throw if line number is invalid for all JMP operations", () => {
       const tests = [
         { a1: tokens.FUNCTIONS.JMP_N },
         { a1: tokens.FUNCTIONS.JMP_P },
