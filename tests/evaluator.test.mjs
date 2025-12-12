@@ -322,16 +322,15 @@ describe("Evaluator suite", () => {
         const registers = new Map();
         registers.set(tokens.REGISTERS[t.a1], expRegisterValue);
         const memory = new Map();
-        const line = 1;
+        const line = chance.integer({ min: 0, max: 50 });
         const logger = [];
 
         const args = [
           new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
         ];
 
-        const operations = [
-          new Operation(line, tokens.FUNCTIONS.PRT, args, tokens.FUNCTION_TYPES.PROC)
-        ];
+        const operations = [];
+        operations[line - 1] = new Operation(line, tokens.FUNCTIONS.PRT, args, tokens.FUNCTION_TYPES.PROC)
 
         const eva = new Evaluator(
           input,
@@ -350,7 +349,7 @@ describe("Evaluator suite", () => {
       }
     });
 
-    it(" should evaluate the JMP_N operation", () => {
+    it(".only should evaluate the JMP_N operation", () => {
       const tests = [
         { a1: "r0", regV: -1, expLine: 2 },
         { a1: "r0", regV: 1, expLine: 1 },
@@ -372,13 +371,14 @@ describe("Evaluator suite", () => {
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.NUM, expectedLineNumber, expectedLineNumber),
+          new Argument(tokens.ARG_TYPES.NUM, 3, 3),
           new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
         ];
 
         const operations = [
           new Operation(line, tokens.FUNCTIONS.JMP_N, args, tokens.FUNCTION_TYPES.FLOW),
-          new Operation(line + 1, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
+          new Operation(line + 1, tokens.FUNCTIONS.PRT, [args[1]], tokens.FUNCTION_TYPES.PROC),
+          new Operation(line + 2, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
         ];
 
         const eva = new Evaluator(
@@ -417,12 +417,13 @@ describe("Evaluator suite", () => {
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.NUM, expectedLineNumber, expectedLineNumber),
+          new Argument(tokens.ARG_TYPES.NUM, 3, 3),
           new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
         ];
 
         const operations = [
           new Operation(line, tokens.FUNCTIONS.JMP_P, args, tokens.FUNCTION_TYPES.FLOW),
+          new Operation(line + 1, tokens.FUNCTIONS.PRT, [args[1]], tokens.FUNCTION_TYPES.PROC),
           new Operation(line + 1, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
         ];
 
@@ -462,12 +463,13 @@ describe("Evaluator suite", () => {
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.NUM, expectedLineNumber, expectedLineNumber),
+          new Argument(tokens.ARG_TYPES.NUM, 3, 3),
           new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
         ];
 
         const operations = [
           new Operation(line, tokens.FUNCTIONS.JMP_Z, args, tokens.FUNCTION_TYPES.FLOW),
+          new Operation(line + 1, tokens.FUNCTIONS.PRT, [args[1]], tokens.FUNCTION_TYPES.PROC),
           new Operation(line + 1, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
         ];
 
@@ -507,12 +509,13 @@ describe("Evaluator suite", () => {
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.NUM, expectedLineNumber, expectedLineNumber),
+          new Argument(tokens.ARG_TYPES.NUM, 3, 3),
           new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
         ];
 
         const operations = [
           new Operation(line, tokens.FUNCTIONS.JMP_U, args, tokens.FUNCTION_TYPES.FLOW),
+          new Operation(line + 1, tokens.FUNCTIONS.PRT, [args[1]], tokens.FUNCTION_TYPES.PROC),
           new Operation(line + 1, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
         ];
 
