@@ -129,7 +129,7 @@ describe("PROGRAM suite", () => {
 
   });
 
-  it(".only should execute the nextLine", () => {
+  it(" should execute the nextLine", () => {
     const fakeCode = 'FAKE CODE';
     const lineReturn = chance.integer({ min: 1, max: 100 })
     const input = [1];
@@ -148,7 +148,7 @@ describe("PROGRAM suite", () => {
 
   });
 
-  it(".only should execute the nextLine and update status if return line is negative", () => {
+  it(" should execute the nextLine and update status if return line is negative", () => {
     const fakeCode = 'FAKE CODE';
     const lineReturn = chance.integer({ min: -100, max: -1 })
     const input = [1];
@@ -166,7 +166,7 @@ describe("PROGRAM suite", () => {
     assert.equal(tickSpy.mock.callCount(), 1)
   });
 
-  it(".only should not run the code if its is not correclty parsed", () => {
+  it(" should not run the code if its is not correclty parsed", () => {
     const fakeCode = 'FAKE CODE';
     const input = [1]
     const p = new Program();
@@ -185,7 +185,7 @@ describe("PROGRAM suite", () => {
     assert.equal(p.evaluator.operations.length, 0)
   });
 
-  it(".only should run the code if correctly parsed", () => {
+  it(" should run the code if correctly parsed", () => {
     const fakeCode = 'FAKE CODE';
     let lineReturn = 1
     const input = [1]
@@ -206,7 +206,7 @@ describe("PROGRAM suite", () => {
     assert.equal(tickSpy.mock.callCount(), 2)
   });
 
-  it(".only should run the code if correctly parsed", () => {
+  it(" should run the code if correctly parsed", () => {
     const fakeCode = 'FAKE CODE';
     let lineReturn = 1
     const input = [1]
