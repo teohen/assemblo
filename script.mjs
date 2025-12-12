@@ -18,7 +18,7 @@ function createListItem(ch) {
   elH5.innerText = ch.title
 
   const elDiv = document.createElement("div")
-  elDiv.className = "d-flex w-100 justify-content-between black-color"
+  elDiv.className = "d-flex w-100 justify-content-between"
   elDiv.appendChild(elH5)
 
   const elA = document.createElement("a");
@@ -31,3 +31,27 @@ function createListItem(ch) {
 }
 
 renderChallenges()
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const themeToggle = document.getElementById('themeToggle');
+  const htmlElement = document.documentElement;
+
+  const savedTheme = localStorage.getItem('theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  if (savedTheme === 'dark') {
+    htmlElement.setAttribute('data-bs-theme', 'dark');
+  }
+
+
+  themeToggle.addEventListener('click', function () {
+    if (htmlElement.getAttribute('data-bs-theme') === 'dark') {
+      htmlElement.setAttribute('data-bs-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    } else {
+      htmlElement.setAttribute('data-bs-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+});

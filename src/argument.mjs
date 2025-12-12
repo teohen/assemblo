@@ -3,6 +3,7 @@ class Argument {
   literal;
 
   constructor(type, literal, intern) {
+    if (!type || !literal || !intern) throw new Error('Args required: type, literal and intern')
     this.type = type;
     this.literal = literal;
     this.intern = intern;

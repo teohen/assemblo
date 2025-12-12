@@ -42,24 +42,19 @@ class Parser {
       return new Argument(tokens.ARG_TYPES.MEM, arg, tokens.MEMORY[arg]);
     }
 
-    if (arg == "INPUT") {
-      return new Argument(tokens.ARG_TYPES.INP, arg);
+    if (arg in tokens.LISTS) {
+      return new Argument(tokens.ARG_TYPES.LIST, arg, tokens.LISTS[arg]);
     }
-
-    if (arg == "OUTPUT") {
-      return new Argument(tokens.ARG_TYPES.OUT, arg);
-    }
-
     
-    if (arg.length == 1 && Number.isInteger(parseInt(arg))) {
-      return new Argument(tokens.ARG_TYPES.NUM, parseInt(arg));
+    if (/^[1-9]\d*$/.test(arg)) {
+      return new Argument(tokens.ARG_TYPES.NUM, parseInt(arg), parseInt(arg));
     }
 
     throw new Error(`AT LINE: ${lineNum}. UNKNOWN ARGUMENT: ${arg}`);
   }
 
   parseLine(line, num) {
-    const op = new Operation(num, undefined, undefined, undefined);
+    const op = new Operation(num, undefined, [], undefined);
 
     const ONE_ARGS = ["PRT"];
     const parts = line.split(":");

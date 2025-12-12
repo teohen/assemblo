@@ -7,6 +7,7 @@
   <title>Assemblo</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.1/theme/monokai.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link rel="stylesheet" href="./coder.css" />
@@ -27,6 +28,7 @@
           <a href="coder.html" class="nav-link">
             <i class="fas fa-file-code"></i> Coder</a>
         </li>
+        <button class="btn btn-outline-secondary" id="themeToggle"><i class="fa-solid fa-moon"></i></button>
       </ul>
     </header>
   </div>
@@ -34,10 +36,9 @@
   <div class="container">
     <div class="col-12 col-lg">
       <div id="challengeInfo"></div>
-
       <div class="row">
         <div class="table-responsive">
-          <table class="table table-striped table-sm">
+          <table class="table table-striped table-sm text-center">
             <thead>
               <tr>
                 <th scope="col">Line</th>
@@ -49,11 +50,11 @@
             </thead>
             <tbody>
               <tr id="codeInfo">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>_</td>
+                <td>_</td>
+                <td>_</td>
+                <td>_</td>
+                <td>_</td>
               </tr>
             </tbody>
           </table>
@@ -63,13 +64,16 @@
       <div class="row editor-container">
         <div class="col-12 col-lg">
           <button id="runBtn">
-            <i class="fas fa-play"></i> Run code
+            <i class="fas fa-play"></i> Run
           </button>
           <button hidden="true" id="nextLineBtn">
-            <i class="fas fa-play"></i> NextLine
+            <i class="fas fa-play"></i> Next line
           </button>
           <button id="debugBtn">
             <i class="fas fa-bug"></i> Debug
+          </button>
+          <button id="restoreBtn">
+            <i class="fas fa-refresh"></i> Restore
           </button>
         </div>
 
@@ -106,9 +110,9 @@
             </thead>
             <tbody>
               <tr id="registersTable">
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>_</td>
+                <td>_</td>
+                <td>_</td>
               </tr>
             </tbody>
           </table>
@@ -127,9 +131,9 @@
             </thead>
             <tbody>
               <tr id="memoryTable">
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>_</td>
+                <td>_</td>
+                <td>_</td>
               </tr>
             </tbody>
           </table>

@@ -7,7 +7,7 @@ class Operation {
   constructor(line, funcName, args, type) {
     this.line = line;
     this.funcName = funcName;
-    this.args = args = [];
+    this.args = args;
     this.type = type;
   }
 }

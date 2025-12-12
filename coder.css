@@ -1,3 +1,13 @@
 .scrollable-row {
   height: 200px;
 }
+
+.yellow-line {
+  background-color: #ffff00;
+  opacity: 0.5;
+}
+
+.red-line {
+  background-color: #ff1100;
+  opacity: 0.5;
+}

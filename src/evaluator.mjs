@@ -2,22 +2,22 @@ import tokens from "./tokens.mjs";
 import Argument from "./argument.mjs";
 
 class Evaluator {
-  lines;
-  registers;
-  memory;
   inQ;
   outQ;
-  line;
+  registers;
+  memory;
   operations;
+  logger;
 
 
-  constructor(inQ, outQ, registers, memory, logger) {
+  constructor(inQ, outQ, registers, memory, operations, logger) {
     if (!Array.isArray(inQ) && inQ.length == 0) {
       throw new Error("InQ should be a non empty array")
     }
 
     this.registers = registers;
     this.memory = memory;
+    this.operations = operations
     this.logger = logger;
 
     this.inQ = inQ;
@@ -45,13 +45,13 @@ class Evaluator {
     const arg2 = args[1];
 
     Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.INP, ln);
+    Argument.validateType(arg2, tokens.ARG_TYPES.LIST, ln);
 
     const result = this.inQ.pop();
 
     this.registers.set(arg1.intern, result);
 
-    return 0;
+    return ln;
   }
 
   cpyFn(args, ln) {
@@ -81,7 +81,7 @@ class Evaluator {
 
     const val = this.registers.get(arg2.intern);
 
-    if (val < 0) return arg1.literal - 1;
+    if (val < 0) return arg1.intern -1;
 
     return ln;
   }
@@ -100,7 +100,7 @@ class Evaluator {
 
     const val = this.registers.get(arg2.intern);
 
-    if (val > 0) return arg1.literal - 1;
+    if (val > 0) return arg1.intern-1;
 
     return ln;
   }
@@ -119,7 +119,7 @@ class Evaluator {
 
     const val = this.registers.get(arg2.intern);
 
-    if (val == 0) return arg1.literal - 1;
+    if (val == 0) return arg1.intern-1;
 
     return ln;
   }
@@ -138,7 +138,7 @@ class Evaluator {
 
     const val = this.registers.get(arg2.intern);
 
-    if (val == undefined) return arg1.literal - 1;
+    if (val == undefined) return arg1.intern-1;
 
     return ln;
   }
@@ -161,7 +161,7 @@ class Evaluator {
     const arg1 = args[0];
     const arg2 = args[1];
 
-    Argument.validateType(arg1, tokens.ARG_TYPES.OUT, ln);
+    Argument.validateType(arg1, tokens.ARG_TYPES.LIST, ln);
     Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
 
     const result = this.registers.get(arg2.intern);
@@ -177,7 +177,7 @@ class Evaluator {
     Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
     Argument.validateType(arg2, tokens.ARG_TYPES.MEM, ln);
 
-    const result = this.registers.get(arg2.intern);
+    const result = this.memory.get(arg2.intern);
     this.registers.set(arg1.intern, result);
     return 0;
   }
@@ -205,7 +205,7 @@ class Evaluator {
 
 
     this.logger.push({type: 'message', value: result})
-    return 0;
+    return ln;
   }
 
   startFn(args, ln) {
@@ -213,7 +213,7 @@ class Evaluator {
   }
 
   endFn(args, ln) {
-    return -2;
+    return -1;
   }
 
   tick(line) {

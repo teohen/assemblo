@@ -26,11 +26,15 @@ const MEMORY = {
   mx2: "MX2",
 }
 
+const LISTS = {
+  INPUT: "INP_LIST",
+  OUTPUT: "OUT_LIST"
+}
+
 const ARG_TYPES = {
   MEM: "MEM",
   REG: "REG",
-  INP: "INP",
-  OUT: "OUT",
+  LIST: "LST",
   NUM: "NUM",
 }
 
@@ -44,5 +48,6 @@ export default {
   REGISTERS,
   MEMORY,
   ARG_TYPES,
-  FUNCTION_TYPES
+  FUNCTION_TYPES,
+  LISTS
 }
