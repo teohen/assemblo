@@ -307,7 +307,7 @@ describe("Evaluator suite", () => {
       }
     });
 
-    it(" should evaluate the PRT operation", () => {
+    it("should evaluate the PRT operation", () => {
       const tests = [
         { a1: "r0" },
         { a1: "r1" },
@@ -349,7 +349,7 @@ describe("Evaluator suite", () => {
       }
     });
 
-    it(".only should evaluate the JMP_N operation", () => {
+    it("should evaluate the JMP_N operation", () => {
       const tests = [
         { a1: "r0", regV: -1, expLine: 2 },
         { a1: "r0", regV: 1, expLine: 1 },
