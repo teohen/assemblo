@@ -217,6 +217,7 @@ describe("Evaluator suite", () => {
         { a1: "r1", a2: "r2" },
         { a1: "r2", a2: "r0" },
         { a1: "r2", a2: "r1" },
+        { a1: "r2", a2: "r1" },
       ]
 
       for (let t of tests) {
@@ -535,7 +536,7 @@ describe("Evaluator suite", () => {
   });
 
   describe("ERROR", () => {
-    it(" should throw if function doesnt exist", () => {
+    it("should show error if function doesnt exist", () => {
       const randonFName = chance.word();
 
       const input = [];
@@ -562,15 +563,12 @@ describe("Evaluator suite", () => {
         logger
       );
 
-      let error;
+      const newLine = eva.tick(line)
 
-      try {
-        eva.tick(line)
-      } catch (err) {
-        error = err
-      }
-
-      assert.equal(error.message, `Unexpected Error. Function (${randonFName}) not found`)
+      assert.equal(newLine, -1);
+      assert.equal(logger.length, 1);
+      assert.equal(logger[0].type, 'error');
+      assert.equal(logger[0].value, `At line ${line}. Instruction (${randonFName}) not found`);
     });
 
     it(" should throw if line number is invalid for all JMP operations", () => {
@@ -619,6 +617,96 @@ describe("Evaluator suite", () => {
         }
 
         assert.equal(error.message, `AT LINE: 1. CAN'T JUMP TO INVALID LINE: ${expectedLineNumber}`)
+      }
+    });
+
+    it("should not ADD the values if one of them are undefined", () => {
+      const tests = [
+        { a1: chance.integer({ min: 0, max: 100 }), a2: undefined },
+        { a1: undefined, a2: chance.integer({ min: 0, max: 100 }) },
+      ]
+
+      for (let t of tests) {
+        const input = [];
+        const output = [];
+        const registers = new Map();
+        registers.set(tokens.REGISTERS.r0, t.a1);
+        registers.set(tokens.REGISTERS.r1, t.a2);
+
+        const memory = new Map();
+        const line = 1;
+        const logger = [];
+
+        const args = [
+          new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+        ];
+
+        const operations = [
+          new Operation(line, tokens.FUNCTIONS.ADD, args, tokens.FUNCTION_TYPES.PROC)
+        ];
+
+        const eva = new Evaluator(
+          input,
+          output,
+          registers,
+          memory,
+          operations,
+          logger
+        );
+
+        const newLine = eva.tick(line)
+        assert.equal(registers.get(tokens.REGISTERS.r0), t.a1);
+        assert.equal(registers.get(tokens.REGISTERS.r1), t.a2);
+        assert.equal(newLine, -1);
+        assert.equal(logger.length, 1);
+        assert.equal(logger[0].type, 'error');
+        assert.equal(logger[0].value, `At line ${line}. Argument should be a valid integer.`);
+      }
+    });
+
+    it("should not SUB the values if one of them are undefined", () => {
+      const tests = [
+        { a1: chance.integer({ min: 0, max: 100 }), a2: undefined },
+        { a1: undefined, a2: chance.integer({ min: 0, max: 100 }) },
+      ]
+
+      for (let t of tests) {
+        const input = [];
+        const output = [];
+        const registers = new Map();
+        registers.set(tokens.REGISTERS.r0, t.a1);
+        registers.set(tokens.REGISTERS.r1, t.a2);
+
+        const memory = new Map();
+        const line = 1;
+        const logger = [];
+
+        const args = [
+          new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+        ];
+
+        const operations = [
+          new Operation(line, tokens.FUNCTIONS.SUB, args, tokens.FUNCTION_TYPES.PROC)
+        ];
+
+        const eva = new Evaluator(
+          input,
+          output,
+          registers,
+          memory,
+          operations,
+          logger
+        );
+
+        const newLine = eva.tick(line)
+        assert.equal(registers.get(tokens.REGISTERS.r0), t.a1);
+        assert.equal(registers.get(tokens.REGISTERS.r1), t.a2);
+        assert.equal(newLine, -1);
+        assert.equal(logger.length, 1);
+        assert.equal(logger[0].type, 'error');
+        assert.equal(logger[0].value, `At line ${line}. Argument should be a valid integer.`);
       }
     });
   })
