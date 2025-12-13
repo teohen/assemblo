@@ -40,3 +40,27 @@ for (const i of allinstructions) {
 }
 
 ui.renderDocContent(docs[paramItem])
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const themeToggle = document.getElementById('themeToggle');
+  const htmlElement = document.documentElement;
+
+  const savedTheme = localStorage.getItem('theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  if (savedTheme === 'dark') {
+    htmlElement.setAttribute('data-bs-theme', 'dark');
+  }
+
+
+  themeToggle.addEventListener('click', function () {
+    if (htmlElement.getAttribute('data-bs-theme') === 'dark') {
+      htmlElement.setAttribute('data-bs-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    } else {
+      htmlElement.setAttribute('data-bs-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+});

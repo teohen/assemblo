@@ -1,4 +1,4 @@
-import challenges from "./challenges.mjs";
+import challenges from "./challenges/challenges.mjs";
 
 const listElem = document.getElementById("challengeList");
 

@@ -1,7 +1,7 @@
-import Program, { status } from "./src/program.mjs";
-import challenges from "./challenges.mjs";
+import Program, { status } from "../src/program.mjs";
+import challenges from "../challenges/challenges.mjs";
 import editor from "./codemirror.mjs";
-import ui from "./ui-scripts.mjs"
+import ui from "./ui.mjs"
 
 const runBtn = document.getElementById('runBtn');
 const debugBtn = document.getElementById('debugBtn');
