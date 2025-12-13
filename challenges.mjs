@@ -3,7 +3,7 @@ const challenges = {
     title: "No Negatives",
     id: "no-negatives",
     description: "Don't send any negative numbers to the output!",
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+    text: "Write a program that process an INPUT list of integers and outtputs a list containing only the non-negative integers from the INPUT list. Constraints: The INPUT list will contain integers ranging from -100 to 100. The output must be a list of positive integers only, presented in the same order from the INPUT list",
     input: [1, -2, 3, -4, 5],
     expected: [5, 3, 1]
   },
