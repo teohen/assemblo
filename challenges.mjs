@@ -3,7 +3,10 @@ const challenges = {
     title: "No Negatives",
     id: "no-negatives",
     description: "Don't send any negative numbers to the output!",
-    text: "Write a program that process an INPUT list of integers and outtputs a list containing only the non-negative integers from the INPUT list. Constraints: The INPUT list will contain integers ranging from -100 to 100. The output must be a list of positive integers only, presented in the same order from the INPUT list",
+    text: `<p>Write a program that process an INPUT list of integers and outtputs a list containing only the non-negative integers from the INPUT list. </p>
+    <p><strong>Constraints</strong>: The INPUT list will contain integers ranging from -100 to 100.</p>
+    <p><strong>Result</strong>: The output must be a list of positive integers only, presented in the same order from the INPUT list.</p>
+    `,
     input: [1, -2, 3, -4, 5],
     expected: [5, 3, 1]
   },

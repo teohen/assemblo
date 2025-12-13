@@ -5,6 +5,7 @@ import register from "./registers.mjs";
 import memory from "./memory.mjs";
 import list from "./lists.mjs";
 import err from "./errors.mjs";
+import assemblo from "./assemblo.mjs";
 import allinstructions from "./instructions-set.mjs"
 
 const docs = {}
@@ -14,6 +15,7 @@ docs[register.name] = register;
 docs[memory.name] = memory;
 docs[list.name] = list;
 docs[err.name] = err;
+docs[assemblo.name] = assemblo;
 
 for (const i of allinstructions) {
   docs[i.name] = i
@@ -24,6 +26,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const paramItem = urlParams.get('item');
 
 
+ui.renderDocList(docs['assemblo']);
 ui.renderDocList(docs['registers']);
 ui.renderDocList(docs['memory']);
 ui.renderDocList(docs['arguments']);

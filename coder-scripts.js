@@ -20,9 +20,11 @@ if (paramChallenge) {
   inputStack = challenge.input
   expected = challenge.expected
   ui.renderChallengeInfo(challenge)
+  
 }
 
 p.reset(inputStack)
+ui.renderCodeInfo(p, inputStack)
 
 runBtn.addEventListener('click', function () {
   const code = editor.getValue();

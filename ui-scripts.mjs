@@ -7,11 +7,11 @@ const registersTable = document.getElementById("registersTable")
 const memoryTable = document.getElementById("memoryTable")
 
 function renderCodeInfo(p, inputStack) {
-  codeInfo.children[0].innerText = p.line;
-  codeInfo.children[1].innerText = p.status;
+  codeInfo.children[0].innerText = p.line || '_';
+  codeInfo.children[1].innerText = p.status || '_';
   codeInfo.children[2].innerText = 0
-  codeInfo.children[3].innerText = inputStack;
-  codeInfo.children[4].innerText = p.outQ;
+  codeInfo.children[3].innerText = inputStack ?  '[' + inputStack + ']' : '[]';
+  codeInfo.children[4].innerText = p.outQ || '_';
 }
 
 function renderRegistersMemoryInfo(p) {
@@ -45,7 +45,7 @@ function createChallengeInfo(c) {
   elemTitle.innerText = c.title
 
   const elemText = document.createElement("p")
-  elemText.innerText = c.text
+  elemText.innerHTML = c.text
   return [elemTitle, elemText]
 }
 
