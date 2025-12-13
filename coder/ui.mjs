@@ -95,17 +95,19 @@ function removePaintEditorLine(lineNumber, colorClass) {
   editor.removeLineClass(lineNumber, "background", colorClass);
 }
 
-function enableDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn) {
+function enableDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn, submitBtn) {
 runBtn.hidden = true
 nextLineBtn.hidden = false
 restoreBtn.hidden = true
+submitBtn.hidden = true
 updateIcon(debugBtn, 'Debugging ... (click to cancel)', 'spin')
 }
 
-function disabelDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn) {
+function disabelDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn, submitBtn) {
   runBtn.hidden = false
   nextLineBtn.hidden = true
   restoreBtn.hidden = false
+  submitBtn.hidden = true
   updateIcon(debugBtn, 'Debug', 'bug')
   }
 

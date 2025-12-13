@@ -7,6 +7,7 @@ const runBtn = document.getElementById('runBtn');
 const debugBtn = document.getElementById('debugBtn');
 const nextLineBtn = document.getElementById('nextLineBtn');
 const restoreBtn = document.getElementById('restoreBtn');
+const submitBtn = document.getElementById('submitBtn');
 
 const urlParams = new URLSearchParams(window.location.search);
 const paramChallenge = urlParams.get('challenge');
@@ -20,7 +21,7 @@ if (paramChallenge) {
   inputStack = challenge.input
   expected = challenge.expected
   ui.renderChallengeInfo(challenge)
-  
+
 }
 
 p.reset(inputStack)
@@ -42,10 +43,10 @@ runBtn.addEventListener('click', function () {
 debugBtn.addEventListener('click', function () {
   if (p.status === status.READY) {
     p.prepareOperations(editor.getValue())
-    ui.enableDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn)
+    ui.enableDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn, submitBtn)
   } else {
     p.reset(inputStack)
-    ui.disabelDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn)
+    ui.disabelDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn, submitBtn)
   }
 
   ui.renderConsoleOutput(p)
@@ -71,4 +72,13 @@ restoreBtn.addEventListener("click", () => {
   ui.renderRegistersMemoryInfo(p);
   ui.renderConsoleOutput(p);
   ui.updateIcon(debugBtn, 'Debug', 'bug')
+})
+
+submitBtn.addEventListener("click", () => {
+  const code = editor.getValue();;
+  p.reset(inputStack);
+  p.run(code);
+  p.test(expected);
+
+  ui.renderConsoleOutput(p)
 })

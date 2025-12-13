@@ -22,11 +22,13 @@ describe("PROGRAM suite", () => {
     const input = [1]
     const p = new Program();
     p.reset(input)
+
     assert.equal(p.line, 0);
     assert.equal(p.status, status.READY);
     assert.equal(p.logger.length, 0);
     assert.equal(p.inQ.length, input.length)
     assert.equal(p.inQ[0], input[0])
+    assert.equal(p.inQ !== input, true)
     assert.equal(p.registers.has(tokens.REGISTERS.r0), true)
     assert.equal(p.registers.has(tokens.REGISTERS.r1), true)
     assert.equal(p.registers.has(tokens.REGISTERS.r2), true)
