@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.1/theme/monokai.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="./coder.css" />
+  <link rel="stylesheet" href="/coder/styles.css" />
 </head>
 
 <body>
@@ -78,6 +78,10 @@
           </button>
           <button id="restoreBtn">
             <i class="fas fa-refresh"></i> Restore
+          </button>
+
+          <button id="submitBtn">
+            <i class="fas fa-check-circle"></i> Submit
           </button>
         </div>
 
@@ -154,7 +158,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.0/addon/mode/simple.min.js"></script>
-  <script type="module" src="./coder-scripts.js"> </script>
+  <script type="module" src="/coder/script.mjs"> </script>
 </body>
 
 </html>

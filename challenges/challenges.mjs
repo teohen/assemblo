@@ -16,7 +16,7 @@ const challenges = {
     description: "Can't send number unless it's negative!",
     text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
     input: [1, -2, 3, -4, 5],
-    expected: [5, 3, 1]
+    expected: [-4, -2]
   },
 }
 

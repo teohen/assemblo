@@ -53,7 +53,7 @@ class Program {
     this.registers = new Map();
     this.memory = new Map();
 
-    this.inQ = inQ;
+    this.inQ = inQ.slice();
     this.outQ = [];
     this.logger = [];
 
