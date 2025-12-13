@@ -25,7 +25,7 @@ const doc = {
     <h2>Lists as Arguments</h2>
 
     <p>
-        Lists are used as <a href="/docs?item=arguments">arguments</a> in specific <a href="/docs?item=instructions">instructions</a>  such as (<a href="/docs?item=pop">POP</a>, <a href="/docs?item=push">PUSH</a>) to move data from/to them.
+        Lists are used as <a href="docs?item=arguments">arguments</a> in specific <a href="docs?item=instructions">instructions</a>  such as (<a href="docs?item=pop">POP</a>, <a href="docs?item=push">PUSH</a>) to move data from/to them.
     </p>
 
     <pre>POP: r1, INPUT</pre>
