@@ -1,4 +1,4 @@
-const docs = {
+const doc = {
   name: 'lists',
   description: `<p>
         Lists are special data storage entities that hold multiple values and enforce a strict, queue-based dynamic for data management. They are used to handle sequential data input and output for the program.
@@ -36,4 +36,4 @@ const docs = {
     `
 }
 
-export default { docs };
+export default doc;

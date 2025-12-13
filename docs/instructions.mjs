@@ -1,73 +1,5 @@
-const list = [
-  {
-    id: 1,
-    name: "START",
-    description: "Initialize the project."
 
-  },
-  {
-    id: 2,
-    name: "END",
-    description: "Install dependencies."
-  },
-  {
-    id: 3,
-    name: "POP",
-    description: "Configure settings."
-  },
-  {
-    id: 4,
-    name: "PUSH",
-    description: "Write code."
-  },
-  {
-    id: 5,
-    name: "CPY",
-    description: "Test the application."
-  },
-  {
-    id: 1,
-    name: "JMP_N",
-    description: "Initialize the project."
-  },
-  {
-    id: 2,
-    name: "JMP_P",
-    description: "Install dependencies."
-  },
-  {
-    id: 3,
-    name: "JMP_Z",
-    description: "Configure settings."
-  },
-  {
-    id: 4,
-    name: "JMP_U",
-    description: "Write code."
-  },
-  {
-    id: 5,
-    name: "ADD",
-    description: "Test the application."
-  },
-  {
-    id: 1,
-    name: "SUB",
-    description: "Initialize the project."
-  },
-  {
-    id: 2,
-    name: "LOAD",
-    description: "Install dependencies."
-  },
-  {
-    id: 3,
-    name: "PRT",
-    description: "Configure settings."
-  },
-];
-
-const docs = {
+const doc = {
   name: 'instructions',
   description: `<p>
         A instruction in Assemblo is a command that take <a href="/docs?item=arguments">argument</a> and tells the program to execute a operation to store, process or move data between the programs entities (<a href="/docs?item=registers">registers</a>, <a href="/docs?item=memory">memory</a>, <a href="/docs?item=list">list</a>) based on the arguments.
@@ -98,4 +30,4 @@ const docs = {
     <pre>PRT: r0</pre>`
 }
 
-export default { docs, list };
+export default doc;

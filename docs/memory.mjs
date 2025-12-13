@@ -1,4 +1,4 @@
-const docs = {
+const doc = {
   name: 'memory',
   description: `<p>
         Memory in Assemblo are storage locations separate from the <a href="/docs?item=registers">registers</a>. It is used for longer-term data storage and retrieval within the program.
@@ -38,4 +38,4 @@ const docs = {
     <p><em>(The value from memory address <code>mx1</code> is loaded into register <code>r2</code>.)</em></p>`
 }
 
-export default { docs };
+export default doc;

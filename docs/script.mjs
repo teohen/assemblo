@@ -1,43 +1,39 @@
 import ui from "./ui.mjs";
-import instructionsDocs from "./instructions.mjs";
-import argumentsDocs from "./arguments.mjs";
-import registersDocs from "./registers.mjs";
-import memoryDocs from "./memory.mjs";
-import listDocs from "./lists.mjs";
+import instructions from "./instructions.mjs";
+import arg from "./arguments.mjs";
+import register from "./registers.mjs";
+import memory from "./memory.mjs";
+import list from "./lists.mjs";
+import err from "./errors.mjs";
+import allinstructions from "./instructions-set.mjs"
 
 const docs = {}
-docs[instructionsDocs.docs.name] = instructionsDocs.docs;
-docs[argumentsDocs.docs.name] = argumentsDocs.docs;
-docs[registersDocs.docs.name] = registersDocs.docs;
-docs[memoryDocs.docs.name] = memoryDocs.docs;
-docs[listDocs.docs.name] = listDocs.docs;
+docs[instructions.name] = instructions;
+docs[arg.name] = arg;
+docs[register.name] = register;
+docs[memory.name] = memory;
+docs[list.name] = list;
+docs[err.name] = err;
+
+for (const i of allinstructions) {
+  docs[i.name] = i
+}
+
 
 const urlParams = new URLSearchParams(window.location.search);
 const paramItem = urlParams.get('item');
 
-ui.renderDocList({
-  title: 'instructions',
-  items: []
-});
 
-ui.renderDocList({
-  title: 'arguments',
-  items: []
-});
+ui.renderDocList(docs['registers']);
+ui.renderDocList(docs['memory']);
+ui.renderDocList(docs['arguments']);
+ui.renderDocList(docs['lists']);
+ui.renderDocList(docs['errors']);
+ui.renderDocList(docs['instructions']);
 
-ui.renderDocList({
-  title: 'registers',
-  items: []
-});
-
-ui.renderDocList({
-  title: 'memory',
-  items: []
-});
-
-ui.renderDocList({
-  title: 'lists',
-  items: []
-});
+const instructionEle = document.getElementById('instructionsListTitle')
+for (const i of allinstructions) {
+  ui.renderDocListItem(instructionEle, i)
+}
 
 ui.renderDocContent(docs[paramItem])

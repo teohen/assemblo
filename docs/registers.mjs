@@ -1,4 +1,4 @@
-const docs = {
+const doc = {
   name: 'registers',
   description: `<p>
         Registers are storage locations directly within the program processor which are used to temporarily hold and process data.
@@ -32,4 +32,4 @@ const docs = {
     <p><em>(The value in <code>r0</code> is added to the value in <code>r1</code>, and the result is stored back in <code>r1</code>.)</em></p>`
 }
 
-export default { docs };
+export default doc;

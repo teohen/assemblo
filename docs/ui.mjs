@@ -1,42 +1,34 @@
 const docSideBar = document.getElementById('docSideBar');
 const docContent = document.getElementById('docContent')
 
-function createDocListItem(item) {
-  const aEl = document.createElement('a');
-  aEl.innerHTML = `<a href="/docs?item=${item.name}" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
-          <div class="d-flex w-100 align-items-center justify-content-between">
-            <strong class="mb-1">${item.name}</strong>
-          </div>
-        </a>`;
-
-  return aEl;
-}
-
-function createDocListItems(items) {
-  const divEl = document.createElement("div");
-  divEl.innerHTML = `<div class="list-group list-group-flush border-bottom scrollarea"></div>`;
-
-  for (const i of items) {
-    divEl.append(createDocListItem(i))
-  }
-
-  return divEl
-}
-
 function createDocListTitle(title) {
   const aEl = document.createElement('a');
-
-  aEl.innerHTML = `<a href="/docs?item=${title}" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-          <span class="fs-5 fw-semibold">${title}</span>
-        </a>`;
+  aEl.id = `${title}ListTitle`
+  aEl.href = `/docs?item=${title}`;
+  aEl.className = "list-group-item list-group-item-action"
+  aEl.innerHTML = `<span class="fs-5 fw-semibold">${title}</span>`;
   return aEl;
+}
+
+function createDocListItem(doc) {
+  const a = document.createElement('a')
+  a.href=`/docs?item=${doc.name}`
+
+  a.className = "mb-1 list-group-item"
+  a.innerText = doc.name
+  return a;
 }
 
 function renderDocList(doc) {
-  const docListTitle = createDocListTitle(doc.title);
-  const docListItems = createDocListItems(doc.items);
+  const docListTitle = createDocListTitle(doc.name);
   docSideBar.append(docListTitle);
-  docSideBar.append(docListItems);
+
+  if (!doc.items) return;
+}
+
+function renderDocListItem(elem, doc) {
+  const listItem = createDocListItem(doc)
+  elem.appendChild(listItem)
 }
 
 function renderDocContent(item) {
@@ -54,5 +46,6 @@ function renderDocContent(item) {
 
 export default {
   renderDocList,
+  renderDocListItem,
   renderDocContent
 }

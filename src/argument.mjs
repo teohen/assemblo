@@ -1,6 +1,7 @@
 class Argument {
   type;
   literal;
+  intern;
 
   constructor(type, literal, intern) {
     if (!type || !literal || !intern) throw new Error('Args required: type, literal and intern')

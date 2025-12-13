@@ -1,4 +1,4 @@
-const docs = {
+const doc = {
   name: 'arguments',
   description: `<p>
         Arguments define the data that an <a href="/docs?item=instructions">instruction</a> operates on. They specify the location of the data or the data itself.
@@ -28,4 +28,4 @@ const docs = {
     <pre>JPM_N: 2, r0</pre>`
 }
 
-export default { docs };
+export default doc;

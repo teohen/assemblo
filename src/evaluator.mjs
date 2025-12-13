@@ -64,7 +64,7 @@ class Evaluator {
     const result = this.registers.get(arg2.intern);
     this.memory.set(arg1.intern, result);
 
-    return 0;
+    return ln;
   }
 
   jmpNegFn(args, ln) {
@@ -150,11 +150,19 @@ class Evaluator {
     Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
     Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
 
-    const result =
-      this.registers.get(arg1.intern) + this.registers.get(arg2.intern);
+    const reg1 = this.registers.get(arg1.intern) 
+    const reg2 = this.registers.get(arg2.intern);
+
+    if (reg1 === undefined || reg2 === undefined) {
+      this.logger.push({type: 'error', value: `At line ${ln}. Argument should be a valid integer.`})
+      return -1;
+    }
+
+    const result = reg1 + reg2
+      
     this.registers.set(arg1.intern, result);
 
-    return 0;
+    return ln;
   }
 
   pushFn(args, ln) {
@@ -167,7 +175,7 @@ class Evaluator {
     const result = this.registers.get(arg2.intern);
     this.outQ.push(result);
 
-    return 0;
+    return ln;
   }
 
   loadFn(args, ln) {
@@ -179,7 +187,7 @@ class Evaluator {
 
     const result = this.memory.get(arg2.intern);
     this.registers.set(arg1.intern, result);
-    return 0;
+    return ln;
   }
 
   subFn(args, ln) {
@@ -189,11 +197,19 @@ class Evaluator {
     Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
     Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
 
-    const result =
-      this.registers.get(arg1.intern) - this.registers.get(arg2.intern);
+    const reg1 = this.registers.get(arg1.intern) 
+    const reg2 = this.registers.get(arg2.intern);
+
+    if (reg1 === undefined || reg2 === undefined) {
+      this.logger.push({type: 'error', value: `At line ${ln}. Argument should be a valid integer.`})
+      return -1;
+    }
+
+    const result = reg1 - reg2
+      
     this.registers.set(arg1.intern, result);
 
-    return 0;
+    return ln;
   }
 
   printFn(args, ln) {
@@ -221,7 +237,8 @@ class Evaluator {
     const f = this[op.funcName];
 
     if (!f) {
-      throw new Error(`Unexpected Error. Function (${op.funcName}) not found`)
+      this.logger.push({type: 'error', value: `At line ${line}. Instruction (${op.funcName}) not found`})
+      return -1
     }
 
     switch (op.type) {
@@ -230,7 +247,7 @@ class Evaluator {
         break;
 
       case tokens.FUNCTION_TYPES.PROC:
-        f(op.args, op.line)
+        line = f(op.args, op.line)
         break;
     }
 
