@@ -2,7 +2,7 @@
 const doc = {
   name: 'instructions',
   description: `<p>
-        A instruction in Assemblo is a command that take <a href="/docs?item=arguments">argument</a> and tells the program to execute a operation to store, process or move data between the programs entities (<a href="/docs?item=registers">registers</a>, <a href="/docs?item=memory">memory</a>, <a href="/docs?item=list">list</a>) based on the arguments.
+        A instruction in Assemblo is a command that take <a href="docs?item=arguments">argument</a> and tells the program to execute a operation to store, process or move data between the programs entities (<a href="docs?item=registers">registers</a>, <a href="docs?item=memory">memory</a>, <a href="docs?item=list">list</a>) based on the arguments.
     </p>
     <hr>
     <h3>Structure</h3>
@@ -15,10 +15,10 @@ const doc = {
             <strong>NAME:</strong> The operation to be performed. The NAME is immediately followed by a colon (<code>:</code>).
         </li>
         <li>
-            <strong>TARGET_ARG:</strong> The first <a href="/docs?item=argument">argument</a> is the entity where the result of the operation will happen.
+            <strong>TARGET_ARG:</strong> The first <a href="docs?item=argument">argument</a> is the entity where the result of the operation will happen.
         </li>
         <li>
-            <strong>SOURCE_ARG:</strong> The second <a href="/docs?item=argument">argument</a> is the source of the data for the operation.
+            <strong>SOURCE_ARG:</strong> The second <a href="docs?item=argument">argument</a> is the source of the data for the operation.
         </li>
     </ul>
     <p>

@@ -22,7 +22,7 @@ const doc = {
     <h2>Registers as Arguments</h2>
 
     <p>
-        Registers are used as <a href="/docs?item=arguments">arguments</a> in <a href="/docs?item=instructions">instructions</a> to provide data for an operation as a source or destination.
+        Registers are used as <a href="docs?item=arguments">arguments</a> in <a href="docs?item=instructions">instructions</a> to provide data for an operation as a source or destination.
     </p>
 
     <pre>LOAD: r0, mx0</pre>

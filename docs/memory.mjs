@@ -1,8 +1,8 @@
 const doc = {
   name: 'memory',
   description: `<p>
-        Memory in Assemblo are storage locations separate from the <a href="/docs?item=registers">registers</a>. It is used for longer-term data storage and retrieval within the program.
-        A memory slot can't be directly used in processing <a href="/docs?item=instructions">instructions</a> such as ADD or SUB. 
+        Memory in Assemblo are storage locations separate from the <a href="docs?item=registers">registers</a>. It is used for longer-term data storage and retrieval within the program.
+        A memory slot can't be directly used in processing <a href="docs?item=instructions">instructions</a> such as ADD or SUB. 
     </p>
 
     <hr>
@@ -20,7 +20,7 @@ const doc = {
     </ul>
 
     <p>
-        These slots are accessed using their unique memory addresses as arguments in <a href="/docs?item=instructions">instructions</a>.
+        These slots are accessed using their unique memory addresses as arguments in <a href="docs?item=instructions">instructions</a>.
     </p>
 
     <hr>
@@ -28,7 +28,7 @@ const doc = {
     <h2>Memory as Arguments</h2>
 
     <p>
-        Memory addresses are used as <a href="/docs?item=arguments">arguments</a> to transfer data between memory and other entities, such as <a href="/docs?item=registers">registers</a>.
+        Memory addresses are used as <a href="docs?item=arguments">arguments</a> to transfer data between memory and other entities, such as <a href="docs?item=registers">registers</a>.
     </p>
 
     <pre>CPY: mx0, r1</pre>

@@ -4,7 +4,7 @@ const docContent = document.getElementById('docContent')
 function createDocListTitle(title) {
   const aEl = document.createElement('a');
   aEl.id = `${title}ListTitle`
-  aEl.href = `/docs?item=${title}`;
+  aEl.href = `docs?item=${title}`;
   aEl.className = "list-group-item list-group-item-action"
   aEl.innerHTML = `<span class="fs-5 fw-semibold">${title}</span>`;
   return aEl;
@@ -12,7 +12,7 @@ function createDocListTitle(title) {
 
 function createDocListItem(doc) {
   const a = document.createElement('a')
-  a.href=`/docs?item=${doc.name}`
+  a.href=`docs?item=${doc.name}`
 
   a.className = "mb-1 list-group-item"
   a.innerText = doc.name

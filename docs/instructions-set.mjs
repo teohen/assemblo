@@ -2,7 +2,7 @@ const list = [
   {
     name: "START",
     description: `<p>
-    Starts the program setting <a href="/docs?item=registers">registers</a>, <a href="/docs?item=memory">memory</a>, line counter, etc and represents the starting point of the program.
+    Starts the program setting <a href="docs?item=registers">registers</a>, <a href="docs?item=memory">memory</a>, line counter, etc and represents the starting point of the program.
 </p>
 
 <hr>
@@ -45,7 +45,7 @@ const list = [
   {
     name: "POP",
     description: `<p>
-    Removes the last item from the program's INPUT <a href="/docs?item=lists">list</a> and store the value into a specified <a href="/docs?item=registers">register</a>.
+    Removes the last item from the program's INPUT <a href="docs?item=lists">list</a> and store the value into a specified <a href="docs?item=registers">register</a>.
 </p>
 
 <hr>
@@ -54,10 +54,10 @@ const list = [
 <pre>POP: TARGET_REGISTER, INPUT</pre>
 <ul>
     <li>
-        <strong>TARGET_REGISTER:</strong> any available <a href="/docs?item=registers">register</a>.
+        <strong>TARGET_REGISTER:</strong> any available <a href="docs?item=registers">register</a>.
     </li>
     <li>
-        <strong>INPUT:</strong> The INPUT <a href="/docs?item=lists">list</a>.
+        <strong>INPUT:</strong> The INPUT <a href="docs?item=lists">list</a>.
     </li>
 </ul>
 
@@ -79,7 +79,7 @@ const list = [
   {
     name: "PUSH",
     description: `<p>
-    Copies a value from a specified <a href="/docs?item=registers">register</a> and add it to the end of the program's OUTPUT <a href="/docs?item=lists">list</a>.
+    Copies a value from a specified <a href="docs?item=registers">register</a> and add it to the end of the program's OUTPUT <a href="docs?item=lists">list</a>.
 </p>
 
 <hr>
@@ -88,10 +88,10 @@ const list = [
 <pre>PUSH: OUTPUT, SOURCE_REGISTER</pre>
 <ul>
     <li>
-        <strong>OUTPUT:</strong> The OUTPUT <a href="/docs?item=lists">list</a>.
+        <strong>OUTPUT:</strong> The OUTPUT <a href="docs?item=lists">list</a>.
     </li>
     <li>
-        <strong>SOURCE_REGISTER:</strong> any available <a href="/docs?item=registers">register</a>.
+        <strong>SOURCE_REGISTER:</strong> any available <a href="docs?item=registers">register</a>.
     </li>
 </ul>
 
@@ -113,7 +113,7 @@ const list = [
   {
     name: "CPY",
     description: `<p>
-    Copies the value stored in a specified <a href="/docs?item=registers">register</a> and place that value into a designated <a href="/docs?item=memory">memory</a> slot.
+    Copies the value stored in a specified <a href="docs?item=registers">register</a> and place that value into a designated <a href="docs?item=memory">memory</a> slot.
 </p>
 
 <hr>
@@ -122,10 +122,10 @@ const list = [
 <pre>CPY: TARGET_MEMORY_ADDRESS, SOURCE_REGISTER</pre>
 <ul>
     <li>
-        <strong>TARGET_MEMORY_ADDRESS:</strong> One of the available <a href="/docs?item=memory">memory addresses</a>.
+        <strong>TARGET_MEMORY_ADDRESS:</strong> One of the available <a href="docs?item=memory">memory addresses</a>.
     </li>
     <li>
-        <strong>SOURCE_REGISTER:</strong> One of the available <a href="/docs?item=registers">registers</a>.
+        <strong>SOURCE_REGISTER:</strong> One of the available <a href="docs?item=registers">registers</a>.
     </li>
 </ul>
 
@@ -147,7 +147,7 @@ const list = [
   {
     name: "LOAD",
     description: `<p>
-    Loads a value from a specified <a href="/docs?item=memory">memory</a> slot and copy that value into a designated <a href="/docs?item=registers">register</a>.
+    Loads a value from a specified <a href="docs?item=memory">memory</a> slot and copy that value into a designated <a href="docs?item=registers">register</a>.
 </p>
 
 <hr>
@@ -156,10 +156,10 @@ const list = [
 <pre>LOAD: TARGET_REGISTER, SOURCE_MEMORY_ADDRESS</pre>
 <ul>
     <li>
-        <strong>TARGET_REGISTER:</strong> One of the available <a href="/docs?item=registers">registers</a>.
+        <strong>TARGET_REGISTER:</strong> One of the available <a href="docs?item=registers">registers</a>.
     </li>
     <li>
-        <strong>SOURCE_MEMORY_ADDRESS:</strong> One of the available <a href="/docs?item=memory">memory addresses</a>.
+        <strong>SOURCE_MEMORY_ADDRESS:</strong> One of the available <a href="docs?item=memory">memory addresses</a>.
     </li>
 </ul>
 
@@ -181,7 +181,7 @@ const list = [
   {
     name: "JMP_N",
     description: `<p>
-    Jumps to the line if the value of the provided <a href="/docs?item=registers">register</a> is <b>NEGATIVE</b>.
+    Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>NEGATIVE</b>.
 </p>
 
 <hr>
@@ -193,7 +193,7 @@ const list = [
         <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
     </li>
     <li>
-        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="/docs?item=registers">registers</a>.
+        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="docs?item=registers">registers</a>.
     </li>
 </ul>
 
@@ -221,7 +221,7 @@ const list = [
   {
     name: "JMP_P",
     description: `<p>
-    Jumps to the line if the value of the provided <a href="/docs?item=registers">register</a> is <b>POSITIVE</b>.
+    Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>POSITIVE</b>.
 </p>
 
 <hr>
@@ -233,7 +233,7 @@ const list = [
         <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
     </li>
     <li>
-        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="/docs?item=registers">registers</a>.
+        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="docs?item=registers">registers</a>.
     </li>
 </ul>
 
@@ -260,7 +260,7 @@ const list = [
   {
     name: "JMP_Z",
     description: `<p>
-    Jumps to the line if the value of the provided <a href="/docs?item=registers">register</a> is <b>ZERO</b>.
+    Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>ZERO</b>.
 </p>
 
 <hr>
@@ -272,7 +272,7 @@ const list = [
         <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
     </li>
     <li>
-        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="/docs?item=registers">registers</a>.
+        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="docs?item=registers">registers</a>.
     </li>
 </ul>
 
@@ -299,7 +299,7 @@ const list = [
   {
     name: "JMP_U",
     description: `<p>
-    Jumps to the line if the value of the provided <a href="/docs?item=registers">register</a> is <b>UNDEFINED</b>.
+    Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>UNDEFINED</b>.
 </p>
 
 <hr>
@@ -311,7 +311,7 @@ const list = [
         <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
     </li>
     <li>
-        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="/docs?item=registers">registers</a>.
+        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="docs?item=registers">registers</a>.
     </li>
 </ul>
 
@@ -338,7 +338,7 @@ const list = [
   {
     name: "ADD",
     description: `<p>
-    Adds the value from the second specified <a href="/docs?item=registers">register</a> (the source) to the value of first specified <a href="/docs?item=registers">register</a> (the target). Will result in a <a href="/docs?item=errors">ERROR</a> if the value of any <a href="/docs?item=registers">register</a> is <b>UNDEFINED</b>.
+    Adds the value from the second specified <a href="docs?item=registers">register</a> (the source) to the value of first specified <a href="docs?item=registers">register</a> (the target). Will result in a <a href="docs?item=errors">ERROR</a> if the value of any <a href="docs?item=registers">register</a> is <b>UNDEFINED</b>.
 </p>
 
 <hr>
@@ -347,10 +347,10 @@ const list = [
 <pre>ADD: TARGET_REGISTER, SOURCE_REGISTER</pre>
 <ul>
     <li>
-        <strong>TARGET_REGISTER :</strong> One of the available <a href="/docs?item=registers">registers</a>. 
+        <strong>TARGET_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>. 
     </li>
     <li>
-        <strong>SOURCE_REGISTER :</strong> One of the available <a href="/docs?item=registers">registers</a>.
+        <strong>SOURCE_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>.
     </li>
 </ul>
 
@@ -385,7 +385,7 @@ const list = [
   {
     name: "SUB",
     description: `<p>
-    Subtracts the value from the second specified <a href="/docs?item=registers">register</a> (the source) to the value of first specified <a href="/docs?item=registers">register</a> (the target). Will result in a <a href="/docs?item=errors">ERROR</a> if the value of any <a href="/docs?item=registers">register</a> is <b>UNDEFINED</b>.
+    Subtracts the value from the second specified <a href="docs?item=registers">register</a> (the source) to the value of first specified <a href="docs?item=registers">register</a> (the target). Will result in a <a href="docs?item=errors">ERROR</a> if the value of any <a href="docs?item=registers">register</a> is <b>UNDEFINED</b>.
 </p>
 
 <hr>
@@ -394,10 +394,10 @@ const list = [
 <pre>SUB: TARGET_REGISTER, SOURCE_REGISTER</pre>
 <ul>
     <li>
-        <strong>TARGET_REGISTER :</strong> One of the available <a href="/docs?item=registers">registers</a>. 
+        <strong>TARGET_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>. 
     </li>
     <li>
-        <strong>SOURCE_REGISTER :</strong> One of the available <a href="/docs?item=registers">registers</a>.
+        <strong>SOURCE_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>.
     </li>
 </ul>
 
@@ -431,7 +431,7 @@ const list = [
   {
     name: "PRT",
     description: `<p>
-    Prints the value of the <a href="/docs?item=registers">register</a> in the console.
+    Prints the value of the <a href="docs?item=registers">register</a> in the console.
 </p>
 
 <hr>
@@ -440,7 +440,7 @@ const list = [
 <pre>PRT: TARGET_REGISTER</pre>
 <ul>
     <li>
-        <strong>TARGET_REGISTER :</strong> One of the available <a href="/docs?item=registers">registers</a>. 
+        <strong>TARGET_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>. 
     </li>
 </ul>
 
