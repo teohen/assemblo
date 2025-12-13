@@ -70,7 +70,7 @@ const list = [
 const docs = {
   name: 'instructions',
   description: `<p>
-        A instruction in Assemblo is a command that take arguments and tells the program to execute a operation to store, process or move data between the programs entities (<a href="/docs?item=registers">registers</a>, <a href="/docs?item=memory">memory</a>, <a href="/docs?item=list">list</a>) based on the arguments.
+        A instruction in Assemblo is a command that take <a href="/docs?item=arguments">argument</a> and tells the program to execute a operation to store, process or move data between the programs entities (<a href="/docs?item=registers">registers</a>, <a href="/docs?item=memory">memory</a>, <a href="/docs?item=list">list</a>) based on the arguments.
     </p>
     <hr>
     <h3>Structure</h3>
