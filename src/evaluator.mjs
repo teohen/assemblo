@@ -65,7 +65,12 @@ class Evaluator {
     Argument.validateType(arg1, [tokens.ARG_TYPES.REG], ln);
     Argument.validateType(arg2, [tokens.ARG_TYPES.LIST], ln);
 
-    Argument.validateValue(arg2, tokens.LISTS.INPUT);
+    if (!(Argument.validateValue(arg2, tokens.LISTS.INPUT))) {
+      this.logger.push({ type: 'error', value: `At line: ${ln}. Invalid Argument (${arg2.literal}). Expected: INPUT`, ln })
+      return -1;
+    }
+
+
 
     const result = this.inQ.pop();
 
@@ -85,7 +90,18 @@ class Evaluator {
         tokens.ARG_TYPES.NUM
       ], ln);
 
+    if (!(Argument.validateValue(arg1, tokens.LISTS.OUTPUT))) {
+      this.logger.push({ type: 'error', value: `At line: ${ln}. Invalid Argument (${arg1.literal}). Expected: OUTPUT`, ln })
+      return -1;
+    }
+
     const result = this.getValue(arg2);
+
+    if (result === undefined) {
+      this.logger.push({ type: 'error', value: `At line ${ln}. SOURCE argument (${arg2.literal}) should is undefined`, ln })
+      return -1;
+    }
+
     this.outQ.push(result);
 
     return ln;
@@ -115,7 +131,7 @@ class Evaluator {
     Argument.validateType(arg1, [tokens.ARG_TYPES.REG], ln);
     Argument.validateType(arg2, [tokens.ARG_TYPES.MEM], ln);
 
-    const result = this.getValue(arg2); 
+    const result = this.getValue(arg2);
     this.registers.set(arg1.intern, result);
     return ln;
   }
@@ -220,11 +236,11 @@ class Evaluator {
     const val2 = this.getValue(arg2);
 
     if (val2 === undefined) {
-      this.logger.push({ type: 'error', value: `At line ${ln}. Source argument should not be undefined` })
+      this.logger.push({ type: 'error', value: `At line ${ln}. SOURCE argument should not be undefined`, ln })
       return -1;
     }
 
-    const result = (val1 || 0) + val2 
+    const result = (val1 || 0) + val2
 
     this.registers.set(arg1.intern, result);
 
@@ -245,7 +261,7 @@ class Evaluator {
     const val2 = this.getValue(arg2)
 
     if (val2 === undefined) {
-      this.logger.push({ type: 'error', value: `At line ${ln}. Argument should be a valid integer.` })
+      this.logger.push({ type: 'error', value: `At line ${ln}. Argument should be a valid integer.`, ln })
       return -1;
     }
 
@@ -263,8 +279,7 @@ class Evaluator {
 
     const result = this.getValue(arg1)
 
-
-    this.logger.push({ type: 'message', value: result })
+    this.logger.push({ type: 'message', value: result, ln })
     return ln;
   }
 
@@ -281,7 +296,7 @@ class Evaluator {
     const f = this[op.funcName];
 
     if (!f) {
-      this.logger.push({ type: 'error', value: `At line ${line}. Instruction (${op.funcName}) not found` })
+      this.logger.push({ type: 'error', value: `At line ${line}. Instruction (${op.funcName}) not found`, ln: line })
       return -1
     }
 

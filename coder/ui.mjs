@@ -1,3 +1,4 @@
+import { status } from "../src/program.mjs";
 import editor from "./codemirror.mjs";
 
 const consoleElem = document.getElementById("consoleOutput");
@@ -5,23 +6,29 @@ const challengeElem = document.getElementById("challengeInfo");
 const codeInfo = document.getElementById("codeInfo");
 const registersTable = document.getElementById("registersTable")
 const memoryTable = document.getElementById("memoryTable")
+const runBtn = document.getElementById('runBtn');
+const debugBtn = document.getElementById('debugBtn');
+const nextLineBtn = document.getElementById('nextLineBtn');
+const restoreBtn = document.getElementById('restoreBtn');
+const submitBtn = document.getElementById('submitBtn');
+const runDelay = document.getElementById('runDelay');
 
 function renderCodeInfo(p, inputStack) {
   codeInfo.children[0].innerText = p.line || '_';
   codeInfo.children[1].innerText = p.status || '_';
   codeInfo.children[2].innerText = 0
-  codeInfo.children[3].innerText = inputStack ?  '[' + inputStack + ']' : '[]';
-  codeInfo.children[4].innerText = p.outQ ?  '[' + p.outQ + ']' : '[]';
+  codeInfo.children[3].innerText = inputStack ? '[' + inputStack + ']' : '[]';
+  codeInfo.children[4].innerText = p.outQ ? '[' + p.outQ + ']' : '[]';
 }
 
 function renderRegistersMemoryInfo(p) {
-  memoryTable.children[0].innerText = p.memory.get("MX0") !== undefined ?  p.memory.get("MX0") : "_"
-  memoryTable.children[1].innerText = p.memory.get("MX1") !== undefined ?  p.memory.get("MX1") : "_"
-  memoryTable.children[2].innerText = p.memory.get("MX2") !== undefined ?  p.memory.get("MX2") : "_"
+  memoryTable.children[0].innerText = p.memory.get("MX0") !== undefined ? p.memory.get("MX0") : "_"
+  memoryTable.children[1].innerText = p.memory.get("MX1") !== undefined ? p.memory.get("MX1") : "_"
+  memoryTable.children[2].innerText = p.memory.get("MX2") !== undefined ? p.memory.get("MX2") : "_"
 
-  registersTable.children[0].innerText = p.registers.get("R0X") !== undefined ?  p.registers.get("R0X") : "_"
-  registersTable.children[1].innerText = p.registers.get("R1X") !== undefined ?  p.registers.get("R1X") : "_"
-  registersTable.children[2].innerText = p.registers.get("R2X") !== undefined ?  p.registers.get("R2X") : "_"
+  registersTable.children[0].innerText = p.registers.get("R0X") !== undefined ? p.registers.get("R0X") : "_"
+  registersTable.children[1].innerText = p.registers.get("R1X") !== undefined ? p.registers.get("R1X") : "_"
+  registersTable.children[2].innerText = p.registers.get("R2X") !== undefined ? p.registers.get("R2X") : "_"
 
 }
 
@@ -34,6 +41,8 @@ function renderConsoleOutput(p) {
 }
 
 function renderChallengeInfo(challenge) {
+  if (!challenge) return;
+
   const challengeEls = createChallengeInfo(challenge);
   for (const el of challengeEls) {
     challengeElem.appendChild(el)
@@ -82,32 +91,88 @@ function updateIcon(elem, text, type) {
 
 }
 
-function toggleButtonHidden(elem) {
-  elem.hidden = !elem.hidden
+function debugging() {
+  if (debugBtn.innerText.includes('Debugging...')) return;
+  updateIcon(debugBtn, 'Debugging... (click to cancel)', 'spin')
 }
 
-function paintEditorLine(lineNumber, colorClass) {
-  editor.addLineClass(lineNumber, "background", colorClass);
+function running() {
+  if (runBtn.innerText.includes('Running...')) return;
+  updateIcon(runBtn, 'Running...', 'spin')
 }
 
-function removePaintEditorLine(lineNumber, colorClass) {
-  if (lineNumber < 0) return
-  editor.removeLineClass(lineNumber, "background", colorClass);
-}
-
-function enableDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn, submitBtn) {
-runBtn.hidden = true
-nextLineBtn.hidden = false
-restoreBtn.hidden = true
-updateIcon(debugBtn, 'Debugging ... (click to cancel)', 'spin')
-}
-
-function disabelDebugMode(runBtn, nextLineBtn, debugBtn, restoreBtn, submitBtn) {
-  runBtn.hidden = false
-  nextLineBtn.hidden = true
-  restoreBtn.hidden = false
+function resetIcons() {
+  updateIcon(runBtn, 'Run', 'play')
   updateIcon(debugBtn, 'Debug', 'bug')
+}
+
+function updateButtons(p) {
+  if (p.status === status.FINISHED) {
+    runBtn.hidden = true
+    debugBtn.hidden = true
+    submitBtn.hidden = true
+    runDelay.hidden = true
+    restoreBtn.hidden = false
+  } else if (p.status === status.READY) {
+    resetIcons()
+    runBtn.hidden = false
+    debugBtn.hidden = false
+    submitBtn.hidden = false
+    runDelay.hidden = false
+    restoreBtn.hidden = false
+    nextLineBtn.hidden = true
+  } else if (p.status === status.RUNNING) {
+    if (editor.options.readOnly) {
+      debugging()
+      runBtn.hidden = true
+      debugBtn.hidden = false
+    } else {
+      running()
+      runBtn.hidden = false
+      debugBtn.hidden = true
+    }
+
+    submitBtn.hidden = true
+    runDelay.hidden = true
+    restoreBtn.hidden = true
+  } else if (p.status === status.PARSED) {
+    runBtn.hidden = true
+    debugBtn.hidden = false
+    submitBtn.hidden = true
+    runDelay.hidden = true
+    restoreBtn.hidden = true
+    nextLineBtn.hidden = false
   }
+}
+
+function clearEditor() {
+  for (let i = 0; i < editor.lineCount(); i++) {
+    editor.removeLineClass(i, "background", 'red-line')
+    editor.removeLineClass(i, "background", 'yellow-line')
+  }
+}
+
+function updateUI(p, inputStack) {
+  renderCodeInfo(p, inputStack);
+  renderRegistersMemoryInfo(p);
+  renderConsoleOutput(p);
+  updateButtons(p);
+}
+
+function updateEditor(p) {
+  if (p.status === status.READY){
+    editor.setOption('readOnly', false);
+  }
+  
+  const errors = p.logger.find((i) => i.type === 'error');
+  clearEditor()
+
+
+
+
+  editor.addLineClass(p.line - 1, "background", "yellow-line");
+  if (errors) editor.addLineClass(errors.ln - 1, "background", "red-line");
+}
 
 document.addEventListener('DOMContentLoaded', function () {
   const themeToggle = document.getElementById('themeToggle');
@@ -137,13 +202,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 export default {
   renderChallengeInfo,
-  renderCodeInfo,
-  renderConsoleOutput,
-  renderRegistersMemoryInfo,
-  updateIcon,
-  toggleButtonHidden,
-  paintEditorLine,
-  removePaintEditorLine,
-  enableDebugMode,
-  disabelDebugMode
+  updateUI,
+  updateEditor
 }

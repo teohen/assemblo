@@ -38,11 +38,11 @@ class Program {
       const out = this.outQ[i];
 
       if (exp != out) {
-        this.logger.push({ type: 'error', value: "incorrect answer" })
+        this.logger.push({ type: 'error', value: "incorrect answer", ln: -1 });
         return
       }
     }
-    this.logger.push({ type: 'success', value: "PASSED!!!" })
+    this.logger.push({ type: 'success', value: "PASSED!!!", ln: -1 })
 
   }
 
@@ -85,7 +85,7 @@ class Program {
       this.evaluator.operations = operations
       this.status = status.PARSED;
     } catch (err) {
-      this.logger.push({ type: 'error', value: err.message })
+      this.logger.push({ type: 'error', value: err.message, ln: this.line });
       this.status = status.FINISHED
     }
   }
@@ -109,7 +109,7 @@ class Program {
         }
         this.line += 1;
       } catch (error) {
-        this.logger.push({ type: 'error', value: error.message })
+        this.logger.push({ type: 'error', value: error.message, ln: this.ln })
         this.status = status.FINISHED;
         clearInterval(interval);
         endProgramFn()
