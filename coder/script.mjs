@@ -21,7 +21,7 @@ if (paramChallenge) {
   inputStack = challenge.input
   expected = challenge.expected
   ui.renderChallengeInfo(challenge)
-
+  submitBtn.hidden = false
 }
 
 p.reset(inputStack)
