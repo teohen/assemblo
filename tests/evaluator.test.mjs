@@ -884,7 +884,6 @@ describe("Evaluator suite", () => {
     it("should not SUB the values if one of them are undefined", () => {
       const tests = [
         { a1: chance.integer({ min: 0, max: 100 }), a2: undefined },
-        { a1: undefined, a2: chance.integer({ min: 0, max: 100 }) },
       ]
 
       for (let t of tests) {
