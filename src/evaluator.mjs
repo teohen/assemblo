@@ -40,126 +40,35 @@ class Evaluator {
     this.jmpUndFn = this.jmpUndFn.bind(this);
   }
 
+  getValue(arg) {
+    switch (arg.type) {
+      case tokens.ARG_TYPES.REG:
+        return this.registers.get(arg.intern);
+
+      case tokens.ARG_TYPES.NUM:
+        return arg.intern;
+
+      case tokens.ARG_TYPES.MEM:
+        return this.memory.get(arg.intern);
+
+      default:
+        throw new Error(`Invalid Argument: ${arg.literal}`)
+    }
+
+  }
+
   popFn(args, ln) {
+    // POP: REG, INPUT
     const arg1 = args[0];
     const arg2 = args[1];
 
-    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.LIST, ln);
+    Argument.validateType(arg1, [tokens.ARG_TYPES.REG], ln);
+    Argument.validateType(arg2, [tokens.ARG_TYPES.LIST], ln);
+
+    Argument.validateValue(arg2, tokens.LISTS.INPUT);
 
     const result = this.inQ.pop();
 
-    this.registers.set(arg1.intern, result);
-
-    return ln;
-  }
-
-  cpyFn(args, ln) {
-    const arg1 = args[0];
-    const arg2 = args[1];
-
-    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
-    Argument.validateType(arg1, tokens.ARG_TYPES.MEM, ln);
-
-    const result = this.registers.get(arg2.intern);
-    this.memory.set(arg1.intern, result);
-
-    return ln;
-  }
-
-  jmpNegFn(args, ln) {
-    const arg1 = args[0];
-    const arg2 = args[1];
-    Argument.validateType(arg1, tokens.ARG_TYPES.NUM, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
-
-    if (arg1.literal > this.operations.length || arg1.literal < 0) {
-      throw new Error(
-        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
-      );
-    }
-
-    const val = this.registers.get(arg2.intern);
-
-    if (val < 0) return arg1.intern -1;
-
-    return ln;
-  }
-
-  jmpPosFn(args, ln) {
-    const arg1 = args[0];
-    const arg2 = args[1];
-    Argument.validateType(arg1, tokens.ARG_TYPES.NUM, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
-
-    if (arg1.literal > this.operations.length || arg1.literal < 0) {
-      throw new Error(
-        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
-      );
-    }
-
-    const val = this.registers.get(arg2.intern);
-
-    if (val > 0) return arg1.intern-1;
-
-    return ln;
-  }
-
-  jmpZeroFn(args, ln) {
-    const arg1 = args[0];
-    const arg2 = args[1];
-    Argument.validateType(arg1, tokens.ARG_TYPES.NUM, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
-
-    if (arg1.literal > this.operations.length || arg1.literal < 0) {
-      throw new Error(
-        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
-      );
-    }
-
-    const val = this.registers.get(arg2.intern);
-
-    if (val == 0) return arg1.intern-1;
-
-    return ln;
-  }
-
-  jmpUndFn(args, ln) {
-    const arg1 = args[0];
-    const arg2 = args[1];
-    Argument.validateType(arg1, tokens.ARG_TYPES.NUM, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
-
-    if (arg1.literal > this.operations.length || arg1.literal < 0) {
-      throw new Error(
-        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
-      );
-    }
-
-    const val = this.registers.get(arg2.intern);
-
-    if (val == undefined) return arg1.intern-1;
-
-    return ln;
-  }
-
-  addFn(args, ln) {
-    const arg1 = args[0];
-    const arg2 = args[1];
-
-    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
-
-    const reg1 = this.registers.get(arg1.intern) 
-    const reg2 = this.registers.get(arg2.intern);
-
-    if (reg1 === undefined || reg2 === undefined) {
-      this.logger.push({type: 'error', value: `At line ${ln}. Argument should be a valid integer.`})
-      return -1;
-    }
-
-    const result = reg1 + reg2
-      
     this.registers.set(arg1.intern, result);
 
     return ln;
@@ -169,11 +78,32 @@ class Evaluator {
     const arg1 = args[0];
     const arg2 = args[1];
 
-    Argument.validateType(arg1, tokens.ARG_TYPES.LIST, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+    Argument.validateType(arg1, [tokens.ARG_TYPES.LIST], ln);
+    Argument.validateType(arg2,
+      [
+        tokens.ARG_TYPES.REG,
+        tokens.ARG_TYPES.NUM
+      ], ln);
 
-    const result = this.registers.get(arg2.intern);
+    const result = this.getValue(arg2);
     this.outQ.push(result);
+
+    return ln;
+  }
+
+  cpyFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+
+    Argument.validateType(arg1, [tokens.ARG_TYPES.MEM], ln);
+
+    Argument.validateType(arg2, [
+      tokens.ARG_TYPES.REG,
+      tokens.ARG_TYPES.NUM
+    ], ln);
+
+    const result = this.getValue(arg2);
+    this.memory.set(arg1.intern, result);
 
     return ln;
   }
@@ -182,11 +112,122 @@ class Evaluator {
     const arg1 = args[0];
     const arg2 = args[1];
 
-    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.MEM, ln);
+    Argument.validateType(arg1, [tokens.ARG_TYPES.REG], ln);
+    Argument.validateType(arg2, [tokens.ARG_TYPES.MEM], ln);
 
-    const result = this.memory.get(arg2.intern);
+    const result = this.getValue(arg2); 
     this.registers.set(arg1.intern, result);
+    return ln;
+  }
+
+  jmpNegFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+    Argument.validateType(arg1, [tokens.ARG_TYPES.NUM], ln);
+    Argument.validateType(arg2, [
+      tokens.ARG_TYPES.REG,
+      tokens.ARG_TYPES.NUM
+    ], ln);
+
+    if (arg1.literal > this.operations.length || arg1.literal < 0) {
+      throw new Error(
+        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
+      );
+    }
+
+    const val = this.getValue(arg2)
+
+    if (val < 0) return arg1.intern - 1;
+
+    return ln;
+  }
+
+  jmpPosFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+    Argument.validateType(arg1, [tokens.ARG_TYPES.NUM], ln);
+    Argument.validateType(arg2, [
+      tokens.ARG_TYPES.REG,
+      tokens.ARG_TYPES.NUM
+    ], ln);
+
+    if (arg1.literal > this.operations.length || arg1.literal < 0) {
+      throw new Error(
+        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
+      );
+    }
+
+    const val = this.getValue(arg2);
+
+    if (val > 0) return arg1.intern - 1;
+
+    return ln;
+  }
+
+  jmpZeroFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+    Argument.validateType(arg1, [tokens.ARG_TYPES.NUM], ln);
+    Argument.validateType(arg2, [
+      tokens.ARG_TYPES.REG,
+      tokens.ARG_TYPES.NUM,
+    ]
+      , ln);
+
+    if (arg1.literal > this.operations.length || arg1.literal < 0) {
+      throw new Error(
+        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
+      );
+    }
+
+    const val = this.getValue(arg2);
+
+    if (val == 0) return arg1.intern - 1;
+
+    return ln;
+  }
+
+  jmpUndFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+    Argument.validateType(arg1, [tokens.ARG_TYPES.NUM], ln);
+    Argument.validateType(arg2, [tokens.ARG_TYPES.REG], ln);
+
+    if (arg1.literal > this.operations.length || arg1.literal < 0) {
+      throw new Error(
+        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.literal}`,
+      );
+    }
+
+    const val = this.getValue(arg2);
+
+    if (val == undefined) return arg1.intern - 1;
+
+    return ln;
+  }
+
+  addFn(args, ln) {
+    const arg1 = args[0];
+    const arg2 = args[1];
+
+    Argument.validateType(arg1, [tokens.ARG_TYPES.REG], ln);
+    Argument.validateType(arg2, [
+      tokens.ARG_TYPES.REG,
+      tokens.ARG_TYPES.NUM,
+    ], ln);
+
+    const val1 = this.getValue(arg1);
+    const val2 = this.getValue(arg2);
+
+    if (val2 === undefined) {
+      this.logger.push({ type: 'error', value: `At line ${ln}. Source argument should not be undefined` })
+      return -1;
+    }
+
+    const result = (val1 || 0) + val2 
+
+    this.registers.set(arg1.intern, result);
+
     return ln;
   }
 
@@ -194,19 +235,22 @@ class Evaluator {
     const arg1 = args[0];
     const arg2 = args[1];
 
-    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
-    Argument.validateType(arg2, tokens.ARG_TYPES.REG, ln);
+    Argument.validateType(arg1, [tokens.ARG_TYPES.REG], ln);
+    Argument.validateType(arg2, [
+      tokens.ARG_TYPES.REG,
+      tokens.ARG_TYPES.NUM
+    ], ln);
 
-    const reg1 = this.registers.get(arg1.intern) 
-    const reg2 = this.registers.get(arg2.intern);
+    const val1 = this.getValue(arg1)
+    const val2 = this.getValue(arg2)
 
-    if (reg1 === undefined || reg2 === undefined) {
-      this.logger.push({type: 'error', value: `At line ${ln}. Argument should be a valid integer.`})
+    if (val2 === undefined) {
+      this.logger.push({ type: 'error', value: `At line ${ln}. Argument should be a valid integer.` })
       return -1;
     }
 
-    const result = reg1 - reg2
-      
+    const result = (val1 || 0) - val2
+
     this.registers.set(arg1.intern, result);
 
     return ln;
@@ -215,12 +259,12 @@ class Evaluator {
   printFn(args, ln) {
     const arg1 = args[0];
 
-    Argument.validateType(arg1, tokens.ARG_TYPES.REG, ln);
+    Argument.validateType(arg1, [tokens.ARG_TYPES.REG], ln);
 
-    const result = this.registers.get(arg1.intern);
+    const result = this.getValue(arg1)
 
 
-    this.logger.push({type: 'message', value: result})
+    this.logger.push({ type: 'message', value: result })
     return ln;
   }
 
@@ -237,7 +281,7 @@ class Evaluator {
     const f = this[op.funcName];
 
     if (!f) {
-      this.logger.push({type: 'error', value: `At line ${line}. Instruction (${op.funcName}) not found`})
+      this.logger.push({ type: 'error', value: `At line ${line}. Instruction (${op.funcName}) not found` })
       return -1
     }
 

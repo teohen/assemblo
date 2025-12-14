@@ -12,10 +12,11 @@ describe("Evaluator suite", () => {
   describe("SUCCESS", () => {
 
     it(" should evaluate the POP operation", () => {
+      // POP: REG, INPUT
       const tests = [
-        { in: "r0" },
-        { in: "r1" },
-        { in: "r2" },
+        { reg: "r0", arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0) },
+        { reg: "r1", arg1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1) },
+        { reg: "r2", arg1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2) },
       ]
 
       for (let t of tests) {
@@ -24,7 +25,7 @@ describe("Evaluator suite", () => {
         const input = [expRegisterValue];
         const output = [];
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.in], undefined);
+        registers.set(tokens.REGISTERS[t.reg], undefined);
         const memory = new Map();
         const line = 1;
         const logger = [];
@@ -32,8 +33,8 @@ describe("Evaluator suite", () => {
 
 
         const args = [
-          new Argument(tokens.ARG_TYPES.REG, t.in, tokens.REGISTERS[t.in]),
-          new Argument(tokens.ARG_TYPES.LIST, "INPUT", tokens.ARG_TYPES.LIST),
+          t.arg1,
+          new Argument(tokens.ARG_TYPES.LIST, "INPUT", tokens.LISTS.INPUT),
         ];
 
         const operations = [
@@ -50,37 +51,40 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(registers.get(tokens.REGISTERS[t.in]), expRegisterValue);
+        assert.equal(registers.get(tokens.REGISTERS[t.reg]), expRegisterValue);
         assert.equal(newLine, line)
         assert.equal(input.length, 0);
       }
     });
 
-    it(" should evaluate the PUSH operation", () => {
-      const tests = [{
-        in: "r0",
-        in: "r1",
-        in: "r2",
-      }]
+    it("should evaluate the PUSH operation", () => {
+      // PUSH: OUTPUT, REG
+      // PUSH: OUTPUT, 1
+      const tests = [
+        { expValue: chance.integer({ min: 0 }), arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0) },
+        { expValue: chance.integer({ min: 0 }), arg2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1) },
+        { expValue: chance.integer({ min: 0 }), arg2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2) },
+        { expValue: -1, arg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1) },
+        { expValue: 0, arg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0) },
+        { expValue: 1, arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1) },
+      ]
 
       for (let t of tests) {
-
-
-        const expRegisterValue = chance.integer({ min: 0 });
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.in], expRegisterValue);
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          registers.set(t.arg2.intern, t.expValue);
+        }
+
         const memory = new Map();
         const line = 1;
         const logger = [];
 
-
-
         const args = [
-          new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.ARG_TYPES.LIST),
-          new Argument(tokens.ARG_TYPES.REG, t.in, tokens.REGISTERS[t.in]),
+          new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
+          t.arg2,
         ];
 
         const operations = [
@@ -97,44 +101,60 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(registers.get(tokens.REGISTERS[t.in]), expRegisterValue);
+
         assert.equal(newLine, line)
-        assert.equal(input.length, 0);
+        assert.equal(output.length, 1);
+        assert.equal(output[0], t.expValue);
       }
     });
 
-    it(" should evaluate the CPY operation", () => {
+    it("should evaluate the CPY operation", () => {
+      // CPY: mx0, r0
+      // CPY: mx0, 1
+
       const tests = [
-        { a1: "mx0", a2: "r0" },
-        { a1: "mx1", a2: "r0" },
-        { a1: "mx2", a2: "r0" },
-        { a1: "mx0", a2: "r1" },
-        { a1: "mx1", a2: "r1" },
-        { a1: "mx2", a2: "r1" },
-        { a1: "mx0", a2: "r2" },
-        { a1: "mx1", a2: "r2" },
-        { a1: "mx2", a2: "r2" },
+        {
+          expValue: chance.integer({ min: 0 }),
+          arg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0), arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+        },
+        {
+          expValue: chance.integer({ min: 0 }),
+          arg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1), arg2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
+        },
+        {
+          expValue: chance.integer({ min: 0 }),
+          arg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx1), arg2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
+        },
+        {
+          expValue: -1,
+          arg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx1), arg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1)
+        },
+        {
+          expValue: 0,
+          arg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx1), arg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0)
+        },
+        {
+          expValue: 1,
+          arg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx1), arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+        },
       ]
 
       for (let t of tests) {
-
-
-        const expMemoryValue = chance.integer({ min: 0 });
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a2], expMemoryValue);
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          registers.set(t.arg2.intern, t.expValue);
+        }
+
         const memory = new Map();
-        memory.set(tokens.MEMORY[t.a1], undefined);
         const line = 1;
         const logger = [];
 
-
-
         const args = [
-          new Argument(tokens.ARG_TYPES.MEM, t.a1, tokens.MEMORY[t.a1]),
-          new Argument(tokens.ARG_TYPES.REG, t.a2, tokens.REGISTERS[t.a2]),
+          t.arg1,
+          t.arg2,
         ];
 
         const operations = [
@@ -151,42 +171,48 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(memory.get(tokens.MEMORY[t.a1]), expMemoryValue);
-        assert.equal(registers.get(tokens.REGISTERS[t.a2]), expMemoryValue);
+
         assert.equal(newLine, line)
+        assert.equal(memory.size, 1);
+        assert.equal(memory.get(t.arg1.intern), t.expValue);
       }
     });
 
-    it(" should evaluate the LOAD operation", () => {
+    it("should evaluate the LOAD operation", () => {
+      // LOAD: r0, mx0
+      // LOAD: r1, mx1
+
       const tests = [
-        { a1: "r0", a2: "mx0" },
-        { a1: "r0", a2: "mx1" },
-        { a1: "r0", a2: "mx2" },
-        { a1: "r1", a2: "mx0" },
-        { a1: "r1", a2: "mx1" },
-        { a1: "r1", a2: "mx2" },
-        { a1: "r2", a2: "mx0" },
-        { a1: "r2", a2: "mx1" },
-        { a1: "r2", a2: "mx2" },
+        {
+          expValue: chance.integer({ min: 0 }),
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          arg2: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0)
+        },
+        {
+          expValue: chance.integer({ min: 0 }),
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          arg2: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1)
+        },
+        {
+          expValue: chance.integer({ min: 0 }),
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          arg2: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx1)
+        },
       ]
 
       for (let t of tests) {
-        const expRegisterValue = chance.integer({ min: 0 });
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a1], undefined);
         const memory = new Map();
-        memory.set(tokens.MEMORY[t.a2], expRegisterValue);
+        memory.set(t.arg2.intern, t.expValue)
         const line = 1;
         const logger = [];
 
-
-
         const args = [
-          new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
-          new Argument(tokens.ARG_TYPES.MEM, t.a2, tokens.MEMORY[t.a2]),
+          t.arg1,
+          t.arg2,
         ];
 
         const operations = [
@@ -203,41 +229,80 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(memory.get(tokens.MEMORY[t.a2]), expRegisterValue);
-        assert.equal(registers.get(tokens.REGISTERS[t.a1]), expRegisterValue);
+
         assert.equal(newLine, line)
+        assert.equal(registers.size, 1);
+        assert.equal(registers.get(t.arg1.intern), t.expValue);
       }
     });
 
-    it(" should evaluate the ADD operation", () => {
+    it("should evaluate the ADD operation", () => {
+      // ADD: r0, r1
+      // ADD: r0, r0
+      // ADD: r0, 1
+
       const tests = [
-        { a1: "r0", a2: "r1" },
-        { a1: "r0", a2: "r2" },
-        { a1: "r1", a2: "r0" },
-        { a1: "r1", a2: "r2" },
-        { a1: "r2", a2: "r0" },
-        { a1: "r2", a2: "r1" },
-        { a1: "r2", a2: "r1" },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: chance.integer({ min: 0, max: 10000 }),
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
+        },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: chance.integer({ min: 0, max: 10000 }),
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
+        },
+        {
+          valueArg1: 10,
+          valueArg2: 10,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+        },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: -1,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1)
+        },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: 0,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0)
+        },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: 1,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+        },
+        {
+          valueArg1: undefined,
+          valueArg2: 1,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+        },
       ]
 
       for (let t of tests) {
-        const reg1Value = chance.integer({ min: 0, max: 100 });
-        const reg2Value = chance.integer({ min: 0, max: 100 });
-
-        const expRegisterValue = reg1Value + reg2Value
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a1], reg1Value);
-        registers.set(tokens.REGISTERS[t.a2], reg2Value);
+
+        registers.set(t.arg1.intern, t.valueArg1);
+        registers.set(t.arg2.intern, t.valueArg2);
+
+
         const memory = new Map();
         const line = 1;
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
-          new Argument(tokens.ARG_TYPES.REG, t.a2, tokens.REGISTERS[t.a2]),
+          t.arg1,
+          t.arg2,
         ];
 
         const operations = [
@@ -254,39 +319,79 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(registers.get(tokens.REGISTERS[t.a1]), expRegisterValue);
-        assert.equal(newLine, line)
+
+        assert.equal(newLine, line);
+        assert.equal(registers.get(t.arg1.intern), (t.valueArg1 || 0) + t.valueArg2);
       }
     });
 
-    it(" should evaluate the SUB operation", () => {
+    it("should evaluate the SUB operation", () => {
+      // SUB: r0, r1
+      // SUB: r0, r0
+      // SUB: r0, 1
+
       const tests = [
-        { a1: "r0", a2: "r1" },
-        { a1: "r0", a2: "r2" },
-        { a1: "r1", a2: "r0" },
-        { a1: "r1", a2: "r2" },
-        { a1: "r2", a2: "r0" },
-        { a1: "r2", a2: "r1" },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: chance.integer({ min: 0, max: 10000 }),
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
+        },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: chance.integer({ min: 0, max: 10000 }),
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
+        },
+        {
+          valueArg1: 10,
+          valueArg2: 10,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+        },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: -1,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1)
+        },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: 0,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0)
+        },
+        {
+          valueArg1: chance.integer({ min: 0, max: 10000 }),
+          valueArg2: 1,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+        },
+        {
+          valueArg1: undefined,
+          valueArg2: 1,
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+        },
       ]
 
       for (let t of tests) {
-        const reg1Value = chance.integer({ min: 0, max: 100 });
-        const reg2Value = chance.integer({ min: 0, max: 100 });
-
-        const expRegisterValue = reg1Value - reg2Value
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a1], reg1Value);
-        registers.set(tokens.REGISTERS[t.a2], reg2Value);
+
+        registers.set(t.arg1.intern, t.valueArg1);
+        registers.set(t.arg2.intern, t.valueArg2);
+
+
         const memory = new Map();
         const line = 1;
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
-          new Argument(tokens.ARG_TYPES.REG, t.a2, tokens.REGISTERS[t.a2]),
+          t.arg1,
+          t.arg2,
         ];
 
         const operations = [
@@ -303,35 +408,42 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(registers.get(tokens.REGISTERS[t.a1]), expRegisterValue);
-        assert.equal(newLine, line)
+
+        assert.equal(newLine, line);
+        assert.equal(registers.get(t.arg1.intern), (t.valueArg1 || 0) - t.valueArg2);
       }
     });
 
     it("should evaluate the PRT operation", () => {
+      // PRT: r0
+
       const tests = [
-        { a1: "r0" },
-        { a1: "r1" },
-        { a1: "r2" },
+        {
+          valArg1: chance.integer({ min: 0, max: 10000 }),
+          arg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
       ]
 
       for (let t of tests) {
-        const expRegisterValue = chance.integer({ min: 0, max: 100 });
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a1], expRegisterValue);
+
+        registers.set(t.arg1.intern, t.valArg1);
+
         const memory = new Map();
-        const line = chance.integer({ min: 0, max: 50 });
+        const line = 1;
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
+          t.arg1,
+          t.arg2,
         ];
 
-        const operations = [];
-        operations[line - 1] = new Operation(line, tokens.FUNCTIONS.PRT, args, tokens.FUNCTION_TYPES.PROC)
+        const operations = [
+          new Operation(line, tokens.FUNCTIONS.PRT, args, tokens.FUNCTION_TYPES.PROC)
+        ];
 
         const eva = new Evaluator(
           input,
@@ -343,43 +455,68 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(newLine, line)
-        assert.equal(logger.length, 1)
-        assert.equal(logger[0].value, expRegisterValue)
-        assert.equal(logger[0].type, 'message')
+
+        assert.equal(newLine, line);
+        assert.equal(logger.length, 1);
+        assert.equal(logger[0].type, 'message');
+        assert.equal(logger[0].value, t.valArg1);
       }
     });
 
     it("should evaluate the JMP_N operation", () => {
+      // JMP_N: 1, r0
+      // JMP_N: 1, 2
+
       const tests = [
-        { a1: "r0", regV: -1, expLine: 2 },
-        { a1: "r0", regV: 1, expLine: 1 },
-        { a1: "r1", regV: -1, expLine: 2 },
-        { a1: "r1", regV: 1, expLine: 1 },
-        { a1: "r2", regV: -1, expLine: 2 },
-        { a1: "r2", regV: 1, expLine: 1 },
+        {
+          expLine: 0,
+          valArg2: chance.integer({ min: -10000, max: -1 }),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          expLine: 1,
+          valArg2: chance.integer({ min: 0, max: 10000 }),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          expLine: 0,
+          valArg2: -1,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1),
+        },
+        {
+          expLine: 1,
+          valArg2: 0,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0),
+        },
+        {
+          expLine: 1,
+          valArg2: 1,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+        },
       ]
 
       for (let t of tests) {
-        const expectedLineNumber = t.expLine;
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a1], t.regV);
+
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          registers.set(t.arg2.intern, t.valArg2);
+        }
+
         const memory = new Map();
         const line = 1;
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.NUM, 3, 3),
-          new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
+          new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+          t.arg2,
         ];
 
         const operations = [
           new Operation(line, tokens.FUNCTIONS.JMP_N, args, tokens.FUNCTION_TYPES.FLOW),
-          new Operation(line + 1, tokens.FUNCTIONS.PRT, [args[1]], tokens.FUNCTION_TYPES.PROC),
-          new Operation(line + 2, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
+          new Operation(line, tokens.FUNCTIONS.PRT, args[1], tokens.FUNCTION_TYPES.PROC),
         ];
 
         const eva = new Evaluator(
@@ -392,40 +529,69 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(newLine, expectedLineNumber)
+
+        assert.equal(newLine, t.expLine);
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          assert.equal(registers.get(t.arg2.intern), t.valArg2);
+        }
       }
     });
 
-    it(" should evaluate the JMP_P operation", () => {
+    it("should evaluate the JMP_P operation", () => {
+      // JMP_P: 1, r0
+      // JMP_P: 1, 2
+
       const tests = [
-        { a1: "r0", regV: -1, expLine: 1 },
-        { a1: "r0", regV: 1, expLine: 2 },
-        { a1: "r1", regV: -1, expLine: 1 },
-        { a1: "r1", regV: 1, expLine: 2 },
-        { a1: "r2", regV: -1, expLine: 1 },
-        { a1: "r2", regV: 1, expLine: 2 },
+        {
+          expLine: 0,
+          valArg2: chance.integer({ min: 1, max: 100000 }),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          expLine: 1,
+          valArg2: chance.integer({ min: -100000, max: 0 }),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          expLine: 1,
+          valArg2: -1,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1),
+        },
+        {
+          expLine: 1,
+          valArg2: 0,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0),
+        },
+        {
+          expLine: 0,
+          valArg2: 1,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+        },
       ]
 
       for (let t of tests) {
-        const expectedLineNumber = t.expLine;
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a1], t.regV);
+
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          registers.set(t.arg2.intern, t.valArg2);
+        }
+
+
         const memory = new Map();
         const line = 1;
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.NUM, 3, 3),
-          new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
+          new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+          t.arg2,
         ];
 
         const operations = [
           new Operation(line, tokens.FUNCTIONS.JMP_P, args, tokens.FUNCTION_TYPES.FLOW),
-          new Operation(line + 1, tokens.FUNCTIONS.PRT, [args[1]], tokens.FUNCTION_TYPES.PROC),
-          new Operation(line + 1, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
+          new Operation(line, tokens.FUNCTIONS.PRT, args[1], tokens.FUNCTION_TYPES.PROC),
         ];
 
         const eva = new Evaluator(
@@ -438,40 +604,74 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(newLine, expectedLineNumber)
+
+        assert.equal(newLine, t.expLine);
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          assert.equal(registers.get(t.arg2.intern), t.valArg2);
+        }
       }
     });
 
-    it(" should evaluate the JMP_Z operation", () => {
+    it("should evaluate the JMP_Z operation", () => {
+      // JMP_Z: 1, r0
+      // JMP_Z: 1, 2
+
       const tests = [
-        { a1: "r0", regV: -1, expLine: 1 },
-        { a1: "r0", regV: 0, expLine: 2 },
-        { a1: "r1", regV: -1, expLine: 1 },
-        { a1: "r1", regV: 0, expLine: 2 },
-        { a1: "r2", regV: -1, expLine: 1 },
-        { a1: "r2", regV: 0, expLine: 2 },
+        {
+          expLine: 1,
+          valArg2: chance.integer({ min: -100000, max: 0 }),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          expLine: 0,
+          valArg2: 0,
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          expLine: 1,
+          valArg2: chance.integer({ min: -100000, max: 0 }),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          expLine: 1,
+          valArg2: -1,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1),
+        },
+        {
+          expLine: 0,
+          valArg2: 0,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0),
+        },
+        {
+          expLine: 1,
+          valArg2: 1,
+          arg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+        },
       ]
 
       for (let t of tests) {
-        const expectedLineNumber = t.expLine;
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a1], t.regV);
+
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          registers.set(t.arg2.intern, t.valArg2);
+        }
+
+
         const memory = new Map();
         const line = 1;
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.NUM, 3, 3),
-          new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
+          new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+          t.arg2,
         ];
 
         const operations = [
           new Operation(line, tokens.FUNCTIONS.JMP_Z, args, tokens.FUNCTION_TYPES.FLOW),
-          new Operation(line + 1, tokens.FUNCTIONS.PRT, [args[1]], tokens.FUNCTION_TYPES.PROC),
-          new Operation(line + 1, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
+          new Operation(line, tokens.FUNCTIONS.PRT, args[1], tokens.FUNCTION_TYPES.PROC),
         ];
 
         const eva = new Evaluator(
@@ -484,40 +684,53 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(newLine, expectedLineNumber)
+
+        assert.equal(newLine, t.expLine);
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          assert.equal(registers.get(t.arg2.intern), t.valArg2);
+        }
       }
     });
 
-    it(" should evaluate the JMP_U operation", () => {
+    it("should evaluate the JMP_U operation", () => {
+      // JMP_U: 1, r0
+
       const tests = [
-        { a1: "r0", regV: -1, expLine: 1 },
-        { a1: "r0", regV: undefined, expLine: 2 },
-        { a1: "r1", regV: -1, expLine: 1 },
-        { a1: "r1", regV: undefined, expLine: 2 },
-        { a1: "r2", regV: -1, expLine: 1 },
-        { a1: "r2", regV: undefined, expLine: 2 },
+        {
+          expLine: 1,
+          valArg2: chance.integer({ min: -100000, max: 0 }),
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          expLine: 0,
+          valArg2: undefined,
+          arg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        }
       ]
 
       for (let t of tests) {
-        const expectedLineNumber = t.expLine;
-
         const input = [];
         const output = [];
+
         const registers = new Map();
-        registers.set(tokens.REGISTERS[t.a1], t.regV);
+
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          registers.set(t.arg2.intern, t.valArg2);
+        }
+
+
         const memory = new Map();
         const line = 1;
         const logger = [];
 
         const args = [
-          new Argument(tokens.ARG_TYPES.NUM, 3, 3),
-          new Argument(tokens.ARG_TYPES.REG, t.a1, tokens.REGISTERS[t.a1]),
+          new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+          t.arg2,
         ];
 
         const operations = [
           new Operation(line, tokens.FUNCTIONS.JMP_U, args, tokens.FUNCTION_TYPES.FLOW),
-          new Operation(line + 1, tokens.FUNCTIONS.PRT, [args[1]], tokens.FUNCTION_TYPES.PROC),
-          new Operation(line + 1, tokens.FUNCTIONS.END, args, tokens.FUNCTION_TYPES.FLOW)
+          new Operation(line, tokens.FUNCTIONS.PRT, args[1], tokens.FUNCTION_TYPES.PROC),
         ];
 
         const eva = new Evaluator(
@@ -530,7 +743,11 @@ describe("Evaluator suite", () => {
         );
 
         const newLine = eva.tick(line)
-        assert.equal(newLine, expectedLineNumber)
+
+        assert.equal(newLine, t.expLine);
+        if (t.arg2.type === tokens.ARG_TYPES.REG) {
+          assert.equal(registers.get(t.arg2.intern), t.valArg2);
+        }
       }
     });
   });
@@ -571,7 +788,7 @@ describe("Evaluator suite", () => {
       assert.equal(logger[0].value, `At line ${line}. Instruction (${randonFName}) not found`);
     });
 
-    it(" should throw if line number is invalid for all JMP operations", () => {
+    it("should throw if line number is invalid for all JMP operations", () => {
       const tests = [
         { a1: tokens.FUNCTIONS.JMP_N },
         { a1: tokens.FUNCTIONS.JMP_P },
@@ -623,7 +840,6 @@ describe("Evaluator suite", () => {
     it("should not ADD the values if one of them are undefined", () => {
       const tests = [
         { a1: chance.integer({ min: 0, max: 100 }), a2: undefined },
-        { a1: undefined, a2: chance.integer({ min: 0, max: 100 }) },
       ]
 
       for (let t of tests) {
@@ -661,7 +877,7 @@ describe("Evaluator suite", () => {
         assert.equal(newLine, -1);
         assert.equal(logger.length, 1);
         assert.equal(logger[0].type, 'error');
-        assert.equal(logger[0].value, `At line ${line}. Argument should be a valid integer.`);
+        assert.equal(logger[0].value, `At line ${line}. Source argument should not be undefined`);
       }
     });
 
