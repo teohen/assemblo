@@ -46,7 +46,7 @@ class Parser {
       return new Argument(tokens.ARG_TYPES.LIST, arg, tokens.LISTS[arg]);
     }
     
-    if (/^[1-9]\d*$/.test(arg)) {
+    if (/^-?[0-9]\d*$/.test(arg)) {
       return new Argument(tokens.ARG_TYPES.NUM, parseInt(arg), parseInt(arg));
     }
 

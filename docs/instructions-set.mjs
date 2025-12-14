@@ -85,13 +85,13 @@ const list = [
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>PUSH: OUTPUT, SOURCE_REGISTER</pre>
+<pre>PUSH: OUTPUT, SOURCE</pre>
 <ul>
     <li>
         <strong>OUTPUT:</strong> The OUTPUT <a href="docs?item=lists">list</a>.
     </li>
     <li>
-        <strong>SOURCE_REGISTER:</strong> any available <a href="docs?item=registers">register</a>.
+        <strong>SOURCE:</strong> <a href="docs?item=registers">register</a> ou a interger number. 
     </li>
 </ul>
 
@@ -103,12 +103,10 @@ const list = [
 <br>
 <br>
 
-<pre>PUSH: OUTPUT, r0</pre>
+<pre>PUSH: OUTPUT, r0<br>PUSH: OUTPUT, 2</pre>
 
-<code>// r0 = 10 <br>// OUTPUT = [4, 5, 10]</code>
-<p>
-    <em>(The value stored in register <code>r0</code> is copied and added to the back of the <code>OUTPUT</code> list.)</em>
-</p>`
+<code>// OUTPUT = [4, 5, 10, 2]</code>
+`
   },
   {
     name: "CPY",
@@ -119,13 +117,13 @@ const list = [
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>CPY: TARGET_MEMORY_ADDRESS, SOURCE_REGISTER</pre>
+<pre>CPY: TARGET_MEMORY_ADDRESS, SOURCE</pre>
 <ul>
     <li>
         <strong>TARGET_MEMORY_ADDRESS:</strong> One of the available <a href="docs?item=memory">memory addresses</a>.
     </li>
     <li>
-        <strong>SOURCE_REGISTER:</strong> One of the available <a href="docs?item=registers">registers</a>.
+        <strong>SOURCE:</strong> a <a href="docs?item=registers">register</a> or a interger number.
     </li>
 </ul>
 
@@ -133,16 +131,14 @@ const list = [
 
 <h3>Example</h3>
 
-<code>// r0 = 55<br>// mx1 = 99 (Initial value in memory)</code>
+<code>// r0 = 55<br>// mx1 = 99 </code>
 <br>
 <br>
 
 <pre>CPY: mx1, r0</pre>
 
-<code>// r0 = 55 (value is unchanged)<br>// mx1 = 55 (Value from r0 is now in memory slot mx1)</code>
-<p>
-    <em>(The value stored in register <code>r0</code> is copied to memory slot <code>mx1</code>, overwriting the previous content of <code>mx1</code>.)</em>
-</p>`
+<code>// r0 = 55 <br>// mx1 = 55</code>
+`
   },
   {
     name: "LOAD",
@@ -187,13 +183,13 @@ const list = [
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>JMP_N: TARGET_LINE_NUMBER, REGISTER_TO_CHECK</pre>
+<pre>JMP_N: TARGET_LINE_NUMBER, SOURCE</pre>
 <ul>
     <li>
         <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
     </li>
     <li>
-        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="docs?item=registers">registers</a>.
+        <strong>SOURCE :</strong> a <a href="docs?item=registers">register</a> OR a integer number.
     </li>
 </ul>
 
@@ -227,13 +223,13 @@ const list = [
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>JMP_P: TARGET_LINE_NUMBER, REGISTER_TO_CHECK</pre>
+<pre>JMP_P: TARGET_LINE_NUMBER, SOURCE</pre>
 <ul>
     <li>
         <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
     </li>
     <li>
-        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="docs?item=registers">registers</a>.
+        <strong>SOURCE :</strong> a <a href="docs?item=registers">register</a> OR a integer number.
     </li>
 </ul>
 
@@ -266,13 +262,13 @@ const list = [
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>JMP_Z: TARGET_LINE_NUMBER, REGISTER_TO_CHECK</pre>
+<pre>JMP_Z: TARGET_LINE_NUMBER, SOURCE</pre>
 <ul>
     <li>
         <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
     </li>
     <li>
-        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="docs?item=registers">registers</a>.
+        <strong>SOURCE :</strong> a available <a href="docs?item=registers">registers</a> OR integer number.
     </li>
 </ul>
 
@@ -305,13 +301,13 @@ const list = [
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>JMP_U: TARGET_LINE_NUMBER, REGISTER_TO_CHECK</pre>
+<pre>JMP_U: TARGET_LINE_NUMBER, SOURCE</pre>
 <ul>
     <li>
         <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
     </li>
     <li>
-        <strong>REGISTER_TO_CHECK :</strong> One of the available <a href="docs?item=registers">registers</a>.
+        <strong>SOURCE :</strong> a <a href="docs?item=registers">register</a> or a integer number.
     </li>
 </ul>
 
@@ -338,19 +334,19 @@ const list = [
   {
     name: "ADD",
     description: `<p>
-    Adds the value from the second specified <a href="docs?item=registers">register</a> (the source) to the value of first specified <a href="docs?item=registers">register</a> (the target). Will result in a <a href="docs?item=errors">ERROR</a> if the value of any <a href="docs?item=registers">register</a> is <b>UNDEFINED</b>.
+    Adds the value from the <i>SOURCE</i> to the value of <i>TARGET_REGISTER</i>.<br>Will result in a <a href="docs?item=errors">ERROR</a> if the value of <i>SOURCE</i> is <b>UNDEFINED</b>.
 </p>
 
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>ADD: TARGET_REGISTER, SOURCE_REGISTER</pre>
+<pre>ADD: <i>TARGET_REGISTER</i>, <i>SOURCE</i></pre>
 <ul>
     <li>
-        <strong>TARGET_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>. 
+        <strong><i>TARGET_REGISTER</i> :</strong> One of the available <a href="docs?item=registers">registers</a>. 
     </li>
     <li>
-        <strong>SOURCE_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>.
+        <strong><i>SOURCE</i> :</strong> a <a href="docs?item=registers">registers</a> or a integer number.
     </li>
 </ul>
 
@@ -362,12 +358,10 @@ const list = [
 <br>
 <br>
 
-<pre>ADD: r0, r1</pre>
+<pre>ADD: r0, r1<br>ADD: r0, 5</pre>
 
-<code>// r0 = 22<br>// r1 = 7 (Source value is unchanged)</code>
-<p>
-    <em>(The value of <code>r1</code> (7) is added to the value of <code>r0</code> (15), and the result (22) is stored back into <code>r0</code>.)</em>
-</p>
+<code>// r0 = 27<br>// r1 = 7 (Source value is unchanged)</code>
+<br>
 =======================================
 <br>
 <code>// r0 = 15 (r1 is never set)</code>
@@ -385,19 +379,19 @@ const list = [
   {
     name: "SUB",
     description: `<p>
-    Subtracts the value from the second specified <a href="docs?item=registers">register</a> (the source) to the value of first specified <a href="docs?item=registers">register</a> (the target). Will result in a <a href="docs?item=errors">ERROR</a> if the value of any <a href="docs?item=registers">register</a> is <b>UNDEFINED</b>.
+    Subtracts the value from the <i>SOURCE</i> to the value of <i>TARGET_REGISTER</i>.<br>Will result in a <a href="docs?item=errors">ERROR</a> if the value of <i>SOURCE</i> is <b>UNDEFINED</b>.
 </p>
 
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>SUB: TARGET_REGISTER, SOURCE_REGISTER</pre>
+<pre>SUB: <i>TARGET_REGISTER</i>, <i>SOURCE</i></pre>
 <ul>
     <li>
-        <strong>TARGET_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>. 
+        <strong><i>TARGET_REGISTER</i> :</strong> One of the available <a href="docs?item=registers">registers</a>. 
     </li>
     <li>
-        <strong>SOURCE_REGISTER :</strong> One of the available <a href="docs?item=registers">registers</a>.
+        <strong><i>SOURCE</i> :</strong> a available <a href="docs?item=registers">register</a> OR a integer number.
     </li>
 </ul>
 
@@ -409,12 +403,10 @@ const list = [
 <br>
 <br>
 
-<pre>SUB: r0, r1</pre>
+<pre>SUB: r0, r1<br>SUB: r0, 5</pre>
 
-<code>// r0 = 8<br>// r1 = 7 (Source value is unchanged)</code>
-<p>
-    <em>(The value of <code>r1</code> (7) is subtracted from the value of <code>r0</code> (15), and the result (8) is stored back into <code>r0</code>.)</em>
-</p>
+<code>// r0 = 3<br>// r1 = 7 (Source value is unchanged)</code>
+<br>
 =======================================
 <br>
 <code>// r0 = 15 (r1 is never set)</code>

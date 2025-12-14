@@ -2,6 +2,7 @@ import test, { describe, it } from "node:test";
 import assert from "node:assert";
 import Parser from "../src/parser.mjs";
 import tokens from "../src/tokens.mjs";
+import Argument from "../src/argument.mjs";
 
 
 describe("parser suite", () => {
@@ -12,19 +13,31 @@ describe("parser suite", () => {
     assert.equal(op.funcName, expFuncName);
   }
 
-  function testArgument(arg, expType, expLabel, expIntern) {
-    assert.equal(arg.type, expType);
-    assert.equal(arg.literal, expLabel);
-    assert.equal(arg.intern, expIntern);
+  function testArgument(arg, expArg) {
+    assert.equal(arg.type, expArg.type);
+    assert.equal(arg.literal, expArg.literal);
+    assert.equal(arg.intern, expArg.intern);
   }
 
   describe("SUCCESS INSTRUCTIONS", () => {
     it("should parse the POP instructions", () => {
       const tests = [
-        { in: `POP: r0, INPUT`, expArg1Lit: "r0", expIntern: tokens.REGISTERS.r0 },
-        { in: `POP: r1, INPUT`, expArg1Lit: "r1", expIntern: tokens.REGISTERS.r1 },
-        { in: `POP: r2, INPUT`, expArg1Lit: "r2", expIntern: tokens.REGISTERS.r2 },
-      ]
+        {
+          in: `POP: r0, INPUT`,
+          expArg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.LIST, "INPUT", tokens.LISTS.INPUT)
+        },
+        {
+          in: `POP: r1, INPUT`,
+          expArg1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.LIST, "INPUT", tokens.LISTS.INPUT)
+        },
+        {
+          in: `POP: r2, INPUT`,
+          expArg1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.LIST, "INPUT", tokens.LISTS.INPUT)
+        }
+      ];
 
       for (const t of tests) {
         const p = new Parser();
@@ -36,18 +49,45 @@ describe("parser suite", () => {
         testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.POP);
 
         const arg1 = op.args[0];
-        testArgument(arg1, tokens.ARG_TYPES.REG, t.expArg1Lit, t.expIntern);
+        testArgument(arg1, t.expArg1);
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.LIST, "INPUT", tokens.LISTS.INPUT);
+        testArgument(arg2, t.expAgr2);
       }
     });
 
     it("should parse the PUSH instructions", () => {
       const tests = [
-        { in: `PUSH: OUTPUT, r0`, expArg2Lit: "r0", expIntern: tokens.REGISTERS.r0 },
-        { in: `PUSH: OUTPUT, r1`, expArg2Lit: "r1", expIntern: tokens.REGISTERS.r1 },
-        { in: `PUSH: OUTPUT, r2`, expArg2Lit: "r2", expIntern: tokens.REGISTERS.r2 },
+        {
+          in: `PUSH: OUTPUT, r0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
+          expArg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+        },
+        {
+          in: `PUSH: OUTPUT, r1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
+          expArg2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
+        },
+        {
+          in: `PUSH: OUTPUT, r2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
+          expArg2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
+        },
+        {
+          in: `PUSH: OUTPUT, -1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
+          expArg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1)
+        },
+        {
+          in: `PUSH: OUTPUT, 0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
+          expArg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0)
+        },
+        {
+          in: `PUSH: OUTPUT, 1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
+          expArg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+        }
       ];
 
       for (const t of tests) {
@@ -60,27 +100,76 @@ describe("parser suite", () => {
         testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.PUSH);
 
         const arg1 = op.args[0];
-        testArgument(arg1, tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT);
+        testArgument(arg1, t.expAgr1);
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.REG, t.expArg2Lit, t.expIntern);
+        testArgument(arg2, t.expArg2);
       }
     });
 
     it("should parse the CPY instructions", () => {
       const tests = [
-        { in: `CPY: mx0, r0`, expArg1Lit: "mx0", arg1Intern: tokens.MEMORY.mx0, expArg2Lit: "r0", arg2Intern: tokens.REGISTERS.r0 },
-        { in: `CPY: mx1, r0`, expArg1Lit: "mx1", arg1Intern: tokens.MEMORY.mx1, expArg2Lit: "r0", arg2Intern: tokens.REGISTERS.r0 },
-        { in: `CPY: mx2, r0`, expArg1Lit: "mx2", arg1Intern: tokens.MEMORY.mx2, expArg2Lit: "r0", arg2Intern: tokens.REGISTERS.r0 },
-        { in: `CPY: mx0, r1`, expArg1Lit: "mx0", arg1Intern: tokens.MEMORY.mx0, expArg2Lit: "r1", arg2Intern: tokens.REGISTERS.r1 },
-        { in: `CPY: mx1, r1`, expArg1Lit: "mx1", arg1Intern: tokens.MEMORY.mx1, expArg2Lit: "r1", arg2Intern: tokens.REGISTERS.r1 },
-        { in: `CPY: mx2, r1`, expArg1Lit: "mx2", arg1Intern: tokens.MEMORY.mx2, expArg2Lit: "r1", arg2Intern: tokens.REGISTERS.r1 },
-        { in: `CPY: mx0, r2`, expArg1Lit: "mx0", arg1Intern: tokens.MEMORY.mx0, expArg2Lit: "r2", arg2Intern: tokens.REGISTERS.r2 },
-        { in: `CPY: mx1, r2`, expArg1Lit: "mx1", arg1Intern: tokens.MEMORY.mx1, expArg2Lit: "r2", arg2Intern: tokens.REGISTERS.r2 },
-        { in: `CPY: mx2, r2`, expArg1Lit: "mx2", arg1Intern: tokens.MEMORY.mx2, expArg2Lit: "r2", arg2Intern: tokens.REGISTERS.r2 },
+        {
+          in: `CPY: mx0, r0`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+        },
+        {
+          in: `CPY: mx1, r0`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+        },
+        {
+          in: `CPY: mx2, r0`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+        },
+        {
+          in: `CPY: mx0, r1`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
+        },
+        {
+          in: `CPY: mx1, r1`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
+        },
+        {
+          in: `CPY: mx2, r1`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
+        },
+        {
+          in: `CPY: mx0, r2`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
+        },
+        {
+          in: `CPY: mx1, r2`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
+        },
+        {
+          in: `CPY: mx2, r2`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
+        },
+        {
+          in: `CPY: mx0, -1`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1)
+        },
+        {
+          in: `CPY: mx1, 0`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "0", 0)
+        },
+        {
+          in: `CPY: mx2, 1`,
+          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+        }
       ];
-
-
 
       for (const t of tests) {
         const p = new Parser(t.in);
@@ -92,27 +181,87 @@ describe("parser suite", () => {
         testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.CPY);
 
         const arg1 = op.args[0];
-        testArgument(arg1, tokens.ARG_TYPES.MEM, t.expArg1Lit, t.arg1Intern);
+        testArgument(arg1, t.expArg1);
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.REG, t.expArg2Lit, t.arg2Intern);
+        testArgument(arg2, t.expAgr2);
       }
     });
 
     it("should parse the JMP instructions", () => {
       const tests = [
-        { in: "JMP_N: 7, r0", fn: tokens.FUNCTIONS.JMP_N, arg2Lit: "r0", arg2Intern: tokens.REGISTERS.r0 },
-        { in: "JMP_N: 7, r1", fn: tokens.FUNCTIONS.JMP_N, arg2Lit: "r1", arg2Intern: tokens.REGISTERS.r1 },
-        { in: "JMP_N: 7, r2", fn: tokens.FUNCTIONS.JMP_N, arg2Lit: "r2", arg2Intern: tokens.REGISTERS.r2 },
-        { in: "JMP_P: 7, r0", fn: tokens.FUNCTIONS.JMP_P, arg2Lit: "r0", arg2Intern: tokens.REGISTERS.r0 },
-        { in: "JMP_P: 7, r1", fn: tokens.FUNCTIONS.JMP_P, arg2Lit: "r1", arg2Intern: tokens.REGISTERS.r1 },
-        { in: "JMP_P: 7, r2", fn: tokens.FUNCTIONS.JMP_P, arg2Lit: "r2", arg2Intern: tokens.REGISTERS.r2 },
-        { in: "JMP_Z: 7, r0", fn: tokens.FUNCTIONS.JMP_Z, arg2Lit: "r0", arg2Intern: tokens.REGISTERS.r0 },
-        { in: "JMP_Z: 7, r1", fn: tokens.FUNCTIONS.JMP_Z, arg2Lit: "r1", arg2Intern: tokens.REGISTERS.r1 },
-        { in: "JMP_Z: 7, r2", fn: tokens.FUNCTIONS.JMP_Z, arg2Lit: "r2", arg2Intern: tokens.REGISTERS.r2 },
-        { in: "JMP_U: 7, r0", fn: tokens.FUNCTIONS.JMP_U, arg2Lit: "r0", arg2Intern: tokens.REGISTERS.r0 },
-        { in: "JMP_U: 7, r1", fn: tokens.FUNCTIONS.JMP_U, arg2Lit: "r1", arg2Intern: tokens.REGISTERS.r1 },
-        { in: "JMP_U: 7, r2", fn: tokens.FUNCTIONS.JMP_U, arg2Lit: "r2", arg2Intern: tokens.REGISTERS.r2 },
+        {
+          in: `JMP_N: 7, r0`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          fn: "jmpNegFn"
+        },
+        {
+          in: `JMP_N: 7, r1`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          fn: "jmpNegFn"
+        },
+        {
+          in: `JMP_N: 7, r2`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          fn: "jmpNegFn"
+        },
+        {
+          in: `JMP_P: 7, r0`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          fn: "jmpPosFn"
+        },
+        {
+          in: `JMP_P: 7, r1`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          fn: "jmpPosFn"
+        },
+        {
+          in: `JMP_P: 7, r2`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          fn: "jmpPosFn"
+        },
+        {
+          in: `JMP_Z: 7, r0`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          fn: "jmpZeroFn"
+        },
+        {
+          in: `JMP_Z: 7, r1`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          fn: "jmpZeroFn"
+        },
+        {
+          in: `JMP_Z: 7, r2`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          fn: "jmpZeroFn"
+        },
+        {
+          in: `JMP_U: 7, r0`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          fn: "jmpUndFn"
+        },
+        {
+          in: `JMP_U: 7, r1`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          fn: "jmpUndFn"
+        },
+        {
+          in: `JMP_U: 7, r2`,
+          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          fn: "jmpUndFn"
+        },
       ];
 
 
@@ -126,27 +275,77 @@ describe("parser suite", () => {
         testOperation(op, 1, tokens.FUNCTION_TYPES.FLOW, 2, t.fn);
 
         const arg1 = op.args[0];
-        testArgument(arg1, tokens.ARG_TYPES.NUM, 7, 7);
+        testArgument(arg1, t.expArg1);
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.REG, t.arg2Lit, t.arg2Intern);
+        testArgument(arg2, t.expAgr2);
       }
     });
 
     it("should parse the ADD instructions", () => {
+
       const tests = [
-        { in: "ADD: r0, r0", arg1Lit: "r0", arg2Lit: "r0", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.REGISTERS.r0 },
-        { in: "ADD: r0, r1", arg1Lit: "r0", arg2Lit: "r1", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.REGISTERS.r1 },
-        { in: "ADD: r0, r2", arg1Lit: "r0", arg2Lit: "r2", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.REGISTERS.r2 },
-        { in: "ADD: r1, r0", arg1Lit: "r1", arg2Lit: "r0", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.REGISTERS.r0 },
-        { in: "ADD: r1, r1", arg1Lit: "r1", arg2Lit: "r1", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.REGISTERS.r1 },
-        { in: "ADD: r1, r2", arg1Lit: "r1", arg2Lit: "r2", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.REGISTERS.r2 },
-        { in: "ADD: r2, r0", arg1Lit: "r2", arg2Lit: "r0", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.REGISTERS.r0 },
-        { in: "ADD: r2, r1", arg1Lit: "r2", arg2Lit: "r1", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.REGISTERS.r1 },
-        { in: "ADD: r2, r2", arg1Lit: "r2", arg2Lit: "r2", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.REGISTERS.r2 },
+        {
+          in: `ADD: r0, r0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          in: `ADD: r0, r1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+        },
+        {
+          in: `ADD: r0, r2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+        },
+        {
+          in: `ADD: r1, r0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          in: `ADD: r1, r1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+        },
+        {
+          in: `ADD: r1, r2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+        },
+        {
+          in: `ADD: r2, r0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          in: `ADD: r2, r1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+        },
+        {
+          in: `ADD: r2, r2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+        },
+        {
+          in: `ADD: r0, -1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1),
+        },
+        {
+          in: `ADD: r0, 0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "0", 0),
+        },
+        {
+          in: `ADD: r0, 1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+        },
       ];
-
-
 
       for (const t of tests) {
         const p = new Parser(t.in);
@@ -157,24 +356,60 @@ describe("parser suite", () => {
         testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.ADD);
 
         const arg1 = op.args[0];
-        testArgument(arg1, tokens.ARG_TYPES.REG, t.arg1Lit, t.arg1Intern);
+        testArgument(arg1, t.expAgr1);
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.REG, t.arg2Lit, t.arg2Intern);
+        testArgument(arg2, t.expAgr2);
       }
     });
 
     it("should parse the LOAD instructions", () => {
       const tests = [
-        { in: `LOAD: r0, mx0`, expArg1Lit: "r0", expArg2Lit: "mx0", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.MEMORY.mx0 },
-        { in: `LOAD: r0, mx1`, expArg1Lit: "r0", expArg2Lit: "mx1", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.MEMORY.mx1 },
-        { in: `LOAD: r0, mx2`, expArg1Lit: "r0", expArg2Lit: "mx2", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.MEMORY.mx2 },
-        { in: `LOAD: r1, mx0`, expArg1Lit: "r1", expArg2Lit: "mx0", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.MEMORY.mx0 },
-        { in: `LOAD: r1, mx1`, expArg1Lit: "r1", expArg2Lit: "mx1", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.MEMORY.mx1 },
-        { in: `LOAD: r1, mx2`, expArg1Lit: "r1", expArg2Lit: "mx2", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.MEMORY.mx2 },
-        { in: `LOAD: r2, mx0`, expArg1Lit: "r2", expArg2Lit: "mx0", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.MEMORY.mx0 },
-        { in: `LOAD: r2, mx1`, expArg1Lit: "r2", expArg2Lit: "mx1", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.MEMORY.mx1 },
-        { in: `LOAD: r2, mx2`, expArg1Lit: "r2", expArg2Lit: "mx2", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.MEMORY.mx2 },
+        {
+          in: `LOAD: r0, mx0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
+        },
+        {
+          in: `LOAD: r0, mx1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
+        },
+        {
+          in: `LOAD: r0, mx2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
+        },
+        {
+          in: `LOAD: r1, mx0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
+        },
+        {
+          in: `LOAD: r1, mx1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
+        },
+        {
+          in: `LOAD: r1, mx2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
+        },
+        {
+          in: `LOAD: r2, mx0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
+        },
+        {
+          in: `LOAD: r2, mx1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
+        },
+        {
+          in: `LOAD: r2, mx2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
+        },
       ];
 
 
@@ -189,24 +424,75 @@ describe("parser suite", () => {
         testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.LOAD);
 
         const arg1 = op.args[0];
-        testArgument(arg1, tokens.ARG_TYPES.REG, t.expArg1Lit, t.arg1Intern);
+        testArgument(arg1, t.expAgr1);
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.MEM, t.expArg2Lit, t.arg2Intern);
+        testArgument(arg2, t.expAgr2);
       }
     });
 
     it("should parse the SUB instructions", () => {
       const tests = [
-        { in: "SUB: r0, r0", arg1Lit: "r0", arg2Lit: "r0", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.REGISTERS.r0 },
-        { in: "SUB: r0, r1", arg1Lit: "r0", arg2Lit: "r1", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.REGISTERS.r1 },
-        { in: "SUB: r0, r2", arg1Lit: "r0", arg2Lit: "r2", arg1Intern: tokens.REGISTERS.r0, arg2Intern: tokens.REGISTERS.r2 },
-        { in: "SUB: r1, r0", arg1Lit: "r1", arg2Lit: "r0", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.REGISTERS.r0 },
-        { in: "SUB: r1, r1", arg1Lit: "r1", arg2Lit: "r1", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.REGISTERS.r1 },
-        { in: "SUB: r1, r2", arg1Lit: "r1", arg2Lit: "r2", arg1Intern: tokens.REGISTERS.r1, arg2Intern: tokens.REGISTERS.r2 },
-        { in: "SUB: r2, r0", arg1Lit: "r2", arg2Lit: "r0", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.REGISTERS.r0 },
-        { in: "SUB: r2, r1", arg1Lit: "r2", arg2Lit: "r1", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.REGISTERS.r1 },
-        { in: "SUB: r2, r2", arg1Lit: "r2", arg2Lit: "r2", arg1Intern: tokens.REGISTERS.r2, arg2Intern: tokens.REGISTERS.r2 },
+        {
+          in: `SUB: r0, r0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          in: `SUB: r0, r1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+        },
+        {
+          in: `SUB: r0, r2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+        },
+        {
+          in: `SUB: r1, r0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          in: `SUB: r1, r1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+        },
+        {
+          in: `SUB: r1, r2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+        },
+        {
+          in: `SUB: r2, r0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+        },
+        {
+          in: `SUB: r2, r1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
+        },
+        {
+          in: `SUB: r2, r2`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
+        },
+        {
+          in: `SUB: r0, -1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1),
+        },
+        {
+          in: `SUB: r0, 0`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "0", 0),
+        },
+        {
+          in: `SUB: r0, 1`,
+          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
+          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "1", 1),
+        },
       ];
 
       for (const t of tests) {
@@ -214,15 +500,14 @@ describe("parser suite", () => {
         const operations = p.parse(t.in)
 
         assert.equal(operations.length, 1);
-
         const op = p.operations[0];
         testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.SUB);
 
         const arg1 = op.args[0];
-        testArgument(arg1, tokens.ARG_TYPES.REG, t.arg1Lit, t.arg1Intern);
+        testArgument(arg1, t.expAgr1);
 
         const arg2 = op.args[1];
-        testArgument(arg2, tokens.ARG_TYPES.REG, t.arg2Lit, t.arg2Intern);
+        testArgument(arg2, t.expAgr2);
       }
     });
 
@@ -241,7 +526,6 @@ describe("parser suite", () => {
         testOperation(op, 1, tokens.FUNCTION_TYPES.FLOW, 0, tokens.FUNCTIONS.START);
       }
     });
-
   });
 
   describe("ERROR INSTRUCTIONS", () => {
