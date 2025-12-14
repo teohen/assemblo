@@ -11,6 +11,7 @@ export const status = {
 }
 
 class Program {
+  clock;
   parser;
   evaluator;
   registers;
@@ -22,7 +23,7 @@ class Program {
 
   constructor() {
   }
-  
+
   isReady() {
     return this.status === status.RUNNING
   }
@@ -47,6 +48,7 @@ class Program {
 
   reset(inQ) {
     this.line = 0;
+    this.clock = 2;
     this.status = status.READY;
 
 
@@ -88,32 +90,31 @@ class Program {
     }
   }
 
-  run(code) {
+  run(code, tickFn, endProgramFn, delay) {
     if (!code) return;
     this.prepareOperations(code)
 
     if (this.status != status.PARSED) return;
-
-    
     this.line = 1
     this.status = status.RUNNING;
 
-    while (true) {
+    const interval = setInterval(() => {
       try {
         this.line = this.evaluator.tick(this.line)
+        tickFn()
         if (this.line < 0) {
           this.status = status.FINISHED;
-          break;
+          clearInterval(interval);
+          endProgramFn()
         }
         this.line += 1;
       } catch (error) {
         this.logger.push({ type: 'error', value: error.message })
         this.status = status.FINISHED;
-        break;
+        clearInterval(interval);
+        endProgramFn()
       }
-    }
-
-    this.status = status.FINISHED;
+    }, this.clock * delay)
   }
 
   nextLine() {

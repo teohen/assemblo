@@ -8,6 +8,7 @@ const debugBtn = document.getElementById('debugBtn');
 const nextLineBtn = document.getElementById('nextLineBtn');
 const restoreBtn = document.getElementById('restoreBtn');
 const submitBtn = document.getElementById('submitBtn');
+const runDelay = document.getElementById('runDelay');
 
 const urlParams = new URLSearchParams(window.location.search);
 const paramChallenge = urlParams.get('challenge');
@@ -21,7 +22,7 @@ if (paramChallenge) {
   inputStack = challenge.input
   expected = challenge.expected
   ui.renderChallengeInfo(challenge)
-
+  submitBtn.hidden = false
 }
 
 p.reset(inputStack)
@@ -31,13 +32,19 @@ runBtn.addEventListener('click', function () {
   const code = editor.getValue();
   ui.updateIcon(this, 'Running...', 'spin');
   p.reset(inputStack);
-  p.run(code)
-
-  ui.updateIcon(this, 'Run', 'play');
-
-  ui.renderCodeInfo(p, inputStack);
-  ui.renderRegistersMemoryInfo(p);
-  ui.renderConsoleOutput(p);
+  let lastLine = p.line;
+  p.run(code,
+    () => {
+      ui.renderCodeInfo(p, inputStack);
+      ui.renderRegistersMemoryInfo(p);
+      ui.renderConsoleOutput(p);
+      ui.paintEditorLine(p.line - 1, 'yellow-line')
+      ui.removePaintEditorLine(lastLine - 1, 'yellow-line')
+      lastLine = p.line
+    },
+    () => { ui.updateIcon(runBtn, 'Run', 'play') },
+    parseInt(runDelay.value)
+    );
 });
 
 debugBtn.addEventListener('click', function () {
@@ -75,10 +82,14 @@ restoreBtn.addEventListener("click", () => {
 })
 
 submitBtn.addEventListener("click", () => {
-  const code = editor.getValue();;
+  const code = editor.getValue();
   p.reset(inputStack);
-  p.run(code);
-  p.test(expected);
-
-  ui.renderConsoleOutput(p)
+  p.run(code, () => {
+    ui.renderCodeInfo(p, inputStack);
+    ui.renderRegistersMemoryInfo(p);
+    ui.renderConsoleOutput(p);
+  }, () => {
+    p.test(expected);
+    ui.renderConsoleOutput(p);
+  }, parseInt(runDelay.value));
 })
