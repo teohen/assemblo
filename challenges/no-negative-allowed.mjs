@@ -15,5 +15,5 @@ const code = `START
   const q = [0, 1, -2, 3, -4, 5];
   const p = new Program();
   p.reset(q);
-  p.run(code)
+  p.run(code, () =>{}, ()=>{}, 10);
 

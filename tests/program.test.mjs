@@ -25,6 +25,7 @@ describe("PROGRAM suite", () => {
 
     assert.equal(p.line, 0);
     assert.equal(p.status, status.READY);
+    assert.equal(p.clock, 2);
     assert.equal(p.logger.length, 0);
     assert.equal(p.inQ.length, input.length)
     assert.equal(p.inQ[0], input[0])
@@ -58,7 +59,7 @@ describe("PROGRAM suite", () => {
     assert.equal(p.parser.flow.length, 0)
   })
 
-  it(" Should prepare the operations with the correct code", () => {
+  it("Should prepare the operations with the correct code", () => {
     const fakeCode = 'FAKE CODE';
     const p = new Program();
     p.reset([]);
@@ -73,7 +74,7 @@ describe("PROGRAM suite", () => {
     assert.equal(p.evaluator.operations[0], "mocked operations")
   })
 
-  it(" Should prepare the operations with the a incorrect code", () => {
+  it("Should prepare the operations with the a incorrect code", () => {
     const fakeCode = 'FAKE CODE';
     const p = new Program();
     p.reset([]);
@@ -91,7 +92,7 @@ describe("PROGRAM suite", () => {
     assert.equal(p.evaluator.operations.length, 0)
   })
 
-  it(" should not execute the nextLine when status is not PARSED or RUNNING", () => {
+  it("should not execute the nextLine when status is not PARSED or RUNNING", () => {
     const input = [1]
     const p = new Program();
     p.reset(input);
@@ -150,7 +151,7 @@ describe("PROGRAM suite", () => {
 
   });
 
-  it(" should execute the nextLine and update status if return line is negative", () => {
+  it("should execute the nextLine and update status if return line is negative", () => {
     const fakeCode = 'FAKE CODE';
     const lineReturn = chance.integer({ min: -100, max: -1 })
     const input = [1];
@@ -168,7 +169,7 @@ describe("PROGRAM suite", () => {
     assert.equal(tickSpy.mock.callCount(), 1)
   });
 
-  it(" should not run the code if its is not correclty parsed", () => {
+  it("should finish program and print parsing error to the console", () => {
     const fakeCode = 'FAKE CODE';
     const input = [1]
     const p = new Program();
@@ -178,16 +179,17 @@ describe("PROGRAM suite", () => {
       throw new Error('fake error')
     });
 
-    p.run(fakeCode);
+    p.run(fakeCode, () => { }, () => { }, 1);
 
     assert.equal(p.status, status.FINISHED);
     assert.equal(p.logger.length, 1)
     assert.equal(p.logger[0].value, 'fake error')
     assert.equal(p.logger[0].type, 'error')
     assert.equal(p.evaluator.operations.length, 0)
+
   });
 
-  it(" should run the code if correctly parsed", () => {
+  it("should run the code if correctly parsed", (t, done) => {
     const fakeCode = 'FAKE CODE';
     let lineReturn = 1
     const input = [1]
@@ -201,14 +203,15 @@ describe("PROGRAM suite", () => {
       return lineReturn
     });
 
-    p.run(fakeCode);
-
-    assert.equal(p.line, lineReturn)
-    assert.equal(p.status, status.FINISHED);
-    assert.equal(tickSpy.mock.callCount(), 2)
+    p.run(fakeCode, () => { }, () => {
+      assert.equal(p.line, lineReturn)
+      assert.equal(p.status, status.FINISHED);
+      assert.equal(tickSpy.mock.callCount(), 2);
+      done();
+    }, 1);
   });
 
-  it(" should run the code if correctly parsed", () => {
+  it("should finish program and print running error to console", (t, done) => {
     const fakeCode = 'FAKE CODE';
     let lineReturn = 1
     const input = [1]
@@ -219,18 +222,19 @@ describe("PROGRAM suite", () => {
 
     const tickSpy = mock.method(p.evaluator, 'tick', () => {
       lineReturn -= 1
-      if (lineReturn < 0 ) throw new Error('fake error')
+      if (lineReturn < 0) throw new Error('fake error')
       return lineReturn
     });
 
-    p.run(fakeCode);
-
-    assert.equal(p.status, status.FINISHED);
-    assert.equal(p.logger.length, 1)
-    assert.equal(p.logger[0].value, 'fake error')
-    assert.equal(p.logger[0].type, 'error')
-    assert.equal(p.evaluator.operations.length, 0)
-    assert.equal(tickSpy.mock.callCount(), 2)
+    p.run(fakeCode, () => { }, () => {
+      assert.equal(p.status, status.FINISHED);
+      assert.equal(p.logger.length, 1)
+      assert.equal(p.logger[0].value, 'fake error')
+      assert.equal(p.logger[0].type, 'error')
+      assert.equal(p.evaluator.operations.length, 0)
+      assert.equal(tickSpy.mock.callCount(), 2)
+      done()
+    }, 1);
   });
 
 });
