@@ -19,7 +19,7 @@ const challenges = {
     <p><strong>Constraints</strong>:<br> The INPUT list will contain an odd sequence of integers ranging from -100 to 100. <br></p>
     <p><strong>Result</strong>:<br> The output must be a list containing the result of the multiplication.</p>
     `,
-    input: [1, 2, 3, 4, 5, 6],
+    input: [6, 5, 4, 3, 2, 1],
     expected: [2, 12, 30]
   },
   "same-sign": {
@@ -31,7 +31,7 @@ const challenges = {
     <p><strong>Result</strong>:<br> The output must be a list containing 0s and 1s in the right sequence.</p>
     `,
     input: [4, -8, 5, -4, 2, -4, -2, -8, 2, 4],
-    expected: [1, 1, 1, 0, 0]
+    expected: [0, 0, 1, 1, 1]
   },
 }
 
