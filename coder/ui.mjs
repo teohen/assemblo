@@ -11,17 +11,17 @@ function renderCodeInfo(p, inputStack) {
   codeInfo.children[1].innerText = p.status || '_';
   codeInfo.children[2].innerText = 0
   codeInfo.children[3].innerText = inputStack ?  '[' + inputStack + ']' : '[]';
-  codeInfo.children[4].innerText = p.outQ || '_';
+  codeInfo.children[4].innerText = p.outQ ?  '[' + p.outQ + ']' : '[]';
 }
 
 function renderRegistersMemoryInfo(p) {
-  memoryTable.children[0].innerText = p.memory.get("MX0") || "_"
-  memoryTable.children[1].innerText = p.memory.get("MX1") || "_"
-  memoryTable.children[2].innerText = p.memory.get("MX2") || "_"
+  memoryTable.children[0].innerText = p.memory.get("MX0") !== undefined ?  p.memory.get("MX0") : "_"
+  memoryTable.children[1].innerText = p.memory.get("MX1") !== undefined ?  p.memory.get("MX1") : "_"
+  memoryTable.children[2].innerText = p.memory.get("MX2") !== undefined ?  p.memory.get("MX2") : "_"
 
-  registersTable.children[0].innerText = p.registers.get("R0X") || "_"
-  registersTable.children[1].innerText = p.registers.get("R1X") || "_"
-  registersTable.children[2].innerText = p.registers.get("R2X") || "_"
+  registersTable.children[0].innerText = p.registers.get("R0X") !== undefined ?  p.registers.get("R0X") : "_"
+  registersTable.children[1].innerText = p.registers.get("R1X") !== undefined ?  p.registers.get("R1X") : "_"
+  registersTable.children[2].innerText = p.registers.get("R2X") !== undefined ?  p.registers.get("R2X") : "_"
 
 }
 

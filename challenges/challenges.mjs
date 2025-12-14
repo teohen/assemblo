@@ -8,7 +8,7 @@ const challenges = {
     <p><strong>Result</strong>: The output must be a list of positive integers only, presented in the same order from the INPUT list.</p>
 <p>hint: try start using POP to take the first item from the INPUT list to a register</p>
     `,
-    input: [1, -2, 3, -4, 5],
+    input: [0, 1, -2, 3, -4, 5],
     expected: [5, 3, 1]
   },
   "multiplication-miracle": {
@@ -19,8 +19,8 @@ const challenges = {
     <p><strong>Constraints</strong>:<br> The INPUT list will contain an odd sequence of integers ranging from -100 to 100. <br></p>
     <p><strong>Result</strong>:<br> The output must be a list containing the result of the multiplication.</p>
     `,
-    input: [6, 5, 4, 3, 2, 1],
-    expected: [2, 12, 30]
+    input: [-3, 2, -1, -4, 3, 0, 6, 5, 4, 3, 2, 1],
+    expected: [2, 12, 30, 0, 4, -6]
   },
   "same-sign": {
     title: "Same sign",

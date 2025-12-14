@@ -80,5 +80,7 @@ submitBtn.addEventListener("click", () => {
   p.run(code);
   p.test(expected);
 
+  ui.renderCodeInfo(p, inputStack);
+  ui.renderRegistersMemoryInfo(p)
   ui.renderConsoleOutput(p)
 })
