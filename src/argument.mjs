@@ -36,12 +36,7 @@ class Argument {
   }
 
   static validateValue(arg, expValue, ln) {
-    if (arg.intern != expValue) {
-      throw new Error(
-        `AT LINE: ${ln}. INVALID ARGUMENT: ${arg.literal}, EXPECTED: ${expValue}`,
-      );
-    }
-    return true;
+    return !(arg.intern != expValue)
   }
 }
 
