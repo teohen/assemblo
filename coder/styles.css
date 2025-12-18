@@ -1,5 +1,5 @@
 .scrollable-row {
-  height: 200px;
+  max-height: 300px;
 }
 
 .yellow-line {

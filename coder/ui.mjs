@@ -12,11 +12,13 @@ const nextLineBtn = document.getElementById('nextLineBtn');
 const restoreBtn = document.getElementById('restoreBtn');
 const submitBtn = document.getElementById('submitBtn');
 const runDelay = document.getElementById('runDelay');
+const testModal = document.getElementById('testModal');
+const myModal = new bootstrap.Modal(testModal);
 
 function renderCodeInfo(p, inputStack) {
   codeInfo.children[0].innerText = p.line || '_';
   codeInfo.children[1].innerText = p.status || '_';
-  codeInfo.children[2].innerText = 0
+  codeInfo.children[2].innerText = p.instCounter || 0
   codeInfo.children[3].innerText = inputStack ? '[' + inputStack + ']' : '[]';
   codeInfo.children[4].innerText = p.outQ ? '[' + p.outQ + ']' : '[]';
 }
@@ -37,6 +39,7 @@ function renderConsoleOutput(p) {
   for (const log of p.logger) {
     consoleElem.appendChild(createConsoleOuput(log))
   }
+
   consoleElem.scrollTop = consoleElem.scrollHeight;
 }
 
@@ -160,18 +163,62 @@ function updateUI(p, inputStack) {
 }
 
 function updateEditor(p) {
-  if (p.status === status.READY){
+  if (p.status === status.READY) {
     editor.setOption('readOnly', false);
   }
-  
+
   const errors = p.logger.find((i) => i.type === 'error');
   clearEditor()
-
-
-
-
   editor.addLineClass(p.line - 1, "background", "yellow-line");
   if (errors) editor.addLineClass(errors.ln - 1, "background", "red-line");
+}
+
+function showModal(p, success) {
+  const modalHeader = testModal.firstElementChild.firstElementChild.firstElementChild;
+  const modalTitle = modalHeader.firstElementChild;
+
+  if (success == true) {
+    modalHeader.classList.remove('bg-danger')
+    modalHeader.classList.add('bg-success')
+    modalTitle.innerHTML = "Correct!"
+  } else {
+    modalHeader.classList.remove('bg-success')
+    modalHeader.classList.add('bg-danger')
+    modalTitle.innerHTML = "Failed"
+  }
+
+  const testsResults = document.getElementById('testsResults');
+  testsResults.replaceChildren()
+
+
+  const fragment = document.createDocumentFragment();
+
+  const items = [
+    { data: 'output', value: '[' + p.outQ + ']' },
+    { data: 'Inst. Count', value: p.instCounter },
+    { data: 'Reg 0', value: p.registers.get("R0X") !== undefined ? p.registers.get("R0X") : " " },
+    { data: 'Reg 1', value: p.registers.get("R1X") !== undefined ? p.registers.get("R1X") : " " },
+    { data: 'Reg 2', value: p.registers.get("R2X") !== undefined ? p.registers.get("R2X") : " " },
+    { data: 'Mem 0', value: p.memory.get("MX0") !== undefined ? p.memory.get("MX0") : " " },
+    { data: 'Mem 1', value: p.memory.get("MX1") !== undefined ? p.memory.get("MX1") : " " },
+    { data: 'Mem 2', value: p.memory.get("MX2") !== undefined ? p.memory.get("MX2") : " " },
+  ];
+
+  items.forEach(i => {
+    const td1 = document.createElement('td');
+    const td2 = document.createElement('td');
+    td1.textContent = i.data;
+    td1.classList.add('bold')
+    td2.textContent = i.value;
+
+    const tr = document.createElement('tr');
+    tr.appendChild(td1)
+    tr.appendChild(td2)
+    fragment.appendChild(tr);
+  });
+
+  testsResults.appendChild(fragment);
+  myModal.show();
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -203,5 +250,6 @@ document.addEventListener('DOMContentLoaded', function () {
 export default {
   renderChallengeInfo,
   updateUI,
-  updateEditor
+  updateEditor,
+  showModal
 }
