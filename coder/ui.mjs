@@ -184,7 +184,7 @@ function showModal(p, success) {
   } else {
     modalHeader.classList.remove('bg-success')
     modalHeader.classList.add('bg-danger')
-    modalTitle.innerHTML = "Failed"
+    modalTitle.innerHTML = "Incorrect"
   }
 
   const testsResults = document.getElementById('testsResults');
