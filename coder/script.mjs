@@ -79,7 +79,7 @@ submitBtn.addEventListener("click", () => {
   p.run(code, () => {
     ui.updateUI(p, inputStack)
   }, () => {
-    p.test(expected);
+    ui.showModal(p, p.test(expected))
     ui.updateUI(p, inputStack)
   }, 1);
 })

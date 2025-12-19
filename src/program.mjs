@@ -20,6 +20,7 @@ class Program {
   outQ;
   status;
   logger;
+  instCounter;
 
   constructor() {
   }
@@ -38,17 +39,17 @@ class Program {
       const out = this.outQ[i];
 
       if (exp != out) {
-        this.logger.push({ type: 'error', value: "incorrect answer", ln: -1 });
-        return
+        return false
       }
     }
-    this.logger.push({ type: 'success', value: "PASSED!!!", ln: -1 })
-
+    
+    return true
   }
 
   reset(inQ) {
     this.line = 0;
     this.clock = 2;
+    this.instCounter = 0;
     this.status = status.READY;
 
 
@@ -101,6 +102,7 @@ class Program {
     const interval = setInterval(() => {
       try {
         this.line = this.evaluator.tick(this.line)
+        this.instCounter += 1
         tickFn()
         if (this.line < 0) {
           this.status = status.FINISHED;
@@ -123,6 +125,7 @@ class Program {
     this.line += 1
     this.status = status.RUNNING;
     this.line = this.evaluator.tick(this.line)
+    this.instCounter += 1
     if (this.line < 0) {
       this.status = status.FINISHED;
       return;
