@@ -39,7 +39,6 @@ class Program {
       const out = this.outQ[i];
 
       if (exp != out) {
-        this.logger.push({ type: 'error', value: "incorrect answer", ln: -1 });
         return false
       }
     }

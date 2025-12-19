@@ -8,7 +8,10 @@
   "scripts": {
     "test": "node --experimental-test-coverage --test",
     "test:only": "node --test --test-name-pattern",
-    "test:coverage": ""
+    "test:coverage": "",
+    "clean": "npx rimraf dist",
+    "prebuild": "npm run clean",
+    "build": "bun build ./index.html ./docs.html ./coder.html --outdir ./built/"
   },
   "engines": {
     "node": ">=20.0.0"
