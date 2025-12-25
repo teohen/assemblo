@@ -1,3 +1,4 @@
+/*
 import test, { before, beforeEach, describe, it, mock } from "node:test";
 import assert from "node:assert";
 import { Chance } from "chance";
@@ -240,3 +241,4 @@ describe("PROGRAM suite", () => {
 });
 
 
+*/

@@ -1,7 +1,15 @@
 import Argument from "./argument";
 import Operation from "./operation";
+import { Label, Labels } from "./program";
 import tokens from "./tokens";
 
+
+
+type ArgumentValue = number | undefined
+
+interface ConditionalFunction {
+  (val: number | undefined): boolean;
+}
 
 // Define types for the storage structures - they use string keys
 interface Storage {
@@ -24,14 +32,16 @@ class Evaluator {
   memory: Storage;
   operations: Operation[];
   logger: Logger;
+  labels: Labels;
 
   constructor(
-    inQ: number[], 
-    outQ: number[], 
-    registers: Storage, 
-    memory: Storage, 
-    operations: Operation[], 
-    logger: Logger
+    inQ: number[],
+    outQ: number[],
+    registers: Storage,
+    memory: Storage,
+    operations: Operation[],
+    logger: Logger,
+    labels: Labels
   ) {
     if (!Array.isArray(inQ)) {
       throw new Error("InQ should be a non empty array");
@@ -41,6 +51,7 @@ class Evaluator {
     this.memory = memory;
     this.operations = operations;
     this.logger = logger;
+    this.labels = labels;
 
     this.inQ = inQ;
     this.outQ = outQ;
@@ -60,9 +71,10 @@ class Evaluator {
     this.jmpPosFn = this.jmpPosFn.bind(this);
     this.jmpZeroFn = this.jmpZeroFn.bind(this);
     this.jmpUndFn = this.jmpUndFn.bind(this);
+    this.lblFn = this.lblFn.bind(this);
   }
 
-  getValue(arg: Argument): number | undefined {
+  getValue(arg: Argument): ArgumentValue {
     switch (arg.type) {
       case tokens.ARG_TYPES.REG:
         return this.registers.get(arg.intern as string);
@@ -87,21 +99,21 @@ class Evaluator {
     Argument.validateType(arg2, [tokens.ARG_TYPES.LIST], ln);
 
     if (!Argument.validateValue(arg2, (tokens.LISTS.INPUT as unknown as number), ln)) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line: ${ln}. Invalid Argument (${arg2.literal}). Expected: INPUT`, 
-        ln 
+      this.logger.push({
+        type: 'error',
+        value: `At line: ${ln}. Invalid Argument (${arg2.literal}). Expected: INPUT`,
+        ln
       });
       return -1;
     }
 
     const result = this.inQ.pop();
-    
+
     if (result === undefined) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line: ${ln}. Input queue is empty`, 
-        ln 
+      this.logger.push({
+        type: 'error',
+        value: `At line: ${ln}. Input queue is empty`,
+        ln
       });
       return -1;
     }
@@ -122,10 +134,10 @@ class Evaluator {
     ], ln);
 
     if (!Argument.validateValue(arg1, (tokens.LISTS.OUTPUT as unknown as number), ln)) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line: ${ln}. Invalid Argument (${arg1.literal}). Expected: OUTPUT`, 
-        ln 
+      this.logger.push({
+        type: 'error',
+        value: `At line: ${ln}. Invalid Argument (${arg1.literal}). Expected: OUTPUT`,
+        ln
       });
       return -1;
     }
@@ -133,10 +145,10 @@ class Evaluator {
     const result = this.getValue(arg2);
 
     if (result === undefined) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line ${ln}. SOURCE argument (${arg2.literal}) is undefined`, 
-        ln 
+      this.logger.push({
+        type: 'error',
+        value: `At line ${ln}. SOURCE argument (${arg2.literal}) is undefined`,
+        ln
       });
       return -1;
     }
@@ -158,14 +170,14 @@ class Evaluator {
 
     const result = this.getValue(arg2);
     if (result === undefined) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line ${ln}. Cannot copy undefined value`, 
-        ln 
+      this.logger.push({
+        type: 'error',
+        value: `At line ${ln}. Cannot copy undefined value`,
+        ln
       });
       return -1;
     }
-    
+
     this.memory.set(arg1.intern as string, result);
 
     return ln;
@@ -180,113 +192,91 @@ class Evaluator {
 
     const result = this.getValue(arg2);
     if (result === undefined) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line ${ln}. Cannot load undefined value from memory`, 
-        ln 
+      this.logger.push({
+        type: 'error',
+        value: `At line ${ln}. Cannot load undefined value from memory`,
+        ln
       });
       return -1;
     }
-    
+
     this.registers.set(arg1.intern as string, result);
     return ln;
   }
 
-  jmpNegFn(args: Argument[], ln: number): number {
+  jmpFn(args: Argument[], ln: number, cond: ConditionalFunction): number {
     const arg1 = args[0];
     const arg2 = args[1];
-    Argument.validateType(arg1, [tokens.ARG_TYPES.NUM], ln);
-    Argument.validateType(arg2, [
-      tokens.ARG_TYPES.REG,
-      tokens.ARG_TYPES.NUM
-    ], ln);
-
-    if ((arg1.intern as number) > this.operations.length || (arg1.intern as number) < 0) {
-      throw new Error(
-        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.intern}`,
-      );
-    }
-
-    const val = this.getValue(arg2);
-
-    if (val === undefined) {
-      return ln;
-    }
-
-    if (val < 0) return (arg1.intern as number) - 1;
-
-    return ln;
-  }
-
-  jmpPosFn(args: Argument[], ln: number): number {
-    const arg1 = args[0];
-    const arg2 = args[1];
-    Argument.validateType(arg1, [tokens.ARG_TYPES.NUM], ln);
-    Argument.validateType(arg2, [
-      tokens.ARG_TYPES.REG,
-      tokens.ARG_TYPES.NUM
-    ], ln);
-
-    if ((arg1.intern as number) > this.operations.length || (arg1.intern as number) < 0) {
-      throw new Error(
-        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.intern}`,
-      );
-    }
-
-    const val = this.getValue(arg2);
-
-    if (val === undefined) {
-      return ln;
-    }
-
-    if (val > 0) return (arg1.intern as number) - 1;
-
-    return ln;
-  }
-
-  jmpZeroFn(args: Argument[], ln: number): number {
-    const arg1 = args[0];
-    const arg2 = args[1];
-    Argument.validateType(arg1, [tokens.ARG_TYPES.NUM], ln);
+    Argument.validateType(arg1, [tokens.ARG_TYPES.LBL], ln);
     Argument.validateType(arg2, [
       tokens.ARG_TYPES.REG,
       tokens.ARG_TYPES.NUM,
     ], ln);
 
-    if ((arg1.intern as number) > this.operations.length || (arg1.intern as number) < 0) {
-      throw new Error(
-        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.intern}`,
-      );
-    }
+
 
     const val = this.getValue(arg2);
 
-    if (val === undefined) {
-      return ln;
-    }
-
-    if (val === 0) return (arg1.intern as number) - 1;
+    if (cond(val)) {
+      const lbl = this.labels.get(arg1.literal);
+      if (!lbl) {
+        throw new Error(
+          `AT LINE: ${ln}. CAN'T JUMP TO INVALID LABEL: ${arg1.intern}`,
+        );
+      }
+      return lbl
+    };
 
     return ln;
   }
 
-  jmpUndFn(args: Argument[], ln: number): number {
-    const arg1 = args[0];
-    const arg2 = args[1];
-    Argument.validateType(arg1, [tokens.ARG_TYPES.NUM], ln);
-    Argument.validateType(arg2, [tokens.ARG_TYPES.REG], ln);
+  jmpNegFn(args: Argument[], ln: number): number {
+    const condition = (val: ArgumentValue) => {
+      if (val && val < 0) {
+        return true
+      }
 
-    if ((arg1.intern as number) > this.operations.length || (arg1.intern as number) < 0) {
-      throw new Error(
-        `AT LINE: ${ln}. CAN'T JUMP TO INVALID LINE: ${arg1.intern}`,
-      );
+      return false
     }
 
-    const val = this.getValue(arg2);
+    return this.jmpFn(args, ln, condition)
+  }
 
-    if (val === undefined) return (arg1.intern as number) - 1;
+  jmpPosFn(args: Argument[], ln: number): number {
+    const condition = (val: ArgumentValue) => {
+      if (val && val > 0) {
+        return true
+      }
 
-    return ln;
+      return false
+    }
+
+    return this.jmpFn(args, ln, condition)
+  }
+
+  jmpZeroFn(args: Argument[], ln: number): number {
+
+    const condition = (val: ArgumentValue) => {
+      if (val === 0) {
+        return true
+      }
+
+      return false
+    }
+
+    return this.jmpFn(args, ln, condition)
+  }
+
+  jmpUndFn(args: Argument[], ln: number): number {
+    const condition = (val: ArgumentValue) => {
+      if (val === undefined) {
+        return true
+      }
+
+      return false
+    }
+
+    return this.jmpFn(args, ln, condition)
   }
 
   addFn(args: Argument[], ln: number): number {
@@ -303,10 +293,10 @@ class Evaluator {
     const val2 = this.getValue(arg2);
 
     if (val2 === undefined) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line ${ln}. SOURCE argument should not be undefined`, 
-        ln 
+      this.logger.push({
+        type: 'error',
+        value: `At line ${ln}. SOURCE argument should not be undefined`,
+        ln
       });
       return -1;
     }
@@ -332,10 +322,10 @@ class Evaluator {
     const val2 = this.getValue(arg2);
 
     if (val2 === undefined) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line ${ln}. Argument should be a valid integer.`, 
-        ln 
+      this.logger.push({
+        type: 'error',
+        value: `At line ${ln}. Argument should be a valid integer.`,
+        ln
       });
       return -1;
     }
@@ -354,10 +344,10 @@ class Evaluator {
 
     const result = this.getValue(arg1);
 
-    this.logger.push({ 
-      type: 'message', 
-      value: result, 
-      ln 
+    this.logger.push({
+      type: 'message',
+      value: result,
+      ln
     });
     return ln;
   }
@@ -370,14 +360,25 @@ class Evaluator {
     return -1;
   }
 
+  lblFn(args: Argument[], ln: number): number {
+    const arg1 = args[0];
+
+    Argument.validateType(arg1, [tokens.ARG_TYPES.LBL], ln);
+
+    const newLbl: Label = { name: arg1.literal, lineNumber: ln }
+    this.labels.push(newLbl);
+
+    return ln;
+  }
+
   tick(line: number): number {
     const op = this.operations[line - 1];
-    
+
     if (!op) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line ${line}. No operation found`, 
-        ln: line 
+      this.logger.push({
+        type: 'error',
+        value: `At line ${line}. No operation found`,
+        ln: line
       });
       return -1;
     }
@@ -386,10 +387,10 @@ class Evaluator {
     const f = this[op.funcName as keyof Evaluator] as (args: Argument[], ln: number) => number;
 
     if (!f) {
-      this.logger.push({ 
-        type: 'error', 
-        value: `At line ${line}. Instruction (${op.funcName}) not found`, 
-        ln: line 
+      this.logger.push({
+        type: 'error',
+        value: `At line ${line}. Instruction (${op.funcName}) not found`,
+        ln: line
       });
       return -1;
     }

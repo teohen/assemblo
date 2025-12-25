@@ -1,3 +1,210 @@
+import { describe, it, expect, expectTypeOf } from 'bun:test';
+
+import Argument from '../assemblo/argument';
+import * as ASM from '../assemblo'
+import { Label, Labels, Logger } from '../assemblo/program';
+import { newLabelArgument, newRegisterArgument, randLabel } from './fixtures/argument';
+import { newMap, newFilledMap } from './fixtures/maps';
+import { createOperation } from './fixtures/operation';
+import { Chance } from 'chance';
+const chance = new Chance();
+
+interface TestCase {
+  op: ASM.Operation;
+  registers: Map<string, number | undefined>;
+  memory: Map<string, number | undefined>;
+  labels: Labels;
+  expLine?: number;
+}
+
+describe("EVALUATOR SUITE", () => {
+
+  it("Should evaluate the JMP instructions to the conditional path", () => {
+
+    const randLabelName = randLabel()
+
+    const tests: TestCase[] = [
+      {
+        op: new ASM.Operation(
+          1,
+          "jmpNegFn",
+          [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+          ASM.tokens.FUNCTION_TYPES.FLOW
+        ),
+        registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: -1 }]),
+        memory: newMap([]),
+        labels: newMap([{ name: randLabelName }])
+      },
+      {
+        op: new ASM.Operation(
+          1,
+          "jmpPosFn",
+          [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+          ASM.tokens.FUNCTION_TYPES.FLOW
+        ),
+        registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: 1 }]),
+        memory: newMap([]),
+        labels: newMap([{ name: randLabelName }])
+      },
+      {
+        op: new ASM.Operation(
+          1,
+          "jmpZeroFn",
+          [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+          ASM.tokens.FUNCTION_TYPES.FLOW
+        ),
+        registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: 0 }]),
+        memory: newMap([]),
+        labels: newMap([{ name: randLabelName }])
+      },
+      {
+        op: new ASM.Operation(
+          1,
+          "jmpUndFn",
+          [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+          ASM.tokens.FUNCTION_TYPES.FLOW
+        ),
+        registers: newFilledMap([{ name: ASM.tokens.REGISTERS.r0, value: undefined }]),
+        memory: newMap([]),
+        labels: newMap([{ name: randLabelName }])
+      }
+    ];
+
+    for (let t of tests) {
+      console.log(`testing ${t.op.funcName} instruction`);
+      const input: number[] = [];
+      const output: number[] = [];
+
+      const registers = t.registers;
+      const memory = t.memory;
+
+      const line = 1;
+      const logger: Logger = [];
+
+      const args = [
+        new Argument(ASM.tokens.ARG_TYPES.NUM, "1", 1),
+      ];
+
+      const operations = [
+        t.op,
+        new ASM.Operation(line, ASM.tokens.FUNCTIONS.PRT, args, ASM.tokens.FUNCTION_TYPES.PROC),
+      ];
+
+      const eva = new ASM.Evaluator(
+        input,
+        output,
+        registers,
+        memory,
+        operations,
+        logger,
+        t.labels
+      );
+
+      const newLine = eva.tick(line);
+      const expLine = t.labels.get(randLabelName)
+      expect(expLine).toBeDefined()
+      expect(expLine).toBe(newLine);
+    }
+
+  })
+
+  it("Should evaluate the JMP instructions to the other path", () => {
+
+    const lineNumber = chance.integer({ min: 0, max: 1000 })
+    const randLabelName = randLabel()
+
+    const tests: TestCase[] = [
+      {
+        op: new ASM.Operation(
+          lineNumber,
+          "jmpNegFn",
+          [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+          ASM.tokens.FUNCTION_TYPES.FLOW
+        ),
+        registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value:  1}]),
+        memory: newMap([]),
+        labels: newMap([]),
+        expLine: lineNumber
+      },
+      {
+        op: new ASM.Operation(
+          lineNumber,
+          "jmpPosFn",
+          [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+          ASM.tokens.FUNCTION_TYPES.FLOW
+        ),
+        registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: -1 }]),
+        memory: newMap([]),
+        labels: newMap([{ name: randLabelName }]),
+        expLine: lineNumber
+      },
+      {
+        op: new ASM.Operation(
+          lineNumber,
+          "jmpZeroFn",
+          [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+          ASM.tokens.FUNCTION_TYPES.FLOW
+        ),
+        registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: 1 }]),
+        memory: newMap([]),
+        labels: newMap([{ name: randLabelName }]),
+        expLine: lineNumber
+      },
+      {
+        op: new ASM.Operation(
+          lineNumber,
+          "jmpUndFn",
+          [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+          ASM.tokens.FUNCTION_TYPES.FLOW
+        ),
+        registers: newFilledMap([{ name: ASM.tokens.REGISTERS.r0, value: 1 }]),
+        memory: newMap([]),
+        labels: newMap([{ name: randLabelName }]),
+        expLine: lineNumber
+      }
+    ];
+
+    for (let t of tests) {
+      console.log(`testing ${t.op.funcName} instruction`);
+      const input: number[] = [];
+      const output: number[] = [];
+
+      const registers = t.registers;
+      const memory = t.memory;
+
+      const line = 1;
+      const logger: Logger = [];
+
+      const args = [
+        new Argument(ASM.tokens.ARG_TYPES.NUM, "1", 1),
+      ];
+
+      const operations = [
+        t.op,
+        new ASM.Operation(line, ASM.tokens.FUNCTIONS.PRT, args, ASM.tokens.FUNCTION_TYPES.PROC),
+      ];
+
+      const eva = new ASM.Evaluator(
+        input,
+        output,
+        registers,
+        memory,
+        operations,
+        logger,
+        t.labels
+      );
+
+      const newLine = eva.tick(line);
+      expect(t.expLine).toBe(newLine);
+    }
+
+  })
+
+});
+
+
+
+/*
 import test, { describe, it } from "node:test";
 import assert from "node:assert";
 import Evaluator from "../src/evaluator.mjs";
@@ -926,3 +1133,4 @@ describe("Evaluator suite", () => {
     });
   })
 });
+*/

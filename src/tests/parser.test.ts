@@ -1,34 +1,86 @@
-import assert
+import { describe, it, expect, expectTypeOf } from 'bun:test';
 
+import Argument from '../assemblo/argument';
+import * as ASM from '../assemblo'
 
-import Argument from "../assemblo/argument.js";
-import Operation from "../assemblo/operation.js";
-import Program from "../assemblo/program.js";
-
-
-
-// Define test types
 interface TestCase {
-  in: string;
-  expArg1?: Argument;
-  expAgr2?: Argument;
-  expFuncName?: string;
-  fn?: string;
+  input: string;
+  exp: ASM.Operation;
 }
 
-interface OperationTest {
-  line: number;
-  type: string;
-  argsLength: number;
-  funcName: string;
-}
 
-interface ArgumentTest {
-  type: string;
-  literal: string | number;
-  intern: string | number;
-}
+describe('Parser suite', () => {
+  it('parse the JMP instructions', () => {
 
+    const tests: TestCase[] = [
+      {
+        input: `JMP_N: .end, r0`,
+        exp: {
+          args: [
+            new Argument(ASM.tokens.ARG_TYPES.LBL, ".end", ".end"),
+            new Argument(ASM.tokens.ARG_TYPES.REG, "r0", ASM.tokens.REGISTERS.r0),
+          ],
+          funcName: "jmpNegFn",
+          line: 1,
+          type: ASM.tokens.FUNCTION_TYPES.FLOW
+        },
+      },
+      {
+        input: `JMP_P: .end, r0`,
+        exp: {
+          args: [
+            new Argument(ASM.tokens.ARG_TYPES.LBL, ".end", ".end"),
+            new Argument(ASM.tokens.ARG_TYPES.REG, "r0", ASM.tokens.REGISTERS.r0),
+          ],
+          funcName: "jmpPosFn",
+          line: 1,
+          type: ASM.tokens.FUNCTION_TYPES.FLOW
+        },
+      },
+      {
+        input: `JMP_Z: .end, r0`,
+        exp: {
+          args: [
+            new Argument(ASM.tokens.ARG_TYPES.LBL, ".end", ".end"),
+            new Argument(ASM.tokens.ARG_TYPES.REG, "r0", ASM.tokens.REGISTERS.r0),
+          ],
+          funcName: "jmpZeroFn",
+          line: 1,
+          type: ASM.tokens.FUNCTION_TYPES.FLOW
+        },
+      },
+      {
+        input: `JMP_U: .end, r0`,
+        exp: {
+          args: [
+            new Argument(ASM.tokens.ARG_TYPES.LBL, ".end", ".end"),
+            new Argument(ASM.tokens.ARG_TYPES.REG, "r0", ASM.tokens.REGISTERS.r0),
+          ],
+          funcName: "jmpUndFn",
+          line: 1,
+          type: ASM.tokens.FUNCTION_TYPES.FLOW
+        },
+      }
+    ];
+
+    for (const t of tests) {
+      const p = new ASM.Parser();
+      const operations = p.parse(t.input);
+
+      expect(operations.length).toBe(1);
+
+      const op = p.operations[0];
+      expect(op).toEqual(t.exp)
+
+      expect(op.args[0]).toEqual(t.exp.args[0]);
+      expect(op.args[1]).toEqual(t.exp.args[1]);
+    }
+  });
+
+});
+
+
+/*
 describe("parser suite", () => {
   function testOperation(op: Operation, expLine: number, expType: string, expArgsLen: number, expFuncName: string): void {
     assert.equal(op.line, expLine);
@@ -615,3 +667,4 @@ describe("parser suite", () => {
     });
   });
 });
+*/

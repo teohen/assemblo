@@ -2,10 +2,16 @@
 import tokens from "./tokens";
 import Parser from "./parser";
 import Evaluator, { LoggerEntry } from "./evaluator";
-import Operation from "./operation";
-import Registers from "./registers";
 
 
+export interface Label {
+  name: string,
+  lineNumber: number
+}
+
+export type Registers = Map<string, number | undefined>;
+
+export type Labels = Map<string, number>;
 
 export type Logger = LoggerEntry[];
 
@@ -28,14 +34,15 @@ class Program {
   clock: number;
   parser: Parser;
   evaluator: Evaluator;
-  registers: Map<string, number | undefined>;
+  registers: Registers;
   memory: Map<string, number | undefined>;
   inQ: number[];
   outQ: number[];
   status: StatusType;
   logger: Logger;
   line: number;
-  registersNew: Registers[];
+  labels: Labels;
+
 
   constructor() {
     this.clock = 2;
@@ -44,12 +51,14 @@ class Program {
 
     // Initialize with default values - these will be overwritten in reset()
     this.parser = new Parser();
-    this.evaluator = new Evaluator([], [], new Map(), new Map(), [], []);
+    this.evaluator = new Evaluator([], [], new Map(), new Map(), [], [], new Map());
     this.registers = new Map();
     this.memory = new Map();
+    this.labels = new Map();
     this.inQ = [];
     this.outQ = [];
     this.logger = [];
+    
   }
 
   isReady(): boolean {
@@ -88,10 +97,12 @@ class Program {
 
     this.registers = new Map();
     this.memory = new Map();
+    this.labels = new Map();
 
     this.inQ = inQ.slice();
     this.outQ = [];
     this.logger = [];
+    
 
     // Set up registers with undefined values
     this.registers.set(tokens.REGISTERS.r0, undefined);
@@ -103,6 +114,9 @@ class Program {
     this.memory.set(tokens.MEMORY.mx1, undefined);
     this.memory.set(tokens.MEMORY.mx2, undefined);
 
+    this.labels.set('.start', 0);
+    this.labels.set('.end', -1);
+
     this.parser = new Parser();
     this.evaluator = new Evaluator(
       this.inQ,
@@ -110,7 +124,8 @@ class Program {
       this.registers,
       this.memory,
       this.parser.operations,
-      this.logger
+      this.logger,
+      this.labels
     );
   }
 

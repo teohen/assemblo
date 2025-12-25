@@ -8,12 +8,13 @@
   "scripts": {
     "test": "node --experimental-test-coverage --test",
     "test:only": "node --test --test-name-pattern",
-    "test:coverage": ""
+    "build": "bun build ./src/ui/index.html ./src/ui/docs.html ./src/ui/coder.html --outdir ./built/"
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "devDependencies": {
+    "@types/chance": "^1.1.7",
     "chance": "^1.1.13"
   },
   "dependencies": {

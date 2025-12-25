@@ -21,6 +21,7 @@ const FUNCTIONS = {
   SUB: "subFn",
   LOAD: "loadFn",
   PRT: "printFn",
+  LBL: "lblFn"
 } as const;
 
 const REGISTERS = {
@@ -45,6 +46,7 @@ const ARG_TYPES = {
   REG: "REG",
   LIST: "LST",
   NUM: "NUM",
+  LBL: "LBL",
 } as const;
 
 

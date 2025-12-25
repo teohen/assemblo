@@ -44,7 +44,11 @@ class Parser {
     if (arg in tokens.LISTS) {
       return new Argument(tokens.ARG_TYPES.LIST, arg, (tokens.LISTS as Record<string, string>)[arg]);
     }
-    
+
+    if (arg[0] === '.') {
+      return new Argument(tokens.ARG_TYPES.LBL, arg, arg)
+    }
+
     if (/^-?[0-9]\d*$/.test(arg)) {
       const numValue = parseInt(arg, 10);
       return new Argument(tokens.ARG_TYPES.NUM, numValue.toString(), numValue);
@@ -55,7 +59,7 @@ class Parser {
 
   parseLine(line: string, num: number): Operation {
     const op = new Operation(num, "", [], "FLOW");
-    const ONE_ARGS = ["PRT"];
+    const ONE_ARGS = ["PRT", "LBL"];
     const parts = line.split(":");
 
     const fPart = parts[0];
@@ -65,7 +69,7 @@ class Parser {
     }
 
     const functions = tokens.FUNCTIONS as Record<string, string>;
-    
+
     if (this.procedures.includes(functions[fPart])) {
       op.type = tokens.FUNCTION_TYPES.PROC;
     } else {
@@ -104,6 +108,7 @@ class Parser {
       tokens.FUNCTIONS.LOAD,
       tokens.FUNCTIONS.SUB,
       tokens.FUNCTIONS.PRT,
+      tokens.FUNCTIONS.LBL,
     ];
     this.flow = [
       tokens.FUNCTIONS.JMP_N,
