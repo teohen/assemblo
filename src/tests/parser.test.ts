@@ -1,648 +1,372 @@
-import { describe, it, expect, expectTypeOf } from 'bun:test';
+import { describe, it, expect } from 'bun:test';
 
-import Argument from '../assemblo/argument';
 import * as ASM from '../assemblo'
+import { newLabelArgument, newListArgument, newMemoryArgument, newNumberArgument, newRegisterArgument } from './fixtures/argument';
 
 interface TestCase {
   input: string;
   exp: ASM.Operation;
 }
 
-
 describe('Parser suite', () => {
-  it('parse the JMP instructions', () => {
-
-    const tests: TestCase[] = [
-      {
-        input: `JMP_N: .end, r0`,
-        exp: {
-          args: [
-            new Argument(ASM.tokens.ARG_TYPES.LBL, ".end", ".end"),
-            new Argument(ASM.tokens.ARG_TYPES.REG, "r0", ASM.tokens.REGISTERS.r0),
-          ],
-          funcName: "jmpNegFn",
-          line: 1,
-          type: ASM.tokens.FUNCTION_TYPES.FLOW
-        },
-      },
-      {
-        input: `JMP_P: .end, r0`,
-        exp: {
-          args: [
-            new Argument(ASM.tokens.ARG_TYPES.LBL, ".end", ".end"),
-            new Argument(ASM.tokens.ARG_TYPES.REG, "r0", ASM.tokens.REGISTERS.r0),
-          ],
-          funcName: "jmpPosFn",
-          line: 1,
-          type: ASM.tokens.FUNCTION_TYPES.FLOW
-        },
-      },
-      {
-        input: `JMP_Z: .end, r0`,
-        exp: {
-          args: [
-            new Argument(ASM.tokens.ARG_TYPES.LBL, ".end", ".end"),
-            new Argument(ASM.tokens.ARG_TYPES.REG, "r0", ASM.tokens.REGISTERS.r0),
-          ],
-          funcName: "jmpZeroFn",
-          line: 1,
-          type: ASM.tokens.FUNCTION_TYPES.FLOW
-        },
-      },
-      {
-        input: `JMP_U: .end, r0`,
-        exp: {
-          args: [
-            new Argument(ASM.tokens.ARG_TYPES.LBL, ".end", ".end"),
-            new Argument(ASM.tokens.ARG_TYPES.REG, "r0", ASM.tokens.REGISTERS.r0),
-          ],
-          funcName: "jmpUndFn",
-          line: 1,
-          type: ASM.tokens.FUNCTION_TYPES.FLOW
-        },
-      }
-    ];
-
-    for (const t of tests) {
-      const p = new ASM.Parser();
-      const operations = p.parse(t.input);
-
-      expect(operations.length).toBe(1);
-
-      const op = p.operations[0];
-      expect(op).toEqual(t.exp)
-
-      expect(op.args[0]).toEqual(t.exp.args[0]);
-      expect(op.args[1]).toEqual(t.exp.args[1]);
-    }
-  });
-
-});
-
-
-/*
-describe("parser suite", () => {
-  function testOperation(op: Operation, expLine: number, expType: string, expArgsLen: number, expFuncName: string): void {
-    assert.equal(op.line, expLine);
-    assert.equal(op.type, expType);
-    assert.equal(op.args.length, expArgsLen);
-    assert.equal(op.funcName, expFuncName);
-  }
-
-  function testArgument(arg: Argument, expArg: ArgumentTest): void {
-    assert.equal(arg.type, expArg.type);
-    assert.equal(arg.literal, expArg.literal);
-    assert.equal(arg.intern, expArg.intern);
-  }
-
-  describe("SUCCESS INSTRUCTIONS", () => {
-    it("should parse the POP instructions", () => {
+  describe('Success operations', () => {
+    it('parse the POP operation', () => {
       const tests: TestCase[] = [
         {
-          in: `POP: r0, INPUT`,
-          expArg1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.LIST, "INPUT", tokens.LISTS.INPUT)
+          input: `POP: r0, INPUT`,
+          exp: new ASM.Operation(
+            1,
+            "popFn",
+            [
+              newRegisterArgument("r0"),
+              newListArgument("INPUT")
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
+        },
+      ];
+
+      for (const t of tests) {
+        const p = new ASM.Parser();
+        const operations = p.parse(t.input);
+
+        expect(operations.length).toBe(1);
+
+        const op = p.operations[0];
+        expect(op).toEqual(t.exp)
+
+        expect(op.args[0]).toEqual(t.exp.args[0]);
+        expect(op.args[1]).toEqual(t.exp.args[1]);
+      }
+    });
+
+    it('parse the PUSH operation', () => {
+      const tests: TestCase[] = [
+        {
+          input: `PUSH: OUTPUT, r0`,
+          exp: new ASM.Operation(
+            1,
+            "pushFn",
+            [
+              newListArgument("OUTPUT"),
+              newRegisterArgument("r0"),
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
         },
         {
-          in: `POP: r1, INPUT`,
-          expArg1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.LIST, "INPUT", tokens.LISTS.INPUT)
+          input: `PUSH: OUTPUT, 1`,
+          exp: new ASM.Operation(
+            1,
+            "pushFn",
+            [
+              newListArgument("OUTPUT"),
+              newNumberArgument("1"),
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
+        },
+      ];
+
+      for (const t of tests) {
+        const p = new ASM.Parser();
+        const operations = p.parse(t.input);
+
+        expect(operations.length).toBe(1);
+
+        const op = p.operations[0];
+        expect(op).toEqual(t.exp)
+
+        expect(op.args[0]).toEqual(t.exp.args[0]);
+        expect(op.args[1]).toEqual(t.exp.args[1]);
+      }
+    });
+
+    it('parse the JMP operations', () => {
+      const tests: TestCase[] = [
+        {
+          input: `JMP_N: .end, r0`,
+          exp: {
+            args: [
+              newLabelArgument(".end"),
+              newRegisterArgument("r0")
+            ],
+            funcName: "jmpNegFn",
+            line: 1,
+            type: ASM.tokens.FUNCTION_TYPES.FLOW
+          },
         },
         {
-          in: `POP: r2, INPUT`,
-          expArg1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.LIST, "INPUT", tokens.LISTS.INPUT)
+          input: `JMP_P: .end, r0`,
+          exp: {
+            args: [
+              newLabelArgument(".end"),
+              newRegisterArgument("r0")
+            ],
+            funcName: "jmpPosFn",
+            line: 1,
+            type: ASM.tokens.FUNCTION_TYPES.FLOW
+          },
+        },
+        {
+          input: `JMP_Z: .end, r0`,
+          exp: {
+            args: [
+              newLabelArgument(".end"),
+              newRegisterArgument("r0")
+            ],
+            funcName: "jmpZeroFn",
+            line: 1,
+            type: ASM.tokens.FUNCTION_TYPES.FLOW
+          },
+        },
+        {
+          input: `JMP_U: .end, r0`,
+          exp: {
+            args: [
+              newLabelArgument(".end"),
+              newRegisterArgument("r0")
+            ],
+            funcName: "jmpUndFn",
+            line: 1,
+            type: ASM.tokens.FUNCTION_TYPES.FLOW
+          },
         }
       ];
 
       for (const t of tests) {
-        const p = new Parser();
-        const operations = p.parse(t.in);
+        const p = new ASM.Parser();
+        const operations = p.parse(t.input);
 
-        assert.equal(operations.length, 1);
-        const op = operations[0];
+        expect(operations.length).toBe(1);
 
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.POP);
+        const op = p.operations[0];
+        expect(op).toEqual(t.exp)
 
-        const arg1 = op.args[0];
-        testArgument(arg1, t.expArg1!);
-
-        const arg2 = op.args[1];
-        testArgument(arg2, t.expAgr2!);
+        expect(op.args[0]).toEqual(t.exp.args[0]);
+        expect(op.args[1]).toEqual(t.exp.args[1]);
       }
     });
 
-    it("should parse the PUSH instructions", () => {
+    it('parse the CPY operations', () => {
       const tests: TestCase[] = [
         {
-          in: `PUSH: OUTPUT, r0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
-          expArg2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+          input: `CPY: mx0, r0`,
+          exp: new ASM.Operation(
+            1,
+            "cpyFn",
+            [
+              newMemoryArgument("mx0"),
+              newRegisterArgument("r0")
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
         },
         {
-          in: `PUSH: OUTPUT, r1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
-          expArg2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
+          input: `CPY: mx0, 2`,
+          exp: new ASM.Operation(
+            1,
+            "cpyFn",
+            [
+              newMemoryArgument("mx0"),
+              newNumberArgument("2")
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
         },
+      ];
+
+      for (const t of tests) {
+        const p = new ASM.Parser();
+        const operations = p.parse(t.input);
+
+        expect(operations.length).toBe(1);
+
+        const op = p.operations[0];
+        expect(op).toEqual(t.exp)
+
+        expect(op.args[0]).toEqual(t.exp.args[0]);
+        expect(op.args[1]).toEqual(t.exp.args[1]);
+      }
+    });
+
+    it('parse the LOAD operations', () => {
+      const tests: TestCase[] = [
         {
-          in: `PUSH: OUTPUT, r2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
-          expArg2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
-        },
-        {
-          in: `PUSH: OUTPUT, -1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
-          expArg2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1)
-        },
-        {
-          in: `PUSH: OUTPUT, 0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
-          expArg2: new Argument(tokens.ARG_TYPES.NUM, "0", 0)
-        },
-        {
-          in: `PUSH: OUTPUT, 1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.LIST, "OUTPUT", tokens.LISTS.OUTPUT),
-          expArg2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+          input: `LOAD: r0, mx0`,
+          exp: new ASM.Operation(
+            1,
+            "loadFn",
+            [
+              newRegisterArgument("r0"),
+              newMemoryArgument("mx0"),
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
         }
       ];
 
       for (const t of tests) {
-        const p = new Parser();
-        const operations = p.parse(t.in);
+        const p = new ASM.Parser();
+        const operations = p.parse(t.input);
 
-        assert.equal(operations.length, 1);
-        const op = operations[0];
+        expect(operations.length).toBe(1);
 
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.PUSH);
+        const op = p.operations[0];
+        expect(op).toEqual(t.exp)
 
-        const arg1 = op.args[0];
-        testArgument(arg1, t.expAgr1!);
-
-        const arg2 = op.args[1];
-        testArgument(arg2, t.expArg2!);
+        expect(op.args[0]).toEqual(t.exp.args[0]);
+        expect(op.args[1]).toEqual(t.exp.args[1]);
       }
     });
 
-    it("should parse the CPY instructions", () => {
+    it('parse the ADD operation', () => {
       const tests: TestCase[] = [
         {
-          in: `CPY: mx0, r0`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+          input: `ADD: r0, r0`,
+          exp: new ASM.Operation(
+            1,
+            "addFn",
+            [
+              newRegisterArgument("r0"),
+              newRegisterArgument("r0"),
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
         },
         {
-          in: `CPY: mx1, r0`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+          input: `ADD: r0, 1`,
+          exp: new ASM.Operation(
+            1,
+            "addFn",
+            [
+              newRegisterArgument("r0"),
+              newNumberArgument("1"),
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
+        },
+      ];
+
+      for (const t of tests) {
+        const p = new ASM.Parser();
+        const operations = p.parse(t.input);
+
+        expect(operations.length).toBe(1);
+
+        const op = p.operations[0];
+        expect(op).toEqual(t.exp)
+
+        expect(op.args[0]).toEqual(t.exp.args[0]);
+        expect(op.args[1]).toEqual(t.exp.args[1]);
+      }
+    });
+
+    it('parse the SUB operation', () => {
+      const tests: TestCase[] = [
+        {
+          input: `SUB: r0, r0`,
+          exp: new ASM.Operation(
+            1,
+            "subFn",
+            [
+              newRegisterArgument("r0"),
+              newRegisterArgument("r0"),
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
         },
         {
-          in: `CPY: mx2, r0`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0)
+          input: `SUB: r0, 1`,
+          exp: new ASM.Operation(
+            1,
+            "subFn",
+            [
+              newRegisterArgument("r0"),
+              newNumberArgument("1"),
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
         },
+      ];
+
+      for (const t of tests) {
+        const p = new ASM.Parser();
+        const operations = p.parse(t.input);
+
+        expect(operations.length).toBe(1);
+
+        const op = p.operations[0];
+        expect(op).toEqual(t.exp)
+
+        expect(op.args[0]).toEqual(t.exp.args[0]);
+        expect(op.args[1]).toEqual(t.exp.args[1]);
+      }
+    });
+
+    it('parse the LBL operation', () => {
+      const tests: TestCase[] = [
         {
-          in: `CPY: mx0, r1`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
-        },
-        {
-          in: `CPY: mx1, r1`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
-        },
-        {
-          in: `CPY: mx2, r1`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1)
-        },
-        {
-          in: `CPY: mx0, r2`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
-        },
-        {
-          in: `CPY: mx1, r2`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
-        },
-        {
-          in: `CPY: mx2, r2`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2)
-        },
-        {
-          in: `CPY: mx0, -1`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1)
-        },
-        {
-          in: `CPY: mx1, 0`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "0", 0)
-        },
-        {
-          in: `CPY: mx2, 1`,
-          expArg1: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "1", 1)
+          input: `LBL: .mult`,
+          exp: new ASM.Operation(
+            1,
+            "labelFn",
+            [
+              newLabelArgument(".mult")
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          )
         }
       ];
 
       for (const t of tests) {
-        const p = new Parser();
-        const operations = p.parse(t.in);
+        const p = new ASM.Parser();
+        const operations = p.parse(t.input);
 
-        assert.equal(operations.length, 1);
-        const op = operations[0];
-
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.CPY);
-
-        const arg1 = op.args[0];
-        testArgument(arg1, t.expArg1!);
-
-        const arg2 = op.args[1];
-        testArgument(arg2, t.expAgr2!);
-      }
-    });
-
-    it("should parse the JMP instructions", () => {
-      const tests: TestCase[] = [
-        {
-          in: `JMP_N: 7, r0`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          fn: "jmpNegFn"
-        },
-        {
-          in: `JMP_N: 7, r1`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          fn: "jmpNegFn"
-        },
-        {
-          in: `JMP_N: 7, r2`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          fn: "jmpNegFn"
-        },
-        {
-          in: `JMP_P: 7, r0`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          fn: "jmpPosFn"
-        },
-        {
-          in: `JMP_P: 7, r1`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          fn: "jmpPosFn"
-        },
-        {
-          in: `JMP_P: 7, r2`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          fn: "jmpPosFn"
-        },
-        {
-          in: `JMP_Z: 7, r0`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          fn: "jmpZeroFn"
-        },
-        {
-          in: `JMP_Z: 7, r1`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          fn: "jmpZeroFn"
-        },
-        {
-          in: `JMP_Z: 7, r2`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          fn: "jmpZeroFn"
-        },
-        {
-          in: `JMP_U: 7, r0`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          fn: "jmpUndFn"
-        },
-        {
-          in: `JMP_U: 7, r1`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          fn: "jmpUndFn"
-        },
-        {
-          in: `JMP_U: 7, r2`,
-          expArg1: new Argument(tokens.ARG_TYPES.NUM, "7", 7),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          fn: "jmpUndFn"
-        },
-      ];
-
-      for (const t of tests) {
-        const p = new Parser();
-        const operations = p.parse(t.in);
-
-        assert.equal(operations.length, 1);
+        expect(operations.length).toBe(1);
 
         const op = p.operations[0];
-        testOperation(op, 1, tokens.FUNCTION_TYPES.FLOW, 2, t.fn!);
+        expect(op).toEqual(t.exp)
 
-        const arg1 = op.args[0];
-        testArgument(arg1, t.expArg1!);
-
-        const arg2 = op.args[1];
-        testArgument(arg2, t.expAgr2!);
-      }
-    });
-
-    it("should parse the ADD instructions", () => {
-      const tests: TestCase[] = [
-        {
-          in: `ADD: r0, r0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-        },
-        {
-          in: `ADD: r0, r1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-        },
-        {
-          in: `ADD: r0, r2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-        },
-        {
-          in: `ADD: r1, r0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-        },
-        {
-          in: `ADD: r1, r1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-        },
-        {
-          in: `ADD: r1, r2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-        },
-        {
-          in: `ADD: r2, r0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-        },
-        {
-          in: `ADD: r2, r1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-        },
-        {
-          in: `ADD: r2, r2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-        },
-        {
-          in: `ADD: r0, -1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1),
-        },
-        {
-          in: `ADD: r0, 0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "0", 0),
-        },
-        {
-          in: `ADD: r0, 1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "1", 1),
-        },
-      ];
-
-      for (const t of tests) {
-        const p = new Parser();
-        const operations = p.parse(t.in);
-
-        assert.equal(operations.length, 1);
-        const op = p.operations[0];
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.ADD);
-
-        const arg1 = op.args[0];
-        testArgument(arg1, t.expAgr1!);
-
-        const arg2 = op.args[1];
-        testArgument(arg2, t.expAgr2!);
-      }
-    });
-
-    it("should parse the LOAD instructions", () => {
-      const tests: TestCase[] = [
-        {
-          in: `LOAD: r0, mx0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
-        },
-        {
-          in: `LOAD: r0, mx1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
-        },
-        {
-          in: `LOAD: r0, mx2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
-        },
-        {
-          in: `LOAD: r1, mx0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
-        },
-        {
-          in: `LOAD: r1, mx1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
-        },
-        {
-          in: `LOAD: r1, mx2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
-        },
-        {
-          in: `LOAD: r2, mx0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx0", tokens.MEMORY.mx0),
-        },
-        {
-          in: `LOAD: r2, mx1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx1", tokens.MEMORY.mx1),
-        },
-        {
-          in: `LOAD: r2, mx2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.MEM, "mx2", tokens.MEMORY.mx2),
-        },
-      ];
-
-      for (const t of tests) {
-        const p = new Parser();
-        const operations = p.parse(t.in);
-
-        assert.equal(operations.length, 1);
-        const op = operations[0];
-
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.LOAD);
-
-        const arg1 = op.args[0];
-        testArgument(arg1, t.expAgr1!);
-
-        const arg2 = op.args[1];
-        testArgument(arg2, t.expAgr2!);
-      }
-    });
-
-    it("should parse the SUB instructions", () => {
-      const tests: TestCase[] = [
-        {
-          in: `SUB: r0, r0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-        },
-        {
-          in: `SUB: r0, r1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-        },
-        {
-          in: `SUB: r0, r2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-        },
-        {
-          in: `SUB: r1, r0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-        },
-        {
-          in: `SUB: r1, r1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-        },
-        {
-          in: `SUB: r1, r2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-        },
-        {
-          in: `SUB: r2, r0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-        },
-        {
-          in: `SUB: r2, r1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r1", tokens.REGISTERS.r1),
-        },
-        {
-          in: `SUB: r2, r2`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-          expAgr2: new Argument(tokens.ARG_TYPES.REG, "r2", tokens.REGISTERS.r2),
-        },
-        {
-          in: `SUB: r0, -1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "-1", -1),
-        },
-        {
-          in: `SUB: r0, 0`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "0", 0),
-        },
-        {
-          in: `SUB: r0, 1`,
-          expAgr1: new Argument(tokens.ARG_TYPES.REG, "r0", tokens.REGISTERS.r0),
-          expAgr2: new Argument(tokens.ARG_TYPES.NUM, "1", 1),
-        },
-      ];
-
-      for (const t of tests) {
-        const p = new Parser();
-        const operations = p.parse(t.in);
-
-        assert.equal(operations.length, 1);
-        const op = p.operations[0];
-        testOperation(op, 1, tokens.FUNCTION_TYPES.PROC, 2, tokens.FUNCTIONS.SUB);
-
-        const arg1 = op.args[0];
-        testArgument(arg1, t.expAgr1!);
-
-        const arg2 = op.args[1];
-        testArgument(arg2, t.expAgr2!);
-      }
-    });
-
-    it("should parse the START instructions", () => {
-      const tests: TestCase[] = [
-        { in: "START" },
-      ];
-
-      for (const t of tests) {
-        const p = new Parser();
-        const operations = p.parse(t.in);
-
-        assert.equal(operations.length, 1);
-
-        const op = p.operations[0];
-        testOperation(op, 1, tokens.FUNCTION_TYPES.FLOW, 0, tokens.FUNCTIONS.START);
+        expect(op.args[0]).toEqual(t.exp.args[0]);
       }
     });
   });
 
-  describe("ERROR INSTRUCTIONS", () => {
-    it("should throw error if unknown instruction", () => {
-      const tests: Array<{in: string, exp: string}> = [
-        { in: "CARRY: r0, mx0", exp: "CARRY" },
-        { in: "MOV: r0, mx0", exp: "MOV" },
-        { in: "JMP: r0, mx0", exp: "JMP" },
-      ];
-
-      for (const t of tests) {
-        const p = new Parser();
-        try {
-          p.parse(t.in);
-        } catch (err) {
-          const error = err as Error;
-          assert.equal(error.message, `AT LINE: 1. UNKNOWN INSTRUCTION: ${t.exp}`);
-        }
-      }
-    });
-
+  describe('Error operations', () => {
     it("should throw error if unknown argument", () => {
-      const tests: Array<{in: string, arg: string}> = [
-        { in: "LOAD: r3, mx0", arg: "r3" },
-        { in: "POP: r0, INPUTT", arg: "INPUTT" },
-        { in: "JMP_N: 1.2, r0", arg: "1.2" },
+      const tests = [
+        {
+          input: "LOAD: r3, mx0",
+          exp: "r3"
+        },
+        {
+          input: "POP: r0, INPUTT",
+          exp: "INPUTT"
+        },
+        {
+          input: "JMP_N: 1.2, r0",
+          exp: "1.2"
+        },
       ];
 
       let errMsg = '';
 
       for (const t of tests) {
-        const p = new Parser();
+        const p = new ASM.Parser();
         try {
-          p.parse(t.in);
+          p.parse(t.input);
         } catch (err) {
           const error = err as Error;
           errMsg = error.message;
         }
 
-        assert.equal(errMsg, `AT LINE: 1. UNKNOWN ARGUMENT: ${t.arg}`);
+        expect(errMsg).toBe(`AT LINE: 1. UNKNOWN ARGUMENT: ${t.exp}`);
       }
     });
 
     it("should throw error if wrong number of arguments", () => {
-      const tests: Array<{in: string, fName: string, expN: number}> = [
+      const tests = [
         { in: "POP: r0, INPUT, r1", fName: "POP", expN: 3 },
         { in: "CPY: mx0", fName: "CPY", expN: 1 },
         { in: "LOAD: mx0", fName: "LOAD", expN: 1 },
@@ -654,7 +378,7 @@ describe("parser suite", () => {
       let errMsg = '';
 
       for (const t of tests) {
-        const p = new Parser();
+        const p = new ASM.Parser();
         try {
           p.parse(t.in);
         } catch (err) {
@@ -662,9 +386,8 @@ describe("parser suite", () => {
           errMsg = error.message;
         }
 
-        assert.equal(errMsg, `AT LINE: 1. (${t.fName}) GOT WRONG NUMBER OF ARGUMENTS: ${t.expN}`);
+        expect(errMsg).toBe(`AT LINE: 1. (${t.fName}) GOT WRONG NUMBER OF ARGUMENTS: ${t.expN}`);
       }
     });
   });
 });
-*/

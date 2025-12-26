@@ -71,7 +71,7 @@ class Evaluator {
     this.jmpPosFn = this.jmpPosFn.bind(this);
     this.jmpZeroFn = this.jmpZeroFn.bind(this);
     this.jmpUndFn = this.jmpUndFn.bind(this);
-    this.lblFn = this.lblFn.bind(this);
+    this.labelFn = this.labelFn.bind(this);
   }
 
   getValue(arg: Argument): ArgumentValue {
@@ -360,7 +360,7 @@ class Evaluator {
     return -1;
   }
 
-  lblFn(args: Argument[], ln: number): number {
+  labelFn(args: Argument[], ln: number): number {
     const arg1 = args[0];
 
     Argument.validateType(arg1, [tokens.ARG_TYPES.LBL], ln);

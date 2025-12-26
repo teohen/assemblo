@@ -21,7 +21,7 @@ const FUNCTIONS = {
   SUB: "subFn",
   LOAD: "loadFn",
   PRT: "printFn",
-  LBL: "lblFn"
+  LBL: "labelFn"
 } as const;
 
 const REGISTERS = {

@@ -12,6 +12,7 @@ export interface Label {
 export type Registers = Map<string, number | undefined>;
 
 export type Labels = Map<string, number>;
+export type InputQ = number[];
 
 export type Logger = LoggerEntry[];
 
@@ -36,7 +37,7 @@ class Program {
   evaluator: Evaluator;
   registers: Registers;
   memory: Map<string, number | undefined>;
-  inQ: number[];
+  inQ: inputQ;
   outQ: number[];
   status: StatusType;
   logger: Logger;
