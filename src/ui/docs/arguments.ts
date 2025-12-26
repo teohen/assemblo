@@ -28,4 +28,4 @@ const doc = {
     <pre>JPM_N: 2, r0</pre>`
 }
 
-export default doc;
+export default doc

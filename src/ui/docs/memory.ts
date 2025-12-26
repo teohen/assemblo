@@ -38,4 +38,4 @@ const doc = {
     <p><em>(The value from memory address <code>mx1</code> is loaded into register <code>r2</code>.)</em></p>`
 }
 
-export default doc;
+export default doc

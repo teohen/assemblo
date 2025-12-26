@@ -1,6 +1,6 @@
-import Chance from "chance";
+import Chance from 'chance'
 
-const chance = new Chance();
+const chance = new Chance()
 
 interface Item {
   name: string;
@@ -8,19 +8,19 @@ interface Item {
 }
 
 export function newMap(items: Item[]) {
-  const newMap = new Map();
+  const newMap = new Map()
   for (const i of items) {
-    let v = i.value ?? chance.integer({ min: -1000, max: 1000 })
+    const v = i.value ?? chance.integer({ min: -1000, max: 1000 })
 
-    newMap.set(i.name, v);
+    newMap.set(i.name, v)
   }
-  return newMap;
+  return newMap
 }
 
 export function newFilledMap(items: Item[]) {
-  const newMap = new Map();
+  const newMap = new Map()
   for (const i of items) {
-    newMap.set(i.name, i.value);
+    newMap.set(i.name, i.value)
   }
-  return newMap;
+  return newMap
 }

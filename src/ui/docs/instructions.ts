@@ -30,4 +30,4 @@ const doc = {
     <pre>PRT: r0</pre>`
 }
 
-export default doc;
+export default doc

@@ -1,48 +1,46 @@
-import tokens from "./tokens";
-import Operation from "./operation";
-import Argument from "./argument";
-
-type ArgumentType = string | number;
+import tokens from './tokens'
+import Operation from './operation'
+import Argument from './argument'
 
 class Parser {
-  code: string;
-  lines: string[];
-  operations: Operation[];
-  procedures: string[];
-  flow: string[];
+  code: string
+  lines: string[]
+  operations: Operation[]
+  procedures: string[]
+  flow: string[]
 
   constructor() {
-    this.code = '';
-    this.lines = [];
-    this.operations = [];
-    this.procedures = [];
-    this.flow = [];
+    this.code = ''
+    this.lines = []
+    this.operations = []
+    this.procedures = []
+    this.flow = []
   }
 
   removeWhitespace(input: string): string {
-    const res = input.replaceAll("\t", "").replaceAll(" ", "");
-    return res;
+    const res = input.replaceAll('\t', '').replaceAll(' ', '')
+    return res
   }
 
   validateArgsLength(args: string[], expLen: number, numLine: number, funcName: string): void {
     if (args.length !== expLen) {
       throw new Error(
         `AT LINE: ${numLine}. (${funcName}) GOT WRONG NUMBER OF ARGUMENTS: ${args.length}`,
-      );
+      )
     }
   }
 
   parseArgument(arg: string, lineNum: number): Argument {
     if (arg in tokens.REGISTERS) {
-      return new Argument(tokens.ARG_TYPES.REG, arg, (tokens.REGISTERS as Record<string, string>)[arg]);
+      return new Argument(tokens.ARG_TYPES.REG, arg, (tokens.REGISTERS as Record<string, string>)[arg])
     }
 
     if (arg in tokens.MEMORY) {
-      return new Argument(tokens.ARG_TYPES.MEM, arg, (tokens.MEMORY as Record<string, string>)[arg]);
+      return new Argument(tokens.ARG_TYPES.MEM, arg, (tokens.MEMORY as Record<string, string>)[arg])
     }
 
     if (arg in tokens.LISTS) {
-      return new Argument(tokens.ARG_TYPES.LIST, arg, (tokens.LISTS as Record<string, string>)[arg]);
+      return new Argument(tokens.ARG_TYPES.LIST, arg, (tokens.LISTS as Record<string, string>)[arg])
     }
 
     if (arg[0] === '.') {
@@ -50,55 +48,55 @@ class Parser {
     }
 
     if (/^-?[0-9]\d*$/.test(arg)) {
-      const numValue = parseInt(arg, 10);
-      return new Argument(tokens.ARG_TYPES.NUM, numValue.toString(), numValue);
+      const numValue = parseInt(arg, 10)
+      return new Argument(tokens.ARG_TYPES.NUM, numValue.toString(), numValue)
     }
 
-    throw new Error(`AT LINE: ${lineNum}. UNKNOWN ARGUMENT: ${arg}`);
+    throw new Error(`AT LINE: ${lineNum}. UNKNOWN ARGUMENT: ${arg}`)
   }
 
   parseLine(line: string, num: number): Operation {
-    const op = new Operation(num, "", [], "FLOW");
-    const ONE_ARGS = ["PRT", "LBL"];
-    const parts = line.split(":");
+    const op = new Operation(num, '', [], 'FLOW')
+    const ONE_ARGS = ['PRT', 'LBL']
+    const parts = line.split(':')
 
-    const fPart = parts[0];
+    const fPart = parts[0]
 
     if (!(fPart in tokens.FUNCTIONS)) {
-      throw new Error(`AT LINE: ${num}. UNKNOWN INSTRUCTION: ${fPart}`);
+      throw new Error(`AT LINE: ${num}. UNKNOWN INSTRUCTION: ${fPart}`)
     }
 
-    const functions = tokens.FUNCTIONS as Record<string, string>;
+    const functions = tokens.FUNCTIONS as Record<string, string>
 
     if (this.procedures.includes(functions[fPart])) {
-      op.type = tokens.FUNCTION_TYPES.PROC;
+      op.type = tokens.FUNCTION_TYPES.PROC
     } else {
-      op.type = tokens.FUNCTION_TYPES.FLOW;
+      op.type = tokens.FUNCTION_TYPES.FLOW
     }
 
-    op.funcName = functions[fPart];
+    op.funcName = functions[fPart]
 
-    if (fPart === "START" || fPart === "END") return op;
+    if (fPart === 'START' || fPart === 'END') return op
 
-    const args = parts[1].split(",");
+    const args = parts[1].split(',')
 
     if (!ONE_ARGS.includes(fPart)) {
-      this.validateArgsLength(args, 2, num, fPart);
+      this.validateArgsLength(args, 2, num, fPart)
     }
 
     if (ONE_ARGS.includes(fPart)) {
-      this.validateArgsLength(args, 1, num, fPart);
+      this.validateArgsLength(args, 1, num, fPart)
     }
 
     for (const arg of args) {
-      if (arg.length > 0) op.args.push(this.parseArgument(arg, num));
+      if (arg.length > 0) op.args.push(this.parseArgument(arg, num))
     }
 
-    return op;
+    return op
   }
 
   setUp(): void {
-    this.lines = this.code.split("\n");
+    this.lines = this.code.split('\n')
 
     this.procedures = [
       tokens.FUNCTIONS.POP,
@@ -109,7 +107,7 @@ class Parser {
       tokens.FUNCTIONS.SUB,
       tokens.FUNCTIONS.PRT,
       tokens.FUNCTIONS.LBL,
-    ];
+    ]
     this.flow = [
       tokens.FUNCTIONS.JMP_N,
       tokens.FUNCTIONS.JMP_P,
@@ -117,30 +115,30 @@ class Parser {
       tokens.FUNCTIONS.JMP_U,
       tokens.FUNCTIONS.START,
       tokens.FUNCTIONS.END
-    ];
+    ]
   }
 
   parse(code: string): Operation[] {
-    this.code = code;
+    this.code = code
 
-    this.setUp();
+    this.setUp()
 
-    let lNumber = 1;
+    let lNumber = 1
 
     for (const line of this.lines) {
-      const escapedLine = this.removeWhitespace(line);
+      const escapedLine = this.removeWhitespace(line)
 
       if (escapedLine.length < 1) {
-        continue;
+        continue
       }
 
-      const op = this.parseLine(escapedLine, lNumber);
-      this.operations.push(op);
-      lNumber += 1;
+      const op = this.parseLine(escapedLine, lNumber)
+      this.operations.push(op)
+      lNumber += 1
     }
 
-    return this.operations;
+    return this.operations
   }
 }
 
-export default Parser;
+export default Parser

@@ -26,4 +26,4 @@ const doc = {
     </p>`
 }
 
-export default doc;
+export default doc

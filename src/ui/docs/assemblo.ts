@@ -18,4 +18,4 @@ const doc = {
     `
 }
 
-export default doc;
+export default doc

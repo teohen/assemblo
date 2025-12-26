@@ -1,13 +1,12 @@
-import { describe, it, expect, expectTypeOf } from 'bun:test';
+import { describe, it, expect } from 'bun:test'
 
-import Argument from '../assemblo/argument';
+import Argument from '../assemblo/argument'
 import * as ASM from '../assemblo'
-import { InputQ, Label, Labels, Logger } from '../assemblo/program';
-import { newLabelArgument, newListArgument, newMemoryArgument, newNumberArgument, newRegisterArgument, randLabel } from './fixtures/argument';
-import { newMap, newFilledMap } from './fixtures/maps';
-import { createOperation } from './fixtures/operation';
-import { Chance } from 'chance';
-const chance = new Chance();
+import { InputQ,  Labels, Logger } from '../assemblo/program'
+import { newLabelArgument, newListArgument, newMemoryArgument, newNumberArgument, newRegisterArgument, randLabel } from './fixtures/argument'
+import { newMap, newFilledMap } from './fixtures/maps'
+import { Chance } from 'chance'
+const chance = new Chance()
 
 interface TestCase {
   op: ASM.Operation;
@@ -19,20 +18,20 @@ interface TestCase {
   expValue?: number;
 }
 
-describe("EVALUATOR SUITE", () => {
+describe('EVALUATOR SUITE', () => {
 
-  describe("SUCCESS", () => {
-    it(" should evaluate the POP instruction", () => {
+  describe('SUCCESS', () => {
+    it(' should evaluate the POP instruction', () => {
       // POP: r0, INPUT
       const randNumber = chance.integer({ min: 0, max: 1000 })
       const tests: TestCase[] = [
         {
           op: new ASM.Operation(
             1,
-            "popFn",
+            'popFn',
             [
-              newRegisterArgument("r0"),
-              newListArgument("INPUT"),
+              newRegisterArgument('r0'),
+              newListArgument('INPUT'),
             ],
             ASM.tokens.FUNCTION_TYPES.PROC
           ),
@@ -42,22 +41,21 @@ describe("EVALUATOR SUITE", () => {
           labels: newMap([]),
           expValue: randNumber
         },
-      ];
+      ]
 
-      for (let t of tests) {
+      for (const t of tests) {
 
-        const output: number[] = [];
-        const input: number[] = [];
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const operations = [
           t.op
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           t.input ?? [],
@@ -67,16 +65,16 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const newLine = eva.tick(line);
+        const newLine = eva.tick(line)
         expect(eva.registers.get(t.op.args[0].intern.toString()))
         expect(1).toBe(newLine)
 
       }
-    });
+    })
 
-    it(" should evaluate the PUSH instruction", () => {
+    it(' should evaluate the PUSH instruction', () => {
       // PUSH: OUTPUT, r0
       // PUSH: OUTPUT, 2
 
@@ -86,10 +84,10 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "pushFn",
+            'pushFn',
             [
-              newListArgument("OUTPUT"),
-              newRegisterArgument("r0"),
+              newListArgument('OUTPUT'),
+              newRegisterArgument('r0'),
             ],
             ASM.tokens.FUNCTION_TYPES.PROC
           ),
@@ -101,9 +99,9 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "pushFn",
+            'pushFn',
             [
-              newListArgument("OUTPUT"),
+              newListArgument('OUTPUT'),
               newNumberArgument(randNumber.toString())
             ],
             ASM.tokens.FUNCTION_TYPES.PROC
@@ -113,21 +111,21 @@ describe("EVALUATOR SUITE", () => {
           labels: newMap([]),
           expValue: randNumber
         },
-      ];
+      ]
 
-      for (let t of tests) {
+      for (const t of tests) {
 
-        const output: number[] = [];
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const operations = [
           t.op,
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           t.input ?? [],
@@ -137,15 +135,15 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const newLine = eva.tick(line);
+        const newLine = eva.tick(line)
         expect(t.expValue).toBe(output[0])
         expect(1).toBe(newLine)
       }
-    });
+    })
 
-    it("Should evaluate the JMP instructions to the conditional path", () => {
+    it('Should evaluate the JMP instructions to the conditional path', () => {
 
       const randLabelName = randLabel()
 
@@ -153,8 +151,8 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "jmpNegFn",
-            [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+            'jmpNegFn',
+            [newLabelArgument(randLabelName), newRegisterArgument('r0')],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
           registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: -1 }]),
@@ -164,8 +162,8 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "jmpPosFn",
-            [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+            'jmpPosFn',
+            [newLabelArgument(randLabelName), newRegisterArgument('r0')],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
           registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: 1 }]),
@@ -175,8 +173,8 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "jmpZeroFn",
-            [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+            'jmpZeroFn',
+            [newLabelArgument(randLabelName), newRegisterArgument('r0')],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
           registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: 0 }]),
@@ -186,35 +184,35 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "jmpUndFn",
-            [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+            'jmpUndFn',
+            [newLabelArgument(randLabelName), newRegisterArgument('r0')],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
           registers: newFilledMap([{ name: ASM.tokens.REGISTERS.r0, value: undefined }]),
           memory: newMap([]),
           labels: newMap([{ name: randLabelName }])
         }
-      ];
+      ]
 
-      for (let t of tests) {
-        console.log(`testing ${t.op.funcName} instruction`);
-        const input: number[] = [];
-        const output: number[] = [];
+      for (const t of tests) {
+        console.log(`testing ${t.op.funcName} instruction`)
+        const input: number[] = []
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const args = [
-          new Argument(ASM.tokens.ARG_TYPES.NUM, "1", 1),
-        ];
+          new Argument(ASM.tokens.ARG_TYPES.NUM, '1', 1),
+        ]
 
         const operations = [
           t.op,
           new ASM.Operation(line, ASM.tokens.FUNCTIONS.PRT, args, ASM.tokens.FUNCTION_TYPES.PROC),
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           input,
@@ -224,17 +222,17 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const newLine = eva.tick(line);
+        const newLine = eva.tick(line)
         const expLine = t.labels.get(randLabelName)
         expect(expLine).toBeDefined()
-        expect(expLine).toBe(newLine);
+        expect(expLine).toBe(newLine)
       }
 
     })
 
-    it("Should evaluate the JMP instructions to the other path", () => {
+    it('Should evaluate the JMP instructions to the other path', () => {
 
       const lineNumber = chance.integer({ min: 0, max: 1000 })
       const randLabelName = randLabel()
@@ -243,8 +241,8 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             lineNumber,
-            "jmpNegFn",
-            [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+            'jmpNegFn',
+            [newLabelArgument(randLabelName), newRegisterArgument('r0')],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
           registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: 1 }]),
@@ -255,8 +253,8 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             lineNumber,
-            "jmpPosFn",
-            [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+            'jmpPosFn',
+            [newLabelArgument(randLabelName), newRegisterArgument('r0')],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
           registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: -1 }]),
@@ -267,8 +265,8 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             lineNumber,
-            "jmpZeroFn",
-            [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+            'jmpZeroFn',
+            [newLabelArgument(randLabelName), newRegisterArgument('r0')],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
           registers: newMap([{ name: ASM.tokens.REGISTERS.r0, value: 1 }]),
@@ -279,8 +277,8 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             lineNumber,
-            "jmpUndFn",
-            [newLabelArgument(randLabelName), newRegisterArgument("r0")],
+            'jmpUndFn',
+            [newLabelArgument(randLabelName), newRegisterArgument('r0')],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
           registers: newFilledMap([{ name: ASM.tokens.REGISTERS.r0, value: 1 }]),
@@ -288,27 +286,27 @@ describe("EVALUATOR SUITE", () => {
           labels: newMap([{ name: randLabelName }]),
           expLine: lineNumber
         }
-      ];
+      ]
 
-      for (let t of tests) {
-        console.log(`testing ${t.op.funcName} instruction`);
-        const input: number[] = [];
-        const output: number[] = [];
+      for (const t of tests) {
+        console.log(`testing ${t.op.funcName} instruction`)
+        const input: number[] = []
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const args = [
-          new Argument(ASM.tokens.ARG_TYPES.NUM, "1", 1),
-        ];
+          new Argument(ASM.tokens.ARG_TYPES.NUM, '1', 1),
+        ]
 
         const operations = [
           t.op,
           new ASM.Operation(line, ASM.tokens.FUNCTIONS.PRT, args, ASM.tokens.FUNCTION_TYPES.PROC),
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           input,
@@ -318,15 +316,15 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const newLine = eva.tick(line);
-        expect(t.expLine).toBe(newLine);
+        const newLine = eva.tick(line)
+        expect(t.expLine).toBe(newLine)
       }
 
     })
 
-    it("should evaluate the CPY instruction", () => {
+    it('should evaluate the CPY instruction', () => {
       // CPY: mx0, r0
       // CPY: mx0, 1
 
@@ -336,10 +334,10 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "cpyFn",
+            'cpyFn',
             [
-              newMemoryArgument("mx0"),
-              newRegisterArgument("r0"),
+              newMemoryArgument('mx0'),
+              newRegisterArgument('r0'),
             ],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
@@ -353,9 +351,9 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "cpyFn",
+            'cpyFn',
             [
-              newMemoryArgument("mx0"),
+              newMemoryArgument('mx0'),
               newNumberArgument(randNumber.toString())
             ],
             ASM.tokens.FUNCTION_TYPES.FLOW
@@ -367,22 +365,22 @@ describe("EVALUATOR SUITE", () => {
           labels: newMap([]),
           expValue: randNumber
         }
-      ];
+      ]
 
-      for (let t of tests) {
-        console.log(`testing ${t.op.funcName} instruction`);
-        const input: number[] = [];
-        const output: number[] = [];
+      for (const t of tests) {
+        console.log(`testing ${t.op.funcName} instruction`)
+        const input: number[] = []
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const operations = [
           t.op
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           input,
@@ -392,16 +390,16 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const _ = eva.tick(line);
+        eva.tick(line)
         const regVal = eva.memory.get(t.op.args[0].intern.toString())
         expect(regVal).toBe(t.expValue)
       }
 
     })
 
-    it("should evaluate the LOAD instruction", () => {
+    it('should evaluate the LOAD instruction', () => {
       // LOAD: r0, mx0
       const randNumber = chance.integer({ min: 0, max: 1000 })
 
@@ -409,10 +407,10 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "loadFn",
+            'loadFn',
             [
-              newRegisterArgument("r0"),
-              newMemoryArgument("mx0"),
+              newRegisterArgument('r0'),
+              newMemoryArgument('mx0'),
             ],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
@@ -424,21 +422,21 @@ describe("EVALUATOR SUITE", () => {
           labels: newMap([]),
           expValue: randNumber
         }
-      ];
+      ]
 
-      for (let t of tests) {
-        const input: number[] = [];
-        const output: number[] = [];
+      for (const t of tests) {
+        const input: number[] = []
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const operations = [
           t.op
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           input,
@@ -448,15 +446,15 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const _ = eva.tick(line);
+        eva.tick(line)
         const memVal = eva.registers.get(t.op.args[0].intern.toString())
         expect(memVal).toBe(t.expValue)
       }
-    });
+    })
 
-    it("should evaluate the ADD instruction", () => {
+    it('should evaluate the ADD instruction', () => {
       // ADD: r0, r1
       // ADD: r0, r0
       // ADD: r0, 1
@@ -468,10 +466,10 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "addFn",
+            'addFn',
             [
-              newRegisterArgument("r0"),
-              newRegisterArgument("r1"),
+              newRegisterArgument('r0'),
+              newRegisterArgument('r1'),
             ],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
@@ -486,10 +484,10 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "addFn",
+            'addFn',
             [
-              newRegisterArgument("r0"),
-              newRegisterArgument("r0"),
+              newRegisterArgument('r0'),
+              newRegisterArgument('r0'),
             ],
             ASM.tokens.FUNCTION_TYPES.FLOW
           ),
@@ -503,9 +501,9 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "addFn",
+            'addFn',
             [
-              newRegisterArgument("r0"),
+              newRegisterArgument('r0'),
               newNumberArgument(randNumber2.toString())
             ],
             ASM.tokens.FUNCTION_TYPES.FLOW
@@ -518,21 +516,21 @@ describe("EVALUATOR SUITE", () => {
           expValue: randNumber1 + randNumber2
         },
 
-      ];
+      ]
 
-      for (let t of tests) {
-        const input: number[] = [];
-        const output: number[] = [];
+      for (const t of tests) {
+        const input: number[] = []
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const operations = [
           t.op
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           input,
@@ -542,17 +540,17 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const _ = eva.tick(line);
+        eva.tick(line)
         const regVal = eva.registers.get(t.op.args[0].intern.toString())
         if (!regVal || !t.expValue) throw new Error('failed')
 
         expect(regVal).toBe(t.expValue)
       }
-    });
+    })
 
-    it("should evaluate the SUB instruction", () => {
+    it('should evaluate the SUB instruction', () => {
       // ADD: r0, r1
       // ADD: r0, r0
       // ADD: r0, 1
@@ -564,10 +562,10 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "subFn",
+            'subFn',
             [
-              newRegisterArgument("r0"),
-              newRegisterArgument("r1"),
+              newRegisterArgument('r0'),
+              newRegisterArgument('r1'),
             ],
             ASM.tokens.FUNCTION_TYPES.PROC
           ),
@@ -582,10 +580,10 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "subFn",
+            'subFn',
             [
-              newRegisterArgument("r0"),
-              newRegisterArgument("r0"),
+              newRegisterArgument('r0'),
+              newRegisterArgument('r0'),
             ],
             ASM.tokens.FUNCTION_TYPES.PROC
           ),
@@ -599,9 +597,9 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "subFn",
+            'subFn',
             [
-              newRegisterArgument("r0"),
+              newRegisterArgument('r0'),
               newNumberArgument(randNumber2.toString())
             ],
             ASM.tokens.FUNCTION_TYPES.PROC
@@ -614,21 +612,21 @@ describe("EVALUATOR SUITE", () => {
           expValue: randNumber1 - randNumber2
         },
 
-      ];
+      ]
 
-      for (let t of tests) {
-        const input: number[] = [];
-        const output: number[] = [];
+      for (const t of tests) {
+        const input: number[] = []
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const operations = [
           t.op
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           input,
@@ -638,17 +636,17 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const _ = eva.tick(line);
+        eva.tick(line)
         const regVal = eva.registers.get(t.op.args[0].intern.toString())
         if (regVal === undefined || t.expValue === undefined) throw new Error('failed')
 
         expect(regVal).toBe(t.expValue)
       }
-    });
+    })
 
-    it("should evaluate the PRT instruction", () => {
+    it('should evaluate the PRT instruction', () => {
       // PRT: r0
 
       const randNumber1 = chance.integer({ min: 0, max: 1000 })
@@ -657,10 +655,10 @@ describe("EVALUATOR SUITE", () => {
         {
           op: new ASM.Operation(
             1,
-            "printFn",
+            'printFn',
             [
-              newRegisterArgument("r0"),
-              newRegisterArgument("r1"),
+              newRegisterArgument('r0'),
+              newRegisterArgument('r1'),
             ],
             ASM.tokens.FUNCTION_TYPES.PROC
           ),
@@ -671,21 +669,21 @@ describe("EVALUATOR SUITE", () => {
           labels: newMap([]),
           expValue: randNumber1
         },
-      ];
+      ]
 
-      for (let t of tests) {
-        const input: number[] = [];
-        const output: number[] = [];
+      for (const t of tests) {
+        const input: number[] = []
+        const output: number[] = []
 
-        const registers = t.registers;
-        const memory = t.memory;
+        const registers = t.registers
+        const memory = t.memory
 
-        const line = 1;
-        const logger: Logger = [];
+        const line = 1
+        const logger: Logger = []
 
         const operations = [
           t.op
-        ];
+        ]
 
         const eva = new ASM.Evaluator(
           input,
@@ -695,17 +693,17 @@ describe("EVALUATOR SUITE", () => {
           operations,
           logger,
           t.labels
-        );
+        )
 
-        const _ = eva.tick(line);
+        eva.tick(line)
         const logVal = eva.logger.pop()
         if (logVal === undefined || t.expValue === undefined) throw new Error('failed')
 
         expect(logVal).toEqual({ln: 1, type: 'message', value: t.expValue})
       }
-    });
-  });
-});
+    })
+  })
+})
 
 
 /*

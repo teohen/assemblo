@@ -32,4 +32,4 @@ const doc = {
     <p><em>(The value in <code>r0</code> is added to the value in <code>r1</code>, and the result is stored back in <code>r1</code>.)</em></p>`
 }
 
-export default doc;
+export default doc

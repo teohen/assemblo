@@ -1,11 +1,11 @@
-import { Chance } from 'chance';
-import { Argument, tokens } from '../../assemblo';
+import { Chance } from 'chance'
+import { Argument, tokens } from '../../assemblo'
 
-const chance = new Chance();
+const chance = new Chance()
 
 function rand<T>(options: T[]): T {
-  const randomIndex = Math.floor(Math.random() * options.length);
-  return options[randomIndex];
+  const randomIndex = Math.floor(Math.random() * options.length)
+  return options[randomIndex]
 }
 
 function randArgType() {
@@ -21,7 +21,7 @@ function randMem() {
 }
 
 export function randLabel() {
-  return "." + chance.word({ capitalize: false, length: 8 }) + "_" + chance.word({ capitalize: false, length: 15 })
+  return '.' + chance.word({ capitalize: false, length: 8 }) + '_' + chance.word({ capitalize: false, length: 15 })
 }
 
 export function newRandomArgument(): Argument {
@@ -58,7 +58,7 @@ export function newLabelArgument(literal?: string): Argument {
 
 export function newListArgument(literal?: string): Argument {
   if (!literal) {
-    literal = rand(["INPUT", "OUTPUT"])
+    literal = rand(['INPUT', 'OUTPUT'])
   }
 
   return new Argument(tokens.ARG_TYPES.LIST, literal, (tokens.LISTS as Record<string, string>)[literal])

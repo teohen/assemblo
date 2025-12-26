@@ -1,6 +1,6 @@
 const list = [
   {
-    name: "START",
+    name: 'START',
     description: `<p>
     Starts the program setting <a href="docs?item=registers">registers</a>, <a href="docs?item=memory">memory</a>, line counter, etc and represents the starting point of the program.
 </p>
@@ -22,7 +22,7 @@ const list = [
 
   },
   {
-    name: "END",
+    name: 'END',
     description: `<p>
     Ends the program setting the program status to ENDED and the line counter to -1.
 </p>
@@ -43,7 +43,7 @@ const list = [
 `
   },
   {
-    name: "POP",
+    name: 'POP',
     description: `<p>
     Removes the last item from the program's INPUT <a href="docs?item=lists">list</a> and store the value into a specified <a href="docs?item=registers">register</a>.
 </p>
@@ -77,7 +77,7 @@ const list = [
 </p>`
   },
   {
-    name: "PUSH",
+    name: 'PUSH',
     description: `<p>
     Copies a value from a specified <a href="docs?item=registers">register</a> and add it to the end of the program's OUTPUT <a href="docs?item=lists">list</a>.
 </p>
@@ -109,7 +109,7 @@ const list = [
 `
   },
   {
-    name: "CPY",
+    name: 'CPY',
     description: `<p>
     Copies the value stored in a specified <a href="docs?item=registers">register</a> and place that value into a designated <a href="docs?item=memory">memory</a> slot.
 </p>
@@ -141,7 +141,7 @@ const list = [
 `
   },
   {
-    name: "LOAD",
+    name: 'LOAD',
     description: `<p>
     Loads a value from a specified <a href="docs?item=memory">memory</a> slot and copy that value into a designated <a href="docs?item=registers">register</a>.
 </p>
@@ -175,7 +175,7 @@ const list = [
 </p>`
   },
   {
-    name: "JMP_N",
+    name: 'JMP_N',
     description: `<p>
     Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>NEGATIVE</b>.
 </p>
@@ -215,7 +215,7 @@ const list = [
 </p>`
   },
   {
-    name: "JMP_P",
+    name: 'JMP_P',
     description: `<p>
     Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>POSITIVE</b>.
 </p>
@@ -254,7 +254,7 @@ const list = [
 </p>`
   },
   {
-    name: "JMP_Z",
+    name: 'JMP_Z',
     description: `<p>
     Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>ZERO</b>.
 </p>
@@ -293,7 +293,7 @@ const list = [
 </p>`
   },
   {
-    name: "JMP_U",
+    name: 'JMP_U',
     description: `<p>
     Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>UNDEFINED</b>.
 </p>
@@ -332,7 +332,7 @@ const list = [
 </p>`
   },
   {
-    name: "ADD",
+    name: 'ADD',
     description: `<p>
     Adds the value from the <i>SOURCE</i> to the value of <i>TARGET_REGISTER</i>.<br>Will result in a <a href="docs?item=errors">ERROR</a> if the value of <i>SOURCE</i> is <b>UNDEFINED</b>.
 </p>
@@ -377,7 +377,7 @@ const list = [
 `
   },
   {
-    name: "SUB",
+    name: 'SUB',
     description: `<p>
     Subtracts the value from the <i>SOURCE</i> to the value of <i>TARGET_REGISTER</i>.<br>Will result in a <a href="docs?item=errors">ERROR</a> if the value of <i>SOURCE</i> is <b>UNDEFINED</b>.
 </p>
@@ -421,7 +421,7 @@ const list = [
 </p>`
   },
   {
-    name: "PRT",
+    name: 'PRT',
     description: `<p>
     Prints the value of the <a href="docs?item=registers">register</a> in the console.
 </p>
@@ -453,6 +453,6 @@ const list = [
 </p>
 `
   },
-];
+]
 
-export default list;
+export default list
