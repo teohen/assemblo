@@ -1,6 +1,6 @@
 import Argument from './argument'
 import Operation from './operation'
-import { Label, Labels } from './program'
+import { Labels } from './program'
 import tokens from './tokens'
 
 
