@@ -6,9 +6,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "node --experimental-test-coverage --test",
-    "test:only": "node --test --test-name-pattern",
-    "build": "bun build ./src/ui/index.html ./src/ui/docs.html ./src/ui/coder.html --outdir ./dist/",
+    "type-check": "tsc --noEmit",
+    "build": "bun build ./src/**/!(*.test|*.spec).ts --outdir ./dist",
+    "prod": "bun run lint && bun run type-check && bun run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

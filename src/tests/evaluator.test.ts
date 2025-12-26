@@ -2,7 +2,7 @@ import { describe, it, expect } from 'bun:test'
 
 import Argument from '../assemblo/argument'
 import * as ASM from '../assemblo'
-import { InputQ,  Labels, Logger } from '../assemblo/program'
+import { InputQ, Labels, Logger } from '../assemblo/program'
 import { newLabelArgument, newListArgument, newMemoryArgument, newNumberArgument, newRegisterArgument, randLabel } from './fixtures/argument'
 import { newMap, newFilledMap } from './fixtures/maps'
 import { Chance } from 'chance'
@@ -289,7 +289,6 @@ describe('EVALUATOR SUITE', () => {
       ]
 
       for (const t of tests) {
-        console.log(`testing ${t.op.funcName} instruction`)
         const input: number[] = []
         const output: number[] = []
 
@@ -368,7 +367,6 @@ describe('EVALUATOR SUITE', () => {
       ]
 
       for (const t of tests) {
-        console.log(`testing ${t.op.funcName} instruction`)
         const input: number[] = []
         const output: number[] = []
 
@@ -699,7 +697,62 @@ describe('EVALUATOR SUITE', () => {
         const logVal = eva.logger.pop()
         if (logVal === undefined || t.expValue === undefined) throw new Error('failed')
 
-        expect(logVal).toEqual({ln: 1, type: 'message', value: t.expValue})
+        expect(logVal).toEqual({ ln: 1, type: 'message', value: t.expValue })
+      }
+    })
+
+    it('should evaluate the LBL instruction', () => {
+      // LB: .any_label
+
+      const randNumber = chance.integer({ min: 0, max: 1000 })
+      const randString = chance.word({ capitalize: false, length: 50 },)
+
+      const tests: TestCase[] = [
+        {
+          op: new ASM.Operation(
+            randNumber,
+            'labelFn',
+            [
+              newLabelArgument(randString),
+            ],
+            ASM.tokens.FUNCTION_TYPES.PROC
+          ),
+          registers: newMap([]),
+          memory: newMap([]),
+          labels: newMap([]),
+        },
+      ]
+
+      for (const t of tests) {
+        const input: number[] = []
+        const output: number[] = []
+
+        const registers = t.registers
+        const memory = t.memory
+        const labels = t.labels
+
+        const line = 1
+        const logger: Logger = []
+
+        const operations = [
+          t.op
+        ]
+
+        const eva = new ASM.Evaluator(
+          input,
+          output,
+          registers,
+          memory,
+          operations,
+          logger,
+          labels
+        )
+
+        eva.tick(line)
+
+        expect(labels).toBeDefined()
+        const val = labels.get(randString)
+        expect(val).toBe(randNumber)
       }
     })
   })

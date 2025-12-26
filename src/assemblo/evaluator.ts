@@ -11,14 +11,14 @@ interface ConditionalFunction {
   (val: number | undefined): boolean;
 }
 
-// Define types for the storage structures - they use string keys
+
 interface Storage {
   get(key: string): number | undefined;
   set(key: string, value: number | undefined): void;
 }
 
 export interface LoggerEntry {
-  type: 'error' | 'message' | 'success';  // Added 'success' here
+  type: 'error' | 'message' | 'success';  
   value: any;
   ln: number;
 }
@@ -56,7 +56,7 @@ class Evaluator {
     this.inQ = inQ
     this.outQ = outQ
 
-    // Bind methods
+    
     this.popFn = this.popFn.bind(this)
     this.cpyFn = this.cpyFn.bind(this)
     this.addFn = this.addFn.bind(this)
@@ -91,7 +91,7 @@ class Evaluator {
   }
 
   popFn(args: Argument[], ln: number): number {
-    // POP: REG, INPUT
+    
     const arg1 = args[0]
     const arg2 = args[1]
 
@@ -364,10 +364,7 @@ class Evaluator {
     const arg1 = args[0]
 
     Argument.validateType(arg1, [tokens.ARG_TYPES.LBL], ln)
-
-    const newLbl: Label = { name: arg1.literal, lineNumber: ln }
-    this.labels.push(newLbl)
-
+    this.labels.set(arg1.literal, ln)
     return ln
   }
 
@@ -383,7 +380,7 @@ class Evaluator {
       return -1
     }
 
-    // Use type assertion since we know these methods exist
+    
     const f = this[op.funcName as keyof Evaluator] as (args: Argument[], ln: number) => number
 
     if (!f) {
