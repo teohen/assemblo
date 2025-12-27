@@ -1,12 +1,15 @@
 import { describe, it, expect } from 'bun:test'
+import { IOperation } from '../assemblo/operation'
 
-import * as ASM from '../assemblo'
-import { newLabelArgument, newListArgument, newMemoryArgument, newNumberArgument, newRegisterArgument } from './fixtures/argument'
+import fixtures from './fixtures'
+import Parser from '../assemblo/parser';
+
 
 interface TestCase {
   input: string;
-  exp: ASM.Operation;
+  operation: IOperation;
 }
+
 
 describe('Parser suite', () => {
   describe('Success operations', () => {
@@ -14,324 +17,257 @@ describe('Parser suite', () => {
       const tests: TestCase[] = [
         {
           input: 'POP: r0, INPUT',
-          exp: new ASM.Operation(
-            1,
-            'popFn',
+          operation: fixtures.Operation.newOperation('popFn', 1,
             [
-              newRegisterArgument('r0'),
-              newListArgument('INPUT')
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newRegisterArgument('r0'),
+              fixtures.Argument.newListArgument('INPUT')
+            ]
           )
         },
       ]
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         const operations = p.parse(t.input)
 
-        expect(operations.length).toBe(1)
-
-        const op = p.operations[0]
-        expect(op).toEqual(t.exp)
-
-        expect(op.args[0]).toEqual(t.exp.args[0])
-        expect(op.args[1]).toEqual(t.exp.args[1])
+        expect(operations).toEqual([t.operation])
       }
     })
+
 
     it('parse the PUSH operation', () => {
       const tests: TestCase[] = [
         {
           input: 'PUSH: OUTPUT, r0',
-          exp: new ASM.Operation(
-            1,
-            'pushFn',
+          operation: fixtures.Operation.newOperation('pushFn', 1,
             [
-              newListArgument('OUTPUT'),
-              newRegisterArgument('r0'),
+              fixtures.Argument.newListArgument('OUTPUT'),
+              fixtures.Argument.newRegisterArgument('r0'),
             ],
-            ASM.tokens.FUNCTION_TYPES.PROC
           )
         },
         {
           input: 'PUSH: OUTPUT, 1',
-          exp: new ASM.Operation(
-            1,
-            'pushFn',
+          operation: fixtures.Operation.newOperation('pushFn', 1,
             [
-              newListArgument('OUTPUT'),
-              newNumberArgument('1'),
+              fixtures.Argument.newListArgument('OUTPUT'),
+              fixtures.Argument.newNumberArgument('1'),
             ],
-            ASM.tokens.FUNCTION_TYPES.PROC
           )
         },
       ]
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         const operations = p.parse(t.input)
 
-        expect(operations.length).toBe(1)
-
-        const op = p.operations[0]
-        expect(op).toEqual(t.exp)
-
-        expect(op.args[0]).toEqual(t.exp.args[0])
-        expect(op.args[1]).toEqual(t.exp.args[1])
+        expect(operations).toEqual([t.operation])
       }
     })
+
+
 
     it('parse the JMP operations', () => {
       const tests: TestCase[] = [
         {
           input: 'JMP_N: .end, r0',
-          exp: {
-            args: [
-              newLabelArgument('.end'),
-              newRegisterArgument('r0')
-            ],
-            funcName: 'jmpNegFn',
-            line: 1,
-            type: ASM.tokens.FUNCTION_TYPES.FLOW
-          },
+          operation: fixtures.Operation.newOperation('jmpNegFn', 1,
+            [
+              fixtures.Argument.newLabelArgument('.end'),
+              fixtures.Argument.newRegisterArgument('r0')
+            ]
+          )
         },
         {
           input: 'JMP_P: .end, r0',
-          exp: {
-            args: [
-              newLabelArgument('.end'),
-              newRegisterArgument('r0')
-            ],
-            funcName: 'jmpPosFn',
-            line: 1,
-            type: ASM.tokens.FUNCTION_TYPES.FLOW
-          },
+          operation: fixtures.Operation.newOperation('jmpPosFn', 1,
+            [
+              fixtures.Argument.newLabelArgument('.end'),
+              fixtures.Argument.newRegisterArgument('r0')
+            ]
+          )
         },
         {
           input: 'JMP_Z: .end, r0',
-          exp: {
-            args: [
-              newLabelArgument('.end'),
-              newRegisterArgument('r0')
-            ],
-            funcName: 'jmpZeroFn',
-            line: 1,
-            type: ASM.tokens.FUNCTION_TYPES.FLOW
-          },
+          operation: fixtures.Operation.newOperation('jmpZeroFn', 1,
+            [
+              fixtures.Argument.newLabelArgument('.end'),
+              fixtures.Argument.newRegisterArgument('r0')
+            ]
+          )
         },
         {
           input: 'JMP_U: .end, r0',
-          exp: {
-            args: [
-              newLabelArgument('.end'),
-              newRegisterArgument('r0')
-            ],
-            funcName: 'jmpUndFn',
-            line: 1,
-            type: ASM.tokens.FUNCTION_TYPES.FLOW
-          },
+          operation: fixtures.Operation.newOperation('jmpUndFn', 1,
+            [
+              fixtures.Argument.newLabelArgument('.end'),
+              fixtures.Argument.newRegisterArgument('r0')
+            ]
+          )
         }
       ]
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         const operations = p.parse(t.input)
 
-        expect(operations.length).toBe(1)
-
-        const op = p.operations[0]
-        expect(op).toEqual(t.exp)
-
-        expect(op.args[0]).toEqual(t.exp.args[0])
-        expect(op.args[1]).toEqual(t.exp.args[1])
+        expect(operations).toEqual([t.operation])
       }
     })
+
+
 
     it('parse the CPY operations', () => {
       const tests: TestCase[] = [
         {
           input: 'CPY: mx0, r0',
-          exp: new ASM.Operation(
-            1,
-            'cpyFn',
+          operation: fixtures.Operation.newOperation('cpyFn', 1,
             [
-              newMemoryArgument('mx0'),
-              newRegisterArgument('r0')
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newMemoryArgument('mx0'),
+              fixtures.Argument.newRegisterArgument('r0')
+            ]
           )
         },
         {
           input: 'CPY: mx0, 2',
-          exp: new ASM.Operation(
-            1,
-            'cpyFn',
+          operation: fixtures.Operation.newOperation('cpyFn', 1,
             [
-              newMemoryArgument('mx0'),
-              newNumberArgument('2')
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newMemoryArgument('mx0'),
+              fixtures.Argument.newNumberArgument('2')
+            ]
           )
         },
       ]
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         const operations = p.parse(t.input)
 
-        expect(operations.length).toBe(1)
-
-        const op = p.operations[0]
-        expect(op).toEqual(t.exp)
-
-        expect(op.args[0]).toEqual(t.exp.args[0])
-        expect(op.args[1]).toEqual(t.exp.args[1])
+        expect(operations).toEqual([t.operation])
       }
     })
+
+
 
     it('parse the LOAD operations', () => {
       const tests: TestCase[] = [
         {
           input: 'LOAD: r0, mx0',
-          exp: new ASM.Operation(
-            1,
-            'loadFn',
+          operation: fixtures.Operation.newOperation('loadFn', 1,
             [
-              newRegisterArgument('r0'),
-              newMemoryArgument('mx0'),
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newRegisterArgument('r0'),
+              fixtures.Argument.newMemoryArgument('mx0'),
+            ]
           )
         }
       ]
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         const operations = p.parse(t.input)
 
-        expect(operations.length).toBe(1)
-
-        const op = p.operations[0]
-        expect(op).toEqual(t.exp)
-
-        expect(op.args[0]).toEqual(t.exp.args[0])
-        expect(op.args[1]).toEqual(t.exp.args[1])
+        expect(operations).toEqual([t.operation])
       }
     })
+
+
 
     it('parse the ADD operation', () => {
       const tests: TestCase[] = [
         {
           input: 'ADD: r0, r0',
-          exp: new ASM.Operation(
-            1,
-            'addFn',
+          operation: fixtures.Operation.newOperation('addFn', 1,
             [
-              newRegisterArgument('r0'),
-              newRegisterArgument('r0'),
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newRegisterArgument('r0'),
+              fixtures.Argument.newRegisterArgument('r0'),
+            ]
           )
         },
         {
           input: 'ADD: r0, 1',
-          exp: new ASM.Operation(
-            1,
-            'addFn',
+          operation: fixtures.Operation.newOperation('addFn', 1,
             [
-              newRegisterArgument('r0'),
-              newNumberArgument('1'),
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newRegisterArgument('r0'),
+              fixtures.Argument.newNumberArgument("1")
+            ]
           )
         },
       ]
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         const operations = p.parse(t.input)
 
-        expect(operations.length).toBe(1)
+        expect(operations).toEqual([t.operation])
 
-        const op = p.operations[0]
-        expect(op).toEqual(t.exp)
-
-        expect(op.args[0]).toEqual(t.exp.args[0])
-        expect(op.args[1]).toEqual(t.exp.args[1])
       }
     })
+
+
 
     it('parse the SUB operation', () => {
       const tests: TestCase[] = [
         {
           input: 'SUB: r0, r0',
-          exp: new ASM.Operation(
-            1,
-            'subFn',
+          operation: fixtures.Operation.newOperation('subFn', 1,
             [
-              newRegisterArgument('r0'),
-              newRegisterArgument('r0'),
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newRegisterArgument('r0'),
+              fixtures.Argument.newRegisterArgument('r0'),
+            ]
           )
         },
         {
           input: 'SUB: r0, 1',
-          exp: new ASM.Operation(
-            1,
-            'subFn',
+          operation: fixtures.Operation.newOperation('subFn', 1,
             [
-              newRegisterArgument('r0'),
-              newNumberArgument('1'),
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newRegisterArgument('r0'),
+              fixtures.Argument.newNumberArgument("1")
+            ]
+          )
+        },
+        {
+          input: 'SUB: r0, r1',
+          operation: fixtures.Operation.newOperation('subFn', 1,
+            [
+              fixtures.Argument.newRegisterArgument('r0'),
+              fixtures.Argument.newRegisterArgument('r1'),
+            ]
           )
         },
       ]
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         const operations = p.parse(t.input)
 
-        expect(operations.length).toBe(1)
-
-        const op = p.operations[0]
-        expect(op).toEqual(t.exp)
-
-        expect(op.args[0]).toEqual(t.exp.args[0])
-        expect(op.args[1]).toEqual(t.exp.args[1])
+        expect(operations).toEqual([t.operation])
       }
     })
+
+
 
     it('parse the LBL operation', () => {
       const tests: TestCase[] = [
         {
           input: 'LBL: .mult',
-          exp: new ASM.Operation(
-            1,
-            'labelFn',
+          operation: fixtures.Operation.newOperation('labelFn', 1,
             [
-              newLabelArgument('.mult')
-            ],
-            ASM.tokens.FUNCTION_TYPES.PROC
+              fixtures.Argument.newLabelArgument('.mult')
+            ]
           )
         }
       ]
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         const operations = p.parse(t.input)
 
-        expect(operations.length).toBe(1)
-
-        const op = p.operations[0]
-        expect(op).toEqual(t.exp)
-
-        expect(op.args[0]).toEqual(t.exp.args[0])
+        expect(operations).toEqual([t.operation])
       }
     })
   })
+
+
 
   describe('Error operations', () => {
     it('should throw error if unknown argument', () => {
@@ -353,7 +289,7 @@ describe('Parser suite', () => {
       let errMsg = ''
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         try {
           p.parse(t.input)
         } catch (err) {
@@ -378,7 +314,7 @@ describe('Parser suite', () => {
       let errMsg = ''
 
       for (const t of tests) {
-        const p = new ASM.Parser()
+        const p = Parser.newParser()
         try {
           p.parse(t.in)
         } catch (err) {

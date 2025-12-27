@@ -1,16 +1,17 @@
 {
   "name": "assemblo",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.ts",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "type-check": "tsc --noEmit",
-    "build": "bun build ./src/**/!(*.test|*.spec).ts --outdir ./dist",
-    "prod": "bun run lint && bun run type-check && bun run build",
+    "types": "tsc --noEmit",
+    "build": "bun build ./src/**/*.html --outdir ./dist",
+    "prod": "bun run lint && bun run types && bun run build",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "bun test --inspect"
   },
   "engines": {
     "node": ">=20.0.0"

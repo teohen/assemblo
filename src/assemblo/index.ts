@@ -1,10 +1,16 @@
-import Argument from './argument'
+// import { IArgument } from './argument'
 import Evaluator from './evaluator'
-import Operation from './operation'
-import Parser from './parser'
+// import Operation, { IOperation } from './operation'
+// import Parser, { IParser } from './parser'
 import Program from './program'
 import tokens from './tokens'
 
 export {
-  Argument, Evaluator, Operation, Parser, Program, tokens
+  // IArgument,
+  // IOperation,
+  // IParser,
+  // Operation,
+  Evaluator,
+  // Parser,
+  tokens
 }

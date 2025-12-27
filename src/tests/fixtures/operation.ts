@@ -1,5 +1,11 @@
-import { Argument, Operation, tokens } from '../../assemblo'
+import { tokens } from '../../assemblo'
+import { IArgument } from '../../assemblo/argument'
+import operation, { IOperation } from '../../assemblo/operation'
 
-export function createOperation(fnName: string, ln: number, args: Argument[]): Operation {
-  return new Operation(ln, fnName, args, tokens.FUNCTION_TYPES.FLOW)
+function newOperation(fnName: string, ln: number, args: IArgument[]): IOperation {
+  return operation.createOperation(ln, fnName, args)
+}
+
+export default {
+  newOperation
 }

@@ -1,5 +1,14 @@
-const challenges: any = {
-  'no-negatives': {
+export interface Challenge {
+  title: string
+  id: string
+  description: string
+  text: string
+  input: Array<number>
+  expected: Array<number>
+}
+
+const challenges: Challenge[] = [
+  {
     title: 'No Negatives',
     id: 'no-negatives',
     description: 'Don\'t send any negative numbers to the output!',
@@ -11,7 +20,7 @@ const challenges: any = {
     input: [0, 1, -2, 3, -4, 5],
     expected: [5, 3, 1]
   },
-  'multiplication-miracle': {
+  {
     title: 'The Multiplication Miracle',
     id: 'multiplication-miracle',
     description: 'Perform the multiplication instruction',
@@ -22,7 +31,7 @@ const challenges: any = {
     input: [-3, 2, -1, -4, 3, 0, 6, 5, 4, 3, 2, 1],
     expected: [2, 12, 30, 0, 4, -6]
   },
-  'same-sign': {
+  {
     title: 'Same sign',
     id: 'same-sign',
     description: 'Compare two values to check their sign.',
@@ -33,6 +42,19 @@ const challenges: any = {
     input: [4, -8, 5, -4, 2, -4, -2, -8, 2, 4],
     expected: [0, 0, 1, 1, 1]
   },
+]
+
+function getChallenge(id: string | null): Challenge | undefined {
+  if (!id) return undefined
+
+  return challenges.find((i) => i.id === id)
 }
 
-export default challenges
+function getAllChallenges(): Challenge[] {
+  return challenges
+}
+
+export default {
+  getChallenge,
+  getAllChallenges
+}

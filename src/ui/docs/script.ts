@@ -35,7 +35,8 @@ ui.renderDocList(docs['lists'])
 ui.renderDocList(docs['errors'])
 ui.renderDocList(docs['instructions'])
 
-const instructionEle = document.getElementById('instructionsListTitle')
+const instructionEle = document.getElementById('instructionsListTitle') as HTMLDivElement
+
 for (const i of allinstructions) {
   ui.renderDocListItem(instructionEle, i)
 }

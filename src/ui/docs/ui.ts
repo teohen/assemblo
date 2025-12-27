@@ -1,7 +1,7 @@
-const docSideBar = document.getElementById('docSideBar')
-const docContent = document.getElementById('docContent')
+const docSideBar = document.getElementById('docSideBar') as HTMLDivElement
+const docContent = document.getElementById('docContent') as HTMLDivElement
 
-function createDocListTitle(title) {
+function createDocListTitle(title: string) {
   const aEl = document.createElement('a')
   aEl.id = `${title}ListTitle`
   aEl.href = `docs?item=${title}`
@@ -10,28 +10,28 @@ function createDocListTitle(title) {
   return aEl
 }
 
-function createDocListItem(doc) {
+function createDocListItem(doc: any) {
   const a = document.createElement('a')
-  a.href=`docs?item=${doc.name}`
+  a.href = `docs?item=${doc.name}`
 
   a.className = 'mb-1 list-group-item'
   a.innerText = doc.name
   return a
 }
 
-function renderDocList(doc) {
+function renderDocList(doc: any) {
   const docListTitle = createDocListTitle(doc.name)
   docSideBar.append(docListTitle)
 
   if (!doc.items) return
 }
 
-function renderDocListItem(elem, doc) {
+function renderDocListItem(elem: HTMLDivElement, doc: any) {
   const listItem = createDocListItem(doc)
   elem.appendChild(listItem)
 }
 
-function renderDocContent(item) {
+function renderDocContent(item: any) {
   if (!item) return
   const divEl = document.createElement('div')
 

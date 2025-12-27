@@ -1,14 +1,14 @@
-import challenges from './challenges/challenges.js'
+import challenges, { Challenge } from './challenges/challenges'
 
-const listElem = document.getElementById('challengeList')
+const listElem = document.getElementById('challengeList') as HTMLDivElement
 
 function renderChallenges() {
-  for (const ch of Object.values(challenges)) {
+  for (const ch of challenges.getAllChallenges()) {
     listElem.appendChild(createListItem((ch)))
   }
 }
 
-function createListItem(ch) {
+function createListItem(ch: Challenge) {
   const elP = document.createElement('p')
   elP.className = 'mb-1 description'
   elP.innerText = ch.description

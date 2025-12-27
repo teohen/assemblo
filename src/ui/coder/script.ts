@@ -3,11 +3,11 @@ import challenges from '../challenges/challenges'
 import editor from './codemirror'
 import ui from './ui'
 
-const runBtn = document.getElementById('runBtn')
-const debugBtn = document.getElementById('debugBtn')
-const nextLineBtn = document.getElementById('nextLineBtn')
-const restoreBtn = document.getElementById('restoreBtn')
-const submitBtn = document.getElementById('submitBtn')
+const runBtn = document.getElementById('runBtn') as HTMLButtonElement
+const debugBtn = document.getElementById('debugBtn') as HTMLButtonElement
+const nextLineBtn = document.getElementById('nextLineBtn') as HTMLButtonElement
+const restoreBtn = document.getElementById('restoreBtn') as HTMLButtonElement
+const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement
 const delay = document.getElementById('runDelay')
 const runDelay = delay?.firstElementChild as HTMLInputElement
 
@@ -15,12 +15,11 @@ const urlParams = new URLSearchParams(window.location.search)
 const paramChallenge = urlParams.get('challenge')
 
 const p = new Program()
-let inputStack = []
-let expected = []
+let inputStack: number[] = []
+let expected: number[] = []
 let challenge
-
-if (paramChallenge) {
-  const ch: any = challenges[paramChallenge]
+const ch = challenges.getChallenge(paramChallenge)
+if (ch) {
   inputStack = ch.input
   expected = ch.expected
   challenge = ch

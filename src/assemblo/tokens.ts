@@ -47,8 +47,8 @@ const ARG_TYPES = {
   LIST: 'LST',
   NUM: 'NUM',
   LBL: 'LBL',
+  CND: 'CND',
 } as const
-
 
 
 const FUNCTION_TYPES = {
@@ -63,7 +63,7 @@ const tokens: Tokens = {
   MEMORY,
   ARG_TYPES,
   FUNCTION_TYPES,
-  LISTS
+  LISTS,
 }
 
 export default tokens

@@ -1,7 +1,14 @@
 
 import tokens from './tokens'
-import Parser from './parser'
-import Evaluator, { LoggerEntry } from './evaluator'
+import Parser, { IParser } from './parser'
+import Evaluator, { IEvaluator } from './evaluator'
+import Operation, { IOperation } from './operation'
+import Argument from './argument'
+import { RegistersType } from './registers'
+import { InputQ, OutputQ } from './lists'
+import { LabelType } from './labels'
+import { MemoryType } from './memory'
+import { Logger } from './logger'
 
 
 export interface Label {
@@ -9,12 +16,6 @@ export interface Label {
   lineNumber: number
 }
 
-export type Registers = Map<string, number | undefined>;
-
-export type Labels = Map<string, number>;
-export type InputQ = number[];
-
-export type Logger = LoggerEntry[];
 
 // Define callback types
 type TickFn = () => void;
@@ -33,16 +34,16 @@ type StatusType = typeof status[keyof typeof status];
 
 class Program {
   clock: number
-  parser: Parser
-  evaluator: Evaluator
-  registers: Registers
-  memory: Map<string, number | undefined>
-  inQ: inputQ
-  outQ: number[]
+  parser: IParser
+  evaluator: IEvaluator
+  registers: RegistersType
+  memory: MemoryType
+  inQ: InputQ
+  outQ: OutputQ
   status: StatusType
-  logger: Logger
+  logger: Logger[]
   line: number
-  labels: Labels
+  labels: LabelType
 
 
   constructor() {
@@ -51,15 +52,15 @@ class Program {
     this.status = status.READY
 
     // Initialize with default values - these will be overwritten in reset()
-    this.parser = new Parser()
-    this.evaluator = new Evaluator([], [], new Map(), new Map(), [], [], new Map())
+    this.parser = Parser.newParser()
+    this.evaluator = Evaluator.newEvaluator([], [], new Map(), new Map(), [], [], new Map())
     this.registers = new Map()
     this.memory = new Map()
     this.labels = new Map()
     this.inQ = []
     this.outQ = []
     this.logger = []
-    
+
   }
 
   isReady(): boolean {
@@ -103,7 +104,7 @@ class Program {
     this.inQ = inQ.slice()
     this.outQ = []
     this.logger = []
-    
+
 
     // Set up registers with undefined values
     this.registers.set(tokens.REGISTERS.r0, undefined)
@@ -115,26 +116,42 @@ class Program {
     this.memory.set(tokens.MEMORY.mx1, undefined)
     this.memory.set(tokens.MEMORY.mx2, undefined)
 
-    this.labels.set('.start', 0)
-    this.labels.set('.end', -1)
+    // this.labels.set('.start', 0)
+    // this.labels.set('.end', -1)
 
-    this.parser = new Parser()
-    this.evaluator = new Evaluator(
+    this.parser = Parser.newParser()
+    this.evaluator = Evaluator.newEvaluator(
       this.inQ,
       this.outQ,
       this.registers,
       this.memory,
-      this.parser.operations,
+      this.parser.parser.operations,
       this.logger,
       this.labels
     )
   }
 
+  substituteLabels(operations: IOperation[]): IOperation[] {
+    return operations.map((op) => {
+      if (op.funcName !== 'labelFn') return op
+
+      return Operation.createOperation(
+        op.line,
+        'jmpFn',
+        [
+          Argument.createNumberArgument(op.line.toString()),
+          Argument.createConditionalArgument(() => true),
+        ]
+      )
+    })
+  }
+
   prepareOperations(code: string): void {
     try {
       this.status = status.PARSING
-      const operations = this.parser.parse(code)
-      this.evaluator.operations = operations
+      const operations = this.substituteLabels(this.parser.parse(code))
+
+      this.evaluator.eva.operations = operations
       this.status = status.PARSED
     } catch (err) {
       const error = err as Error
@@ -145,6 +162,21 @@ class Program {
       })
       this.status = status.FINISHED
     }
+  }
+
+  startRunning(): void {
+    const startLine = this.labels.get('.start')
+    if (!startLine) {
+      this.logger.push({
+        type: 'error',
+        value: '.start LABEL is required to run program',
+        ln: -1
+      })
+      return
+    }
+
+    this.line = startLine
+    this.status = status.RUNNING
   }
 
   run(
@@ -161,6 +193,7 @@ class Program {
 
     this.line = 1
     this.status = status.RUNNING
+    // this.startRunning()
 
     const interval = setInterval(() => {
       try {
@@ -177,7 +210,7 @@ class Program {
         this.line += 1
 
         // Check if we've reached the end of operations
-        if (this.line > this.evaluator.operations.length) {
+        if (this.line > this.evaluator.eva.operations.length) {
           this.status = status.FINISHED
           clearInterval(interval)
           endProgramFn()

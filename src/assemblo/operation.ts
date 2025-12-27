@@ -1,20 +1,15 @@
-import Argument from './argument'
+import { IArgument } from './argument'
 
-// Assuming tokens.FUNCTION_TYPES.PROC and tokens.FUNCTION_TYPES.FLOW are strings
-type FunctionType = 'PROC' | 'FLOW'; // If these are the only possible values
-
-class Operation {
-  line: number
-  funcName: string
-  args: Argument[]
-  type: FunctionType
-
-  constructor(line: number, funcName: string, args: Argument[], type: FunctionType) {
-    this.line = line
-    this.funcName = funcName
-    this.args = args
-    this.type = type
-  }
+export interface IOperation {
+  line: number;
+  funcName: string;
+  args: IArgument[];
 }
 
-export default Operation
+function createOperation(line: number, funcName: string, args: IArgument[]): IOperation {
+  return { line, funcName, args  } as IOperation;
+}
+
+export default {
+  createOperation
+}
