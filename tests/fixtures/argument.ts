@@ -1,10 +1,10 @@
 import { Chance } from 'chance'
-import { tokens } from '../../assemblo'
-import Argument, { NumberArgument } from '../../assemblo/argument'
-import { RegisterArgument } from '../../assemblo/registers'
-import { MemoryArgument } from '../../assemblo/memory'
-import { LabelArgument } from '../../assemblo/labels'
-import { ListArgument } from '../../assemblo/lists'
+import { tokens } from '../../src/assemblo'
+import Argument, { NumberArgument } from '../../src/assemblo/argument'
+import { RegisterArgument } from '../../src/assemblo/registers'
+import { MemoryArgument } from '../../src/assemblo/memory'
+import { LabelArgument } from '../../src/assemblo/labels'
+import { ListArgument } from '../../src/assemblo/lists'
 
 const chance = new Chance()
 

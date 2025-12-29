@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'bun:test'
-import { IOperation } from '../assemblo/operation'
+import { IOperation } from '../src/assemblo/operation'
 
 import fixtures from './fixtures'
-import Parser from '../assemblo/parser';
+import Parser from '../src/assemblo/parser';
 
 
 interface TestCase {
