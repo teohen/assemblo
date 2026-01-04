@@ -1,16 +1,14 @@
 import Argument, {
   IArgument,
   ArgTypes,
-  ConditionalArgument,
   NumberArgument
 } from './argument'
 
-import { RegisterArgument, RegistersType } from './registers'
+import Register, { RegisterArgument, RegistersType } from './registers'
 import { IOperation } from './operation'
-import { InputQ, OutputQ } from './lists'
-import { LabelArgument, LabelType } from './labels'
-import { MemoryArgument, MemoryType } from './memory'
-import { Logger, LogType } from './logger'
+import Lists, { IListInput, IListOutput,} from './lists'
+import Memory, { MemoryArgument, MemoryType } from './memory'
+import { Logger } from './logger'
 
 
 type InstructionArgument = {
@@ -23,13 +21,12 @@ export interface ConditionalFunction {
 }
 
 type TEvaluator = {
-  inQ: InputQ
-  outQ: OutputQ
+  inQ: IListInput
+  outQ: IListOutput
   registers: RegistersType
   memory: MemoryType
   operations: IOperation[]
   logger: Logger[]
-  labels: LabelType
   line: number
 }
 
@@ -49,10 +46,9 @@ const FUNCTION_LIST: Array<(arg: InstructionArgument) => number> = [
   jmpNegFn,
   jmpPosFn,
   jmpZeroFn,
-  jmpUndFn,
   addFn,
   subFn,
-  printFn
+  prtFn
 ];
 
 function addError(eva: TEvaluator, value: string): void {
@@ -83,20 +79,30 @@ function validateLiteral(eva: TEvaluator, arg: IArgument, literal: string): IArg
   return undefined
 }
 
+function getValue(eva: TEvaluator, argument: RegisterArgument | NumberArgument): number {
+  if (argument.type === 'NUM') {
+    return argument.intern
+  }
+
+  return eva.registers.get(argument.intern);
+}
+
 function popFn(arg: InstructionArgument): number {
   const { eva, args } = arg
 
-  let arg1 = validateType(eva, args[0], ['LST'])
-  arg1 = validateLiteral(eva, args[0], 'INPUT')
+  const arg1 = validateType(eva, args[0], ['REG'])
+
 
   if (!arg1) return -1
 
-  const arg2 = validateType(eva, args[1], ['LST'])
+  let arg2 = validateType(eva, args[1], ['LST'])
+  arg2 = validateLiteral(eva, args[1], 'INPUT')
   if (!arg2) return -1
 
   const firstArgument = arg1 as RegisterArgument
 
   const result = eva.inQ.pop()
+
   eva.registers.set(firstArgument.intern, result)
   return eva.line
 }
@@ -105,7 +111,7 @@ function pushFn(arg: InstructionArgument): number {
   const { eva, args } = arg
 
   let arg1 = validateType(eva, args[0], ['LST'])
-  arg1 = validateLiteral(eva, args[0], 'INPUT')
+  arg1 = validateLiteral(eva, args[0], 'OUTPUT')
 
   if (!arg1) return -1
 
@@ -180,15 +186,17 @@ function loadFn(arg: InstructionArgument): number {
 function jmpFn(arg: InstructionArgument): number {
   const { eva, args } = arg
 
-  const arg1 = validateType(eva, args[0], ['NUM'])
-  if (!arg1) return -1
 
-  const arg2 = validateType(eva, args[1], ['CND'])
-  if (!arg2) return -1
+  const firstArgument = Argument.createNumberArgument(args[0].literal);
+  if (!firstArgument) return -1
 
+  if (typeof args[1].intern !== 'function') {
+    return -1
+  }
 
-  const firstArgument = arg1 as NumberArgument
-  const secondArgument = arg2 as ConditionalArgument
+  const secondArgument = Argument.createConditionalArgument(args[1].intern);
+
+  if (!secondArgument) return -1
 
   if (secondArgument.intern()) {
     return firstArgument.intern
@@ -200,125 +208,45 @@ function jmpFn(arg: InstructionArgument): number {
 function jmpNegFn(arg: InstructionArgument): number {
   const { eva, args } = arg
 
-  const arg1 = validateType(eva, args[0], ['REG'])
-  if (!arg1) return -1
+  const firstArgument = Argument.createNumberArgument(args[0].literal);
+  if (!firstArgument) return -1
 
-  const arg2 = validateType(eva, args[1], ['MEM'])
-  if (!arg2) return -1
+  const secondArgument = Argument.createNumberArgument(args[1].literal) || Argument.createRegisterArgument(args[1].literal);
+  if (!secondArgument) return -1
 
-  const firstArgument = arg1 as LabelArgument
-  const secondArgument = arg2 as RegisterArgument
-
-  if (!eva.labels.get(firstArgument.literal)) {
-    addError(eva, `Can't find the label: ${firstArgument.literal}`)
-    return -1
-  }
-
-  const valueToCheck = eva.registers.get(secondArgument.intern)
-
-  const condition = () => {
-    if (valueToCheck && valueToCheck < 0) {
-      return true
-    }
-
-    return false
-  }
-
-  const condArgumet = Argument.createConditionalArgument(condition)
+  const valueToCheck = getValue(eva, secondArgument);
+  const condArgumet = Argument.createConditionalArgument(() => valueToCheck < 0)
 
   return jmpFn({ eva: eva, args: [firstArgument, condArgumet] })
 }
 
 function jmpPosFn(arg: InstructionArgument): number {
   const { eva, args } = arg
-  const arg1 = validateType(eva, args[0], ['REG'])
-  if (!arg1) return -1
 
-  const arg2 = validateType(eva, args[1], ['MEM'])
-  if (!arg2) return -1
+  const firstArgument = Argument.createNumberArgument(args[0].literal);
+  if (!firstArgument) return -1
 
-  const firstArgument = arg1 as LabelArgument
-  const secondArgument = arg2 as RegisterArgument
+  const secondArgument = Argument.createNumberArgument(args[1].literal) || Argument.createRegisterArgument(args[1].literal)
 
-  if (!eva.labels.get(firstArgument.literal)) {
-    addError(eva, `Can't find the label: ${firstArgument.literal}`)
-    return -1
-  }
+  if (!secondArgument) return -1
 
-  const valueToCheck = eva.registers.get(secondArgument.intern)
-
-  const condition = () => {
-    if (valueToCheck && valueToCheck > 0) {
-      return true
-    }
-
-    return false
-  }
-
-  const condArgumet = Argument.createConditionalArgument(condition)
-
+  const valueToCheck = getValue(eva, secondArgument);
+  const condArgumet = Argument.createConditionalArgument(() => valueToCheck > 0)
   return jmpFn({ eva: eva, args: [firstArgument, condArgumet] })
 }
 
 function jmpZeroFn(arg: InstructionArgument): number {
   const { eva, args } = arg
-  const arg1 = validateType(eva, args[0], ['REG'])
-  if (!arg1) return -1
 
-  const arg2 = validateType(eva, args[1], ['MEM'])
-  if (!arg2) return -1
+  const firstArgument = Argument.createNumberArgument(args[0].literal);
+  if (!firstArgument) return -1
 
-  const firstArgument = arg1 as LabelArgument
-  const secondArgument = arg2 as RegisterArgument
+  const secondArgument = Argument.createNumberArgument(args[1].literal) || Argument.createRegisterArgument(args[1].literal)
 
-  if (!eva.labels.get(firstArgument.literal)) {
-    addError(eva, `Can't find the label: ${firstArgument.literal}`)
-    return -1
-  }
+  if (!secondArgument) return -1
 
-  const valueToCheck = eva.registers.get(secondArgument.intern)
-
-  const condition = () => {
-    if (valueToCheck === 0) {
-      return true
-    }
-
-    return false
-  }
-
-  const condArgumet = Argument.createConditionalArgument(condition)
-
-  return jmpFn({ eva: eva, args: [firstArgument, condArgumet] })
-}
-
-function jmpUndFn(arg: InstructionArgument): number {
-  const { eva, args } = arg
-  const arg1 = validateType(eva, args[0], ['REG'])
-  if (!arg1) return -1
-
-  const arg2 = validateType(eva, args[1], ['MEM'])
-  if (!arg2) return -1
-
-  const firstArgument = arg1 as LabelArgument
-  const secondArgument = arg2 as RegisterArgument
-
-  if (!eva.labels.get(firstArgument.literal)) {
-    addError(eva, `Can't find the label: ${firstArgument.literal}`)
-    return -1
-  }
-
-  const valueToCheck = eva.registers.get(secondArgument.intern)
-
-  const condition = () => {
-    if (valueToCheck === undefined) {
-      return true
-    }
-
-    return false
-  }
-
-  const condArgumet = Argument.createConditionalArgument(condition)
-
+  const valueToCheck = getValue(eva, secondArgument);
+  const condArgumet = Argument.createConditionalArgument(() => valueToCheck == 0)
   return jmpFn({ eva: eva, args: [firstArgument, condArgumet] })
 }
 
@@ -364,7 +292,7 @@ function subFn(arg: InstructionArgument): number {
   return eva.line
 }
 
-function printFn(arg: InstructionArgument): number {
+function prtFn(arg: InstructionArgument): number {
   const { eva, args } = arg
   const firstArgument = args[0] as RegisterArgument
 
@@ -385,34 +313,32 @@ function tick(eva: TEvaluator, line: number): number {
   const fn = FUNCTION_LIST.find((fn) => fn.name === op.funcName)
 
   if (!fn) {
-    addError(eva, `Instruction (${op.funcName}) not found`)
+    addError(eva, `Instruction (${op.funcName}) does not exist.`)
     return -1
   }
 
   line = fn({ eva, args: op.args })
 
-  return eva.line
+  return line
 }
 
 function newEvaluator(
-  inQ?: InputQ,
-  outQ?: OutputQ,
+  inQ?: IListInput,
+  outQ?: IListOutput,
   registers?: RegistersType,
   memory?: MemoryType,
   operations?: IOperation[],
   logger?: Logger[],
-  labels?: LabelType,
   line?: number
 ): IEvaluator {
 
   const eva: TEvaluator = {
-    inQ: inQ || [],
-    outQ: outQ || [],
-    registers: registers || new Map(),
-    memory: memory || new Map(),
+    inQ: inQ || Lists.createList('INPUT'),
+    outQ: outQ || Lists.createList('OUTPUT'),
+    registers: registers || Register.createRegister("registers"),
+    memory: memory || Memory.createMemory(),
     operations: operations || [],
     logger: logger || [],
-    labels: labels || new Map(),
     line: line || 0
   }
 

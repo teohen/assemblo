@@ -1,5 +1,5 @@
 import Chance from 'chance'
-import { RegistersType } from '../../assemblo/registers';
+import registers, { RegistersType } from '../../assemblo/registers';
 import { MemoryType } from '../../assemblo/memory';
 import { LabelType } from '../../assemblo/labels';
 import { Logger } from '../../assemblo/logger';
@@ -9,11 +9,12 @@ const chance = new Chance()
 
 interface Item {
   name: string;
-  value?: number;
+  value: number;
 }
 
 export function newMap(items: Item[]) {
-  const newMap = new Map()
+  const newMap = registers.createRegister();
+
   for (const i of items) {
     const v = i.value ?? chance.integer({ min: -1000, max: 1000 })
 

@@ -52,7 +52,8 @@ function parseArgument(arg: string, lineNum: number): IArgument {
   }
 
   if (/^-?[0-9]\d*$/.test(arg)) {
-    return Argument.createNumberArgument(arg)
+    const num = Argument.createNumberArgument(arg);
+    if (num) return num
   }
 
   throw new Error(`AT LINE: ${lineNum}. UNKNOWN ARGUMENT: ${arg}`)

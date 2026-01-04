@@ -4,24 +4,16 @@ import Parser, { IParser } from './parser'
 import Evaluator, { IEvaluator } from './evaluator'
 import Operation, { IOperation } from './operation'
 import Argument from './argument'
-import { RegistersType } from './registers'
-import { InputQ, OutputQ } from './lists'
-import { LabelType } from './labels'
-import { MemoryType } from './memory'
+import Register, { RegistersType } from './registers'
+import Lists, { IListInput, IListOutput} from './lists'
+import Label, { LabelType } from './labels'
+import Memory, { MemoryType } from './memory'
 import { Logger } from './logger'
 
 
-export interface Label {
-  name: string,
-  lineNumber: number
-}
-
-
-// Define callback types
 type TickFn = () => void;
 type EndProgramFn = () => void;
 
-// Status enum
 export const status = {
   READY: 'ready',
   PARSING: 'parsing',
@@ -32,226 +24,241 @@ export const status = {
 
 type StatusType = typeof status[keyof typeof status];
 
-class Program {
+type TProgram = {
   clock: number
   parser: IParser
   evaluator: IEvaluator
   registers: RegistersType
   memory: MemoryType
-  inQ: InputQ
-  outQ: OutputQ
+  inQ: IListInput
+  outQ: IListOutput
   status: StatusType
   logger: Logger[]
   line: number
   labels: LabelType
+}
 
+interface IProgram {
+  program: TProgram,
 
-  constructor() {
-    this.clock = 2
-    this.line = 0
-    this.status = status.READY
+  test: (answer: []) => void
+  reset: (inputQ: IListInput) => void
+  convertLabels: (operations: IOperation[]) => IOperation[]
+  prepareOperations: (code: string) => void
+  startRunning: () => void
+  run: (code: string, tickFn: TickFn, endProgramFn: EndProgramFn, delay: number) => void
+  nextLine: () => void
+}
 
-    // Initialize with default values - these will be overwritten in reset()
-    this.parser = Parser.newParser()
-    this.evaluator = Evaluator.newEvaluator([], [], new Map(), new Map(), [], [], new Map())
-    this.registers = new Map()
-    this.memory = new Map()
-    this.labels = new Map()
-    this.inQ = []
-    this.outQ = []
-    this.logger = []
-
+function newProgram(inQ: IListInput, outQ: IListOutput): IProgram {
+  const p: TProgram = {
+    inQ: inQ,
+    outQ: outQ,
+    line: 0,
+    clock: 2,
+    status: status.READY,
+    parser: Parser.newParser(),
+    evaluator: Evaluator.newEvaluator(),
+    registers: Register.createRegister(),
+    memory: Memory.createMemory(),
+    labels: Label.createLabels(),
+    //TODO: See how to create a new Logger
+    logger: []
   }
 
-  isReady(): boolean {
-    return this.status === status.READY
+
+  const obj: IProgram = {
+    program: p,
+
+    test: (answer: []) => test(p, answer),
+    reset: (inputQ: IListInput) => reset(p, inputQ),
+    convertLabels: (operations: IOperation[]) => convertLabels(operations),
+    prepareOperations: (code: string) => prepareOperations(p, code),
+    startRunning: () => startRunning(p),
+    run: (code: string, tickFn: TickFn, endProgramFn: EndProgramFn, delay: number) => run(p, code, tickFn, endProgramFn, delay),
+    nextLine: () => nextLine(p)
   }
 
-  isRunning(): boolean {
-    return this.status === status.RUNNING
-  }
+  return obj;
+}
 
-  test(expectedOutput: number[]): void {
-    for (let i = 0; i < expectedOutput.length; i++) {
-      const exp = expectedOutput[i]
-      const out = this.outQ[i]
+function test(p: TProgram, expectedOutput: number[]): void {
+  for (let i = 0; i < expectedOutput.length; i++) {
+    const exp = expectedOutput[i]
+    const out = p.outQ.items[i]
 
-      if (exp !== out) {
-        this.logger.push({
-          type: 'error',
-          value: 'incorrect answer',
-          ln: -1
-        })
-        return
-      }
-    }
-    this.logger.push({
-      type: 'success',
-      value: 'PASSED!!!',
-      ln: -1
-    })
-  }
-
-  reset(inQ: number[]): void {
-    this.line = 0
-    this.clock = 2
-    this.status = status.READY
-
-    this.registers = new Map()
-    this.memory = new Map()
-    this.labels = new Map()
-
-    this.inQ = inQ.slice()
-    this.outQ = []
-    this.logger = []
-
-
-    // Set up registers with undefined values
-    this.registers.set(tokens.REGISTERS.r0, undefined)
-    this.registers.set(tokens.REGISTERS.r1, undefined)
-    this.registers.set(tokens.REGISTERS.r2, undefined)
-
-    // Set up memory with undefined values
-    this.memory.set(tokens.MEMORY.mx0, undefined)
-    this.memory.set(tokens.MEMORY.mx1, undefined)
-    this.memory.set(tokens.MEMORY.mx2, undefined)
-
-    // this.labels.set('.start', 0)
-    // this.labels.set('.end', -1)
-
-    this.parser = Parser.newParser()
-    this.evaluator = Evaluator.newEvaluator(
-      this.inQ,
-      this.outQ,
-      this.registers,
-      this.memory,
-      this.parser.parser.operations,
-      this.logger,
-      this.labels
-    )
-  }
-
-  substituteLabels(operations: IOperation[]): IOperation[] {
-    return operations.map((op) => {
-      if (op.funcName !== 'labelFn') return op
-
-      return Operation.createOperation(
-        op.line,
-        'jmpFn',
-        [
-          Argument.createNumberArgument(op.line.toString()),
-          Argument.createConditionalArgument(() => true),
-        ]
-      )
-    })
-  }
-
-  prepareOperations(code: string): void {
-    try {
-      this.status = status.PARSING
-      const operations = this.substituteLabels(this.parser.parse(code))
-
-      this.evaluator.eva.operations = operations
-      this.status = status.PARSED
-    } catch (err) {
-      const error = err as Error
-      this.logger.push({
+    if (exp !== out) {
+      p.logger.push({
         type: 'error',
-        value: error.message,
-        ln: this.line
-      })
-      this.status = status.FINISHED
-    }
-  }
-
-  startRunning(): void {
-    const startLine = this.labels.get('.start')
-    if (!startLine) {
-      this.logger.push({
-        type: 'error',
-        value: '.start LABEL is required to run program',
+        value: 'incorrect answer',
         ln: -1
       })
       return
     }
-
-    this.line = startLine
-    this.status = status.RUNNING
   }
+  p.logger.push({
+    type: 'success',
+    value: 'PASSED!!!',
+    ln: -1
+  })
+}
 
-  run(
-    code: string,
-    tickFn: TickFn,
-    endProgramFn: EndProgramFn,
-    delay: number
-  ): void {
-    if (!code) return
+function reset(p: TProgram, inQ: IListInput): void {
+  p.line = 0
+  p.clock = 2
+  p.status = status.READY
 
-    this.prepareOperations(code)
+  p.registers = Register.createRegister()
+  p.memory = Memory.createMemory()
+  p.labels = Label.createLabels()
 
-    if (this.status !== status.PARSED) return
+  p.inQ = Lists.createList('INPUT', inQ.items)
+  p.outQ = Lists.createList('OUTPUT', [])
+  p.logger = []
 
-    this.line = 1
-    this.status = status.RUNNING
-    // this.startRunning()
 
-    const interval = setInterval(() => {
-      try {
-        this.line = this.evaluator.tick(this.line)
-        tickFn()
+  p.registers.set(tokens.REGISTERS.r0, 0)
+  p.registers.set(tokens.REGISTERS.r1, 0)
+  p.registers.set(tokens.REGISTERS.r2, 0)
+  p.memory.set(tokens.MEMORY.mx0, 0)
+  p.memory.set(tokens.MEMORY.mx1, 0)
+  p.memory.set(tokens.MEMORY.mx2, 0)
 
-        if (this.line < 0) {
-          this.status = status.FINISHED
-          clearInterval(interval)
-          endProgramFn()
-          return
-        }
 
-        this.line += 1
+  p.parser = Parser.newParser()
+  p.evaluator = Evaluator.newEvaluator(
+    p.inQ,
+    p.outQ,
+    p.registers,
+    p.memory,
+    p.parser.parser.operations,
+    p.logger,
+  )
+}
 
-        // Check if we've reached the end of operations
-        if (this.line > this.evaluator.eva.operations.length) {
-          this.status = status.FINISHED
-          clearInterval(interval)
-          endProgramFn()
-        }
-      } catch (error) {
-        const err = error as Error
-        this.logger.push({
-          type: 'error',
-          value: err.message,
-          ln: this.line
-        })
-        this.status = status.FINISHED
-        clearInterval(interval)
-        endProgramFn()
-      }
-    }, this.clock * delay)
-  }
+function convertLabels(operations: IOperation[]): IOperation[] {
+  return operations.map((op) => {
+    if (op.funcName !== 'labelFn') return op
 
-  nextLine(): void {
-    if (this.status !== status.PARSED && this.status !== status.RUNNING) return
 
-    this.line += 1
-    this.status = status.RUNNING
+    return Operation.createOperation(
+      op.line,
+      'jmpFn',
+      [
+        Argument.createNumberArgument(op.line),
+        Argument.createConditionalArgument(() => true),
+      ]
+    )
+  })
+}
 
-    try {
-      this.line = this.evaluator.tick(this.line)
+function prepareOperations(p: TProgram, code: string): void {
+  try {
+    p.status = status.PARSING
+    const parsedCode = p.parser.parse(code);
+    const operations = convertLabels(parsedCode);
 
-      if (this.line < 0) {
-        this.status = status.FINISHED
-        return
-      }
-    } catch (error) {
-      const err = error as Error
-      this.logger.push({
-        type: 'error',
-        value: err.message,
-        ln: this.line
-      })
-      this.status = status.FINISHED
-    }
+    p.evaluator.eva.operations = operations
+    p.status = status.PARSED
+  } catch (err) {
+    const error = err as Error
+    p.logger.push({
+      type: 'error',
+      value: error.message,
+      ln: p.line
+    })
+    p.status = status.FINISHED
   }
 }
 
-export default Program
+function startRunning(p: TProgram): void {
+  const startLine = p.labels.get('.start')
+  if (!startLine) {
+    p.logger.push({
+      type: 'error',
+      value: '.start LABEL is required to run program',
+      ln: -1
+    })
+    return
+  }
+
+  p.line = startLine
+  p.status = status.RUNNING
+}
+
+function run(p: TProgram,
+  code: string,
+  tickFn: TickFn,
+  endProgramFn: EndProgramFn,
+  delay: number
+): void {
+  if (!code) return
+
+  prepareOperations(p, code)
+
+  if (p.status !== status.PARSED) return
+
+  p.line = 1
+  p.status = status.RUNNING
+
+
+  const interval = setInterval(() => {
+    try {
+      p.line = p.evaluator.tick(p.line)
+      tickFn()
+
+      if (p.line < 0) {
+        p.status = status.FINISHED
+        clearInterval(interval)
+        endProgramFn()
+        return
+      }
+
+      p.line += 1
+
+      if (p.line > p.evaluator.eva.operations.length) {
+        p.status = status.FINISHED
+        clearInterval(interval)
+        endProgramFn()
+      }
+    } catch (error) {
+      const err = error as Error
+      p.logger.push({
+        type: 'error',
+        value: err.message,
+        ln: p.line
+      })
+      p.status = status.FINISHED
+      clearInterval(interval)
+      endProgramFn()
+    }
+  }, p.clock * delay)
+}
+
+function nextLine(p: TProgram): void {
+  if (p.status !== status.PARSED && p.status !== status.RUNNING) return
+
+  p.line += 1
+  p.status = status.RUNNING
+
+  try {
+    p.line = p.evaluator.tick(p.line)
+
+    if (p.line < 0) {
+      p.status = status.FINISHED
+      return
+    }
+  } catch (error) {
+    const err = error as Error
+    p.logger.push({
+      type: 'error',
+      value: err.message,
+      ln: p.line
+    })
+    p.status = status.FINISHED
+  }
+}
+
+export default {
+  newProgram
+}

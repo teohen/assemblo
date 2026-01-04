@@ -1,14 +1,10 @@
-/*
-import test, { before, beforeEach, describe, it, mock } from "node:test";
-import assert from "node:assert";
+
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test"
 import { Chance } from "chance";
 
-import Program, { status } from "../src/program.mjs";
-import Parser from "../src/parser.mjs";
-import Evaluator from "../src/evaluator.mjs";
-import tokens from "../src/tokens.mjs";
-import Operation from "../src/operation.mjs";
-
+import Program, { status } from "../assemblo/program";
+import fixture from "./fixtures"
+import List from "../assemblo/lists"
 
 
 const chance = new Chance();
@@ -16,229 +12,233 @@ const chance = new Chance();
 
 describe("PROGRAM suite", () => {
   beforeEach(() => {
-    mock.reset()
+    mock.restore()
   });
 
+
   it("Should reset the program", () => {
-    const input = [1]
-    const p = new Program();
+    const input = List.createList('INPUT', [1]);
+
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
     p.reset(input)
 
-    assert.equal(p.line, 0);
-    assert.equal(p.status, status.READY);
-    assert.equal(p.clock, 2);
-    assert.equal(p.logger.length, 0);
-    assert.equal(p.inQ.length, input.length)
-    assert.equal(p.inQ[0], input[0])
-    assert.equal(p.inQ !== input, true)
-    assert.equal(p.registers.has(tokens.REGISTERS.r0), true)
-    assert.equal(p.registers.has(tokens.REGISTERS.r1), true)
-    assert.equal(p.registers.has(tokens.REGISTERS.r2), true)
+    expect(p.program.line).toBe(0)
+    expect(p.program.status).toBe(status.READY)
+    expect(p.program.clock).toBe(2)
+    expect(p.program.logger).toEqual([])
+    expect(p.program.inQ).toMatchObject(input)
+    expect(p.program.inQ.pop).toBeInstanceOf(Function)
 
-    assert.equal(p.memory.has(tokens.MEMORY.mx0), true)
-    assert.equal(p.memory.has(tokens.MEMORY.mx1), true)
-    assert.equal(p.memory.has(tokens.MEMORY.mx2), true)
+    expect(p.program.inQ).not.toBe(input)
 
-    assert.equal(p.parser instanceof Parser, true);
-    assert.equal(p.parser.code, '')
-    assert.equal(p.parser.lines.length, 0)
-    assert.equal(p.parser.operations.length, 0)
-    assert.equal(p.parser.procedures.length, 0)
-    assert.equal(p.parser.flow.length, 0)
+    expect(p.program.registers.get('R0X')).toBe(0)
+    expect(p.program.registers.get('R1X')).toBe(0)
+    expect(p.program.registers.get('R2X')).toBe(0)
 
-    assert.equal(p.evaluator instanceof Evaluator, true);
-    assert.equal(p.evaluator.registers, p.registers)
-    assert.equal(p.evaluator.memory, p.memory)
-    assert.equal(p.evaluator.operations, p.parser.operations)
-    assert.equal(p.evaluator.logger, p.logger)
-    assert.equal(p.evaluator.inQ, p.inQ)
-    assert.equal(p.evaluator.outQ, p.outQ)
+    expect(p.program.memory.get("MX0")).toBe(0)
+    expect(p.program.memory.get("MX1")).toBe(0)
+    expect(p.program.memory.get("MX2")).toBe(0)
 
-    assert.equal(p.parser.lines.length, 0)
-    assert.equal(p.parser.operations.length, 0)
-    assert.equal(p.parser.procedures.length, 0)
-    assert.equal(p.parser.flow.length, 0)
+    const { parser } = p.program.parser
+    expect(parser.code).toBe('');
+    expect(parser.lines).toEqual([])
+    expect(parser.operations).toEqual([])
+    expect(parser.procedures).toEqual([])
+    expect(parser.flow).toEqual([])
+
+    const { eva } = p.program.evaluator
+
+    expect(eva.registers).toBe(p.program.registers)
+    expect(eva.memory).toBe(p.program.memory)
+    expect(eva.operations).toBe(parser.operations)
+    expect(eva.logger).toBe(p.program.logger)
+    expect(eva.inQ).toBe(p.program.inQ)
+    expect(eva.outQ).toBe(p.program.outQ)
   })
 
   it("Should prepare the operations with the correct code", () => {
-    const fakeCode = 'FAKE CODE';
-    const p = new Program();
-    p.reset([]);
+    const fakeCode = chance.paragraph();
+    const input = List.createList('INPUT');
 
-    mock.method(p.parser, 'parse', () => ["mocked operations"]);
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
+    p.reset(input);
+
+    const randomOperation = fixture.Operation.newRandomOperation()
+    spyOn(p.program.parser, "parse").mockImplementation(() => [randomOperation]);
 
     p.prepareOperations(fakeCode);
 
-    assert.equal(p.status, status.PARSED);
-    assert.equal(p.logger.length, 0)
-    assert.equal(p.evaluator.operations.length, 1)
-    assert.equal(p.evaluator.operations[0], "mocked operations")
+    expect(p.program.status, status.PARSED)
+    expect(p.program.logger).toEqual([])
+    expect(p.program.evaluator.eva.operations).toEqual([randomOperation])
   })
 
   it("Should prepare the operations with the a incorrect code", () => {
-    const fakeCode = 'FAKE CODE';
-    const p = new Program();
-    p.reset([]);
+    const fakeCode = chance.paragraph();
+    const input = List.createList('INPUT');
 
-    mock.method(p.parser, 'parse', () => {
-      throw new Error('fake error on parse')
-    });
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
+    p.reset(input);
+
+    const randomOperation = fixture.Operation.newRandomOperation()
+    spyOn(p.program.parser, "parse").mockImplementation(() => { throw new Error('Error on parse') });
 
     p.prepareOperations(fakeCode);
 
-    assert.equal(p.status, status.FINISHED);
-    assert.equal(p.logger.length, 1)
-    assert.equal(p.logger[0].value, 'fake error on parse')
-    assert.equal(p.logger[0].type, 'error')
-    assert.equal(p.evaluator.operations.length, 0)
+    expect(p.program.status, status.FINISHED)
+    expect(p.program.logger).toEqual([{ type: 'error', value: 'Error on parse', ln: randomOperation.line }])
+    expect(p.program.evaluator.eva.operations).toEqual([])
   })
 
   it("should not execute the nextLine when status is not PARSED or RUNNING", () => {
-    const input = [1]
-    const p = new Program();
+    const input = List.createList('INPUT');
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
     p.reset(input);
-
-
 
     p.nextLine()
 
-    assert.equal(p.line, 0);
-    assert.equal(p.status, status.READY);
-    assert.equal(p.logger.length, 0);
-    assert.equal(p.inQ.length, input.length)
-    assert.equal(p.inQ[0], input[0])
-    assert.equal(p.registers.has(tokens.REGISTERS.r0), true)
-    assert.equal(p.registers.has(tokens.REGISTERS.r1), true)
-    assert.equal(p.registers.has(tokens.REGISTERS.r2), true)
-    assert.equal(p.memory.has(tokens.MEMORY.mx0), true)
-    assert.equal(p.memory.has(tokens.MEMORY.mx1), true)
-    assert.equal(p.memory.has(tokens.MEMORY.mx2), true)
-    assert.equal(p.parser instanceof Parser, true);
-    assert.equal(p.parser.code, '')
-    assert.equal(p.parser.lines.length, 0)
-    assert.equal(p.parser.operations.length, 0)
-    assert.equal(p.parser.procedures.length, 0)
-    assert.equal(p.parser.flow.length, 0)
-    assert.equal(p.evaluator instanceof Evaluator, true);
-    assert.equal(p.evaluator.registers, p.registers)
-    assert.equal(p.evaluator.memory, p.memory)
-    assert.equal(p.evaluator.operations, p.parser.operations)
-    assert.equal(p.evaluator.logger, p.logger)
-    assert.equal(p.evaluator.inQ, p.inQ)
-    assert.equal(p.evaluator.outQ, p.outQ)
-    assert.equal(p.parser.lines.length, 0)
-    assert.equal(p.parser.operations.length, 0)
-    assert.equal(p.parser.procedures.length, 0)
-    assert.equal(p.parser.flow.length, 0)
+    expect(p.program.line).toBe(0)
+    expect(p.program.status).toBe(status.READY)
+    expect(p.program.clock).toBe(2)
+    expect(p.program.logger).toEqual([])
+    expect(p.program.inQ).toMatchObject(input)
+    expect(p.program.inQ.pop).toBeInstanceOf(Function)
 
+    expect(p.program.inQ).not.toBe(input)
+
+    expect(p.program.registers.get('R0X')).toBe(0)
+    expect(p.program.registers.get('R1X')).toBe(0)
+    expect(p.program.registers.get('R2X')).toBe(0)
+
+    expect(p.program.memory.get("MX0")).toBe(0)
+    expect(p.program.memory.get("MX1")).toBe(0)
+    expect(p.program.memory.get("MX2")).toBe(0)
+
+    const { parser } = p.program.parser
+    expect(parser.code).toBe('');
+    expect(parser.lines).toEqual([])
+    expect(parser.operations).toEqual([])
+    expect(parser.procedures).toEqual([])
+    expect(parser.flow).toEqual([])
+
+    const { eva } = p.program.evaluator
+
+    expect(eva.registers).toBe(p.program.registers)
+    expect(eva.memory).toBe(p.program.memory)
+    expect(eva.operations).toBe(parser.operations)
+    expect(eva.logger).toBe(p.program.logger)
+    expect(eva.inQ).toBe(p.program.inQ)
+    expect(eva.outQ).toBe(p.program.outQ)
   });
 
   it(" should execute the nextLine", () => {
-    const fakeCode = 'FAKE CODE';
-    const lineReturn = chance.integer({ min: 1, max: 100 })
-    const input = [1];
-    const p = new Program();
+    const input = List.createList('INPUT');
+    const fakeCode = chance.paragraph();
+    const randomLineReturn = chance.integer({ min: 0 });
+
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
     p.reset(input);
 
-    mock.method(p.parser, 'parse', () => [])
-    const tickSpy = mock.method(p.evaluator, 'tick', (line) => lineReturn);
+    spyOn(p.program.parser, "parse").mockImplementation(() => [fixture.Operation.newRandomOperation()]);
+    const spyTick = spyOn(p.program.evaluator, "tick").mockImplementation((line) => randomLineReturn);
 
     p.prepareOperations(fakeCode);
     p.nextLine();
 
-    assert.equal(p.line, lineReturn)
-    assert.equal(p.status, status.RUNNING);
-    assert.equal(tickSpy.mock.callCount(), 1)
-
+    expect(p.program.line).toBe(randomLineReturn)
+    expect(p.program.status).toBe(status.RUNNING)
+    expect(spyTick).toBeCalled()
   });
 
   it("should execute the nextLine and update status if return line is negative", () => {
-    const fakeCode = 'FAKE CODE';
-    const lineReturn = chance.integer({ min: -100, max: -1 })
-    const input = [1];
-    const p = new Program();
+    const input = List.createList('INPUT');
+    const fakeCode = chance.paragraph();
+    const randomLineReturn = chance.integer({ max: 0 });
+
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
     p.reset(input);
 
-    mock.method(p.parser, 'parse', () => [])
-    const tickSpy = mock.method(p.evaluator, 'tick', () => lineReturn);
+    spyOn(p.program.parser, "parse").mockImplementation(() => [fixture.Operation.newRandomOperation()]);
+    const spyTick = spyOn(p.program.evaluator, "tick").mockImplementation((line) => randomLineReturn);
 
     p.prepareOperations(fakeCode);
     p.nextLine();
 
-    assert.equal(p.line, lineReturn)
-    assert.equal(p.status, status.FINISHED);
-    assert.equal(tickSpy.mock.callCount(), 1)
+    expect(p.program.line).toBe(randomLineReturn)
+    expect(p.program.status).toBe(status.FINISHED)
+    expect(p.program.line).toBe(randomLineReturn)
+    expect(spyTick).toBeCalled()
   });
 
   it("should finish program and print parsing error to the console", () => {
-    const fakeCode = 'FAKE CODE';
-    const input = [1]
-    const p = new Program();
+    const input = List.createList('INPUT');
+    const fakeCode = chance.paragraph();
+
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
     p.reset(input);
 
-    mock.method(p.parser, 'parse', () => {
-      throw new Error('fake error')
-    });
+    const spyTick = spyOn(p.program.parser, "parse").mockImplementation(() => { throw new Error('Error on parse') });
 
     p.run(fakeCode, () => { }, () => { }, 1);
 
-    assert.equal(p.status, status.FINISHED);
-    assert.equal(p.logger.length, 1)
-    assert.equal(p.logger[0].value, 'fake error')
-    assert.equal(p.logger[0].type, 'error')
-    assert.equal(p.evaluator.operations.length, 0)
-
+    expect(p.program.line).toBe(0)
+    expect(p.program.status).toBe(status.FINISHED)
+    expect(spyTick).toBeCalled()
+    expect(p.program.logger).toEqual([{ type: 'error', ln: 0, value: 'Error on parse' }])
+    expect(p.program.evaluator.eva.operations).toEqual([])
   });
 
-  it("should run the code if correctly parsed", (t, done) => {
-    const fakeCode = 'FAKE CODE';
+  it("should run the code if correctly parsed", (done) => {
+    const input = List.createList('INPUT');
+    const fakeCode = chance.paragraph();
     let lineReturn = 1
-    const input = [1]
-    const p = new Program();
+
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
     p.reset(input);
 
-    mock.method(p.parser, 'parse', () => []);
 
-    const tickSpy = mock.method(p.evaluator, 'tick', () => {
+    spyOn(p.program.parser, "parse").mockImplementation(() => [fixture.Operation.newRandomOperation()]);
+
+    const spyTick = spyOn(p.program.evaluator, "tick").mockImplementation(() => {
       lineReturn -= 1
       return lineReturn
     });
 
     p.run(fakeCode, () => { }, () => {
-      assert.equal(p.line, lineReturn)
-      assert.equal(p.status, status.FINISHED);
-      assert.equal(tickSpy.mock.callCount(), 2);
+      expect(p.program.line).toBe(lineReturn)
+      expect(p.program.status).toBe(status.FINISHED)
+      expect(spyTick).toBeCalledTimes(2)
       done();
     }, 1);
   });
 
-  it("should finish program and print running error to console", (t, done) => {
-    const fakeCode = 'FAKE CODE';
+
+
+  it("should finish program and print running error to console", (done) => {
+    const input = List.createList('INPUT');
+    const fakeCode = chance.paragraph();
     let lineReturn = 1
-    const input = [1]
-    const p = new Program();
+
+    const p = Program.newProgram(input, List.createList('OUTPUT'));
     p.reset(input);
 
-    mock.method(p.parser, 'parse', () => []);
 
-    const tickSpy = mock.method(p.evaluator, 'tick', () => {
+    const randomOperation = fixture.Operation.newRandomOperation()
+    spyOn(p.program.parser, "parse").mockImplementation(() => [randomOperation]);
+
+    const spyTick = spyOn(p.program.evaluator, "tick").mockImplementation(() => {
       lineReturn -= 1
       if (lineReturn < 0) throw new Error('fake error')
       return lineReturn
     });
 
     p.run(fakeCode, () => { }, () => {
-      assert.equal(p.status, status.FINISHED);
-      assert.equal(p.logger.length, 1)
-      assert.equal(p.logger[0].value, 'fake error')
-      assert.equal(p.logger[0].type, 'error')
-      assert.equal(p.evaluator.operations.length, 0)
-      assert.equal(tickSpy.mock.callCount(), 2)
+      expect(p.program.status, status.FINISHED)
+
+      expect(p.program.evaluator.eva.operations).toEqual([randomOperation])
+      expect(spyTick).toBeCalledTimes(2)
+      expect(p.program.logger).toEqual([{ type: 'error', ln: 1, value: 'fake error' }])
       done()
     }, 1);
   });
-
 });
-
-
-*/

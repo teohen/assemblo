@@ -71,10 +71,21 @@ function createLabelArgument(literal: string): LabelArgument {
   return { type: tokens.ARG_TYPES.LBL, literal, intern: literal } as LabelArgument
 }
 
-function createNumberArgument(literal: string): NumberArgument {
-  const numValue = parseInt(literal, 10)
+function createNumberArgument(value: number): NumberArgument;
+function createNumberArgument(value: string): NumberArgument | null;
+function createNumberArgument(value: string | number): NumberArgument | null {
+  if (typeof value === "number") {
+    return { type: 'NUM', literal: value.toString(), intern: value }
+  }
 
-  return { type: 'NUM', literal, intern: numValue } as NumberArgument
+
+  const numValue = parseInt(value, 10)
+  if (Number.isNaN(numValue)) {
+    return null
+
+  }
+  return { type: 'NUM', literal: value, intern: numValue } as NumberArgument
+
 }
 
 function createConditionalArgument(func: ConditionalFunction): ConditionalArgument {

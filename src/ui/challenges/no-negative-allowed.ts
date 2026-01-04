@@ -16,6 +16,6 @@ LBL: .end`
 const q = [0, 1, -2, 3, -4, 5]
 const p = new Program()
 p.reset(q)
-p.run(code, () =>{}, ()=>{}, 10)
+p.run(code, () => { }, () => { }, 10)
 console.log(p.logger)
 
