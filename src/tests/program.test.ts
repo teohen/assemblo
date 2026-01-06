@@ -17,16 +17,16 @@ describe("PROGRAM suite", () => {
 
 
   it("Should reset the program", () => {
-    const input = List.createList('INPUT', [1]);
+    const input = [1];
 
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
+    const p = Program.newProgram(input, []);
     p.reset(input)
 
     expect(p.program.line).toBe(0)
     expect(p.program.status).toBe(status.READY)
     expect(p.program.clock).toBe(2)
     expect(p.program.logger).toEqual([])
-    expect(p.program.inQ).toMatchObject(input)
+    expect(p.program.inQ.items).toMatchObject(input)
     expect(p.program.inQ.pop).toBeInstanceOf(Function)
 
     expect(p.program.inQ).not.toBe(input)
@@ -60,8 +60,8 @@ describe("PROGRAM suite", () => {
     const fakeCode = chance.paragraph();
     const input = List.createList('INPUT');
 
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
-    p.reset(input);
+    const p = Program.newProgram(input.items, []);
+    p.reset(input.items);
 
     const randomOperation = fixture.Operation.newRandomOperation()
     spyOn(p.program.parser, "parse").mockImplementation(() => [randomOperation]);
@@ -77,8 +77,8 @@ describe("PROGRAM suite", () => {
     const fakeCode = chance.paragraph();
     const input = List.createList('INPUT');
 
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
-    p.reset(input);
+    const p = Program.newProgram(input.items, []);
+    p.reset(input.items);
 
     const randomOperation = fixture.Operation.newRandomOperation()
     spyOn(p.program.parser, "parse").mockImplementation(() => { throw new Error('Error on parse') });
@@ -92,8 +92,8 @@ describe("PROGRAM suite", () => {
 
   it("should not execute the nextLine when status is not PARSED or RUNNING", () => {
     const input = List.createList('INPUT');
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
-    p.reset(input);
+    const p = Program.newProgram(input.items, [])
+    p.reset(input.items);
 
     p.nextLine()
 
@@ -136,8 +136,8 @@ describe("PROGRAM suite", () => {
     const fakeCode = chance.paragraph();
     const randomLineReturn = chance.integer({ min: 0 });
 
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
-    p.reset(input);
+    const p = Program.newProgram(input.items, [])
+    p.reset(input.items);
 
     spyOn(p.program.parser, "parse").mockImplementation(() => [fixture.Operation.newRandomOperation()]);
     const spyTick = spyOn(p.program.evaluator, "tick").mockImplementation((line) => randomLineReturn);
@@ -155,8 +155,8 @@ describe("PROGRAM suite", () => {
     const fakeCode = chance.paragraph();
     const randomLineReturn = chance.integer({ max: 0 });
 
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
-    p.reset(input);
+    const p = Program.newProgram(input.items, [])
+    p.reset(input.items);
 
     spyOn(p.program.parser, "parse").mockImplementation(() => [fixture.Operation.newRandomOperation()]);
     const spyTick = spyOn(p.program.evaluator, "tick").mockImplementation((line) => randomLineReturn);
@@ -174,8 +174,8 @@ describe("PROGRAM suite", () => {
     const input = List.createList('INPUT');
     const fakeCode = chance.paragraph();
 
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
-    p.reset(input);
+    const p = Program.newProgram(input.items, []);
+    p.reset(input.items);
 
     const spyTick = spyOn(p.program.parser, "parse").mockImplementation(() => { throw new Error('Error on parse') });
 
@@ -193,8 +193,8 @@ describe("PROGRAM suite", () => {
     const fakeCode = chance.paragraph();
     let lineReturn = 1
 
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
-    p.reset(input);
+    const p = Program.newProgram(input.items, [])
+    p.reset(input.items);
 
 
     spyOn(p.program.parser, "parse").mockImplementation(() => [fixture.Operation.newRandomOperation()]);
@@ -219,8 +219,8 @@ describe("PROGRAM suite", () => {
     const fakeCode = chance.paragraph();
     let lineReturn = 1
 
-    const p = Program.newProgram(input, List.createList('OUTPUT'));
-    p.reset(input);
+    const p = Program.newProgram(input.items, [])
+    p.reset(input.items);
 
 
     const randomOperation = fixture.Operation.newRandomOperation()

@@ -6,7 +6,7 @@ import Argument, {
 
 import Register, { RegisterArgument, RegistersType } from './registers'
 import { IOperation } from './operation'
-import Lists, { IListInput, IListOutput,} from './lists'
+import Lists, { IListInput, IListOutput, } from './lists'
 import Memory, { MemoryArgument, MemoryType } from './memory'
 import { Logger } from './logger'
 
@@ -213,6 +213,11 @@ function jmpNegFn(arg: InstructionArgument): number {
 
   const secondArgument = Argument.createNumberArgument(args[1].literal) || Argument.createRegisterArgument(args[1].literal);
   if (!secondArgument) return -1
+
+  if (firstArgument.intern < 0 || firstArgument.intern > eva.operations.length) {
+    addError(eva, `Can't jump to a invalid line: ${firstArgument.intern}`);
+    return -1
+  }
 
   const valueToCheck = getValue(eva, secondArgument);
   const condArgumet = Argument.createConditionalArgument(() => valueToCheck < 0)

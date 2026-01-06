@@ -11,7 +11,8 @@
     "prod": "bun run lint && bun run types && bun run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "bun test --inspect"
+    "test": "bun test --inspect --coverage",
+    "testnc": "bun test --inspect"
   },
   "engines": {
     "node": ">=20.0.0"

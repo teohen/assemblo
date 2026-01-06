@@ -14,7 +14,7 @@ const runDelay = delay?.firstElementChild as HTMLInputElement
 const urlParams = new URLSearchParams(window.location.search)
 const paramChallenge = urlParams.get('challenge')
 
-const p = new Program()
+const p = Program.newProgram()
 let inputStack: number[] = []
 let expected: number[] = []
 let challenge
@@ -30,8 +30,8 @@ ui.renderChallengeInfo(challenge)
 p.reset(inputStack)
 ui.updateUI(p, inputStack)
 
-runBtn?.addEventListener('click', function () {
-  if (p.status === status.RUNNING) return
+runBtn?.addEventListener('click', function() {
+  if (p.program.status === status.RUNNING) return
 
   const code = editor.getValue()
   p.reset(inputStack)
@@ -47,8 +47,8 @@ runBtn?.addEventListener('click', function () {
   )
 })
 
-debugBtn?.addEventListener('click', function () {
-  if (p.status === status.READY) {
+debugBtn?.addEventListener('click', function() {
+  if (p.program.status === status.READY) {
     p.prepareOperations(editor.getValue())
   } else {
     p.reset(inputStack)
@@ -85,9 +85,9 @@ submitBtn?.addEventListener('click', () => {
 
 let autoSaveTimeout: any
 
-editor.on('change', function () {
+editor.on('change', function() {
   if (autoSaveTimeout) clearTimeout(autoSaveTimeout)
-  autoSaveTimeout = setTimeout(function () {
+  autoSaveTimeout = setTimeout(function() {
     localStorage.setItem('code', editor.getValue())
   }, 750)
 })

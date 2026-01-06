@@ -5,10 +5,11 @@ import Evaluator, { IEvaluator } from './evaluator'
 import Operation, { IOperation } from './operation'
 import Argument from './argument'
 import Register, { RegistersType } from './registers'
-import Lists, { IListInput, IListOutput} from './lists'
+import Lists, { IListInput, IListOutput } from './lists'
 import Label, { LabelType } from './labels'
 import Memory, { MemoryType } from './memory'
 import { Logger } from './logger'
+import lists from './lists'
 
 
 type TickFn = () => void;
@@ -41,8 +42,8 @@ type TProgram = {
 interface IProgram {
   program: TProgram,
 
-  test: (answer: []) => void
-  reset: (inputQ: IListInput) => void
+  test: (answer: number[]) => void
+  reset: (inputQ: number[]) => void
   convertLabels: (operations: IOperation[]) => IOperation[]
   prepareOperations: (code: string) => void
   startRunning: () => void
@@ -50,10 +51,10 @@ interface IProgram {
   nextLine: () => void
 }
 
-function newProgram(inQ: IListInput, outQ: IListOutput): IProgram {
+function newProgram(inQ?: number[], outQ?: number[]): IProgram {
   const p: TProgram = {
-    inQ: inQ,
-    outQ: outQ,
+    inQ: lists.createList('INPUT', inQ),
+    outQ: lists.createList('OUTPUT', outQ),
     line: 0,
     clock: 2,
     status: status.READY,
@@ -71,7 +72,7 @@ function newProgram(inQ: IListInput, outQ: IListOutput): IProgram {
     program: p,
 
     test: (answer: []) => test(p, answer),
-    reset: (inputQ: IListInput) => reset(p, inputQ),
+    reset: (inputQ: number[]) => reset(p, inputQ),
     convertLabels: (operations: IOperation[]) => convertLabels(operations),
     prepareOperations: (code: string) => prepareOperations(p, code),
     startRunning: () => startRunning(p),
@@ -103,7 +104,7 @@ function test(p: TProgram, expectedOutput: number[]): void {
   })
 }
 
-function reset(p: TProgram, inQ: IListInput): void {
+function reset(p: TProgram, inQ: number[]): void {
   p.line = 0
   p.clock = 2
   p.status = status.READY
@@ -112,7 +113,7 @@ function reset(p: TProgram, inQ: IListInput): void {
   p.memory = Memory.createMemory()
   p.labels = Label.createLabels()
 
-  p.inQ = Lists.createList('INPUT', inQ.items)
+  p.inQ = Lists.createList('INPUT', inQ)
   p.outQ = Lists.createList('OUTPUT', [])
   p.logger = []
 

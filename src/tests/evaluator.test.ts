@@ -5,6 +5,7 @@ import fixtures from './fixtures'
 import { Evaluator } from '../assemblo';
 import { EvaluatorFixture } from './fixtures/evaluator';
 import { newMemory, newRegisters } from './fixtures/maps';
+import lists from '../assemblo/lists';
 
 const chance = new Chance();
 
@@ -14,7 +15,7 @@ interface TestCase {
   expValue: number;
 }
 
-describe('EVALUATOR SUITE', () => {
+describe.only('EVALUATOR SUITE', () => {
   describe('SUCCESS', () => {
     it(' should evaluate the POP instruction', () => {
       // POP: r0, INPUT
@@ -22,7 +23,7 @@ describe('EVALUATOR SUITE', () => {
       const tests: TestCase[] = [
         {
           evaluator: fixtures.Evaluator.newEvaluator({
-            input: [randNumber],
+            input: lists.createList('INPUT', [randNumber]),
             operations: [
               fixtures.Operation.newOperation('popFn', 1, [
                 fixtures.Argument.newRegisterArgument('r0'),
@@ -104,7 +105,7 @@ describe('EVALUATOR SUITE', () => {
 
         evaluator.tick(line)
 
-        expect(evaluator.eva.outQ).toEqual([randNumber])
+        expect(evaluator.eva.outQ.items).toEqual(lists.createList('OUTPUT', [randNumber]).items)
       }
     })
 
@@ -208,6 +209,7 @@ describe('EVALUATOR SUITE', () => {
 
       for (const t of tests) {
         const line = 1
+        t.evaluator.operations.length = randNumber
         const evaluator = Evaluator.newEvaluator(
           t.evaluator.input,
           t.evaluator.output,
@@ -564,6 +566,48 @@ describe("ERROR", () => {
       { type: 'error', value: expValue, ln: t.expValue }
     ])
   });
+
+  it.only('Should not allow the JMP instructions to lines outside of the range', () => {
+    const tests: TestCase[] = [
+      {
+        evaluator: fixtures.Evaluator.newEvaluator({
+          operations: [
+            fixtures.Operation.newOperation('jmpNegFn', 1, [
+              fixtures.Argument.newNumberArgument(-1),
+              fixtures.Argument.newRegisterArgument('r0'),
+            ]),
+          ],
+          registers: newRegisters([{
+            value: -1,
+            name: "R0X"
+          }]),
+        }),
+        expValue: -1
+      },
+    ]
+
+    for (const t of tests) {
+      const line = 1
+      const evaluator = Evaluator.newEvaluator(
+        t.evaluator.input,
+        t.evaluator.output,
+        t.evaluator.registers,
+        t.evaluator.memory,
+        t.evaluator.operations,
+        t.evaluator.logger,
+        line
+      )
+
+      evaluator.tick(line)
+      expect(t.evaluator.logger).toEqual([
+        {
+          type: 'error', value: `Can't jump to a invalid line: ${t.expValue}`, ln: 1
+        }
+      ])
+    }
+
+  })
+
 })
 /*
 
@@ -703,6 +747,6 @@ describe("ERROR", () => {
       assert.equal(logger[0].value, `At line ${line}. Argument should be a valid integer.`);
     }
   });
-  })
+})
 });
 */

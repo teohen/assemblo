@@ -1,14 +1,14 @@
 import { IOperation } from "../../assemblo/operation"
 import { LabelType } from "../../assemblo/labels";
-import { InputQ, OutputQ } from "../../assemblo/lists";
+import List, { IListInput, IListOutput } from "../../assemblo/lists";
 import { Logger } from "../../assemblo/logger";
 import { MemoryType } from "../../assemblo/memory";
 import { RegistersType } from "../../assemblo/registers";
 import { newRegisters, newMemory, newLabels, newLogger } from "./maps";
 
 type EvaluatorArgFixture = {
-  input?: InputQ,
-  output?: OutputQ,
+  input?: IListInput,
+  output?: IListOutput,
   registers?: RegistersType,
   memory?: MemoryType,
   labels?: LabelType,
@@ -17,8 +17,8 @@ type EvaluatorArgFixture = {
 }
 
 export type EvaluatorFixture = {
-  input: InputQ,
-  output: OutputQ,
+  input: IListInput,
+  output: IListOutput,
   operations: IOperation[]
   registers: RegistersType,
   memory: MemoryType,
@@ -28,8 +28,8 @@ export type EvaluatorFixture = {
 
 function newEvaluator(arg: EvaluatorArgFixture): EvaluatorFixture {
   const fixEva: EvaluatorFixture = {
-    input: arg.input ?? [],
-    output: arg.output ?? [],
+    input: arg.input ?? List.createList('INPUT'),
+    output: arg.output ?? List.createList('OUTPUT'),
     registers: arg.registers ?? newRegisters([]),
     memory: arg.memory ?? newMemory([]),
     labels: arg.labels ?? newLabels([]),

@@ -3,8 +3,8 @@ export interface Challenge {
   id: string
   description: string
   text: string
-  input: Array<number>
-  expected: Array<number>
+  input: number[]
+  expected: number[]
 }
 
 const challenges: Challenge[] = [
