@@ -84,6 +84,15 @@ function newProgram(inQ?: number[], outQ?: number[]): IProgram {
 }
 
 function test(p: TProgram, expectedOutput: number[]): void {
+  if (p.outQ.items.length !== expectedOutput.length) {
+    p.logger.push({
+      type: 'error',
+      value: 'incorrect answer',
+      ln: -1
+    })
+    return
+  }
+
   for (let i = 0; i < expectedOutput.length; i++) {
     const exp = expectedOutput[i]
     const out = p.outQ.items[i]

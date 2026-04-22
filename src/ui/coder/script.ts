@@ -42,6 +42,9 @@ runBtn?.addEventListener('click', function() {
       ui.updateEditor(p)
     },
     () => {
+      if (expected.length > 0) {
+        p.test(expected)
+      }
       ui.updateUI(p)
     },
     parseInt(runDelay?.value)
