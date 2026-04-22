@@ -1,4 +1,5 @@
 import Program, { status } from '../../assemblo/program'
+import { Challenge } from '../challenges/challenges'
 import challenges from '../challenges/challenges'
 import editor from './codemirror'
 import ui from './ui'
@@ -26,7 +27,7 @@ if (ch) {
   if (submitBtn) submitBtn.hidden = false
 }
 
-ui.renderChallengeInfo(challenge)
+ui.renderChallengeInfo(challenge as Challenge | undefined)
 p.reset(inputStack)
 ui.updateUI(p)
 
@@ -83,7 +84,7 @@ submitBtn?.addEventListener('click', () => {
 })
 
 
-let autoSaveTimeout: any
+let autoSaveTimeout: ReturnType<typeof setTimeout>
 
 editor.on('change', function() {
   if (autoSaveTimeout) clearTimeout(autoSaveTimeout)

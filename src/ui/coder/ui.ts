@@ -1,4 +1,6 @@
 import { IProgram, status } from '../../assemblo/program'
+import { Logger } from '../../assemblo/logger'
+import { Challenge } from '../challenges/challenges'
 import editor from './codemirror'
 
 const consoleElem = document.getElementById('consoleOutput')
@@ -42,7 +44,7 @@ function renderConsoleOutput(p: IProgram) {
   if (consoleElem) consoleElem.scrollTop = consoleElem.scrollHeight
 }
 
-function renderChallengeInfo(challenge: any) {
+function renderChallengeInfo(challenge?: Challenge) {
   if (!challenge) return
 
   const challengeEls = createChallengeInfo(challenge)
@@ -51,7 +53,7 @@ function renderChallengeInfo(challenge: any) {
   }
 }
 
-function createChallengeInfo(c: any) {
+function createChallengeInfo(c: Challenge) {
   const elemTitle = document.createElement('h3')
   elemTitle.innerText = c.title
 
@@ -60,21 +62,21 @@ function createChallengeInfo(c: any) {
   return [elemTitle, elemText]
 }
 
-function createConsoleOuput(log: any) {
+function createConsoleOuput(log: Logger) {
   const output = document.createElement('div')
   output.classList.add('alert')
   output.role = 'alert'
 
   switch (log.type) {
-    case 'error':
-      output.classList.add('alert-danger')
-      break
-    case 'message':
-      output.classList.add('alert-secondary')
-      break
+  case 'error':
+    output.classList.add('alert-danger')
+    break
+  case 'message':
+    output.classList.add('alert-secondary')
+    break
 
-    default:
-      output.classList.add('alert-success')
+  default:
+    output.classList.add('alert-success')
   }
 
   output.innerText = log.value
@@ -82,7 +84,8 @@ function createConsoleOuput(log: any) {
   return output
 }
 
-function updateIcon(elem: any, text: any, type: any) {
+function updateIcon(elem: HTMLElement | null, text: string, type: 'spin' | 'play' | 'bug') {
+  if (!elem) return
   const runningIcon = `<i class="fas fa-sync-alt fa-spin"></i> ${text}`
   const playIcon = `<i class="fas fa-play"></i> ${text}`
   const bugIcon = `<i class="fas fa-bug"></i> ${text}`
@@ -167,7 +170,7 @@ function updateEditor(p: IProgram) {
   }
 
   console.log()
-  const errors = p.program.logger.find((i: any) => i.type === 'error')
+  const errors = p.program.logger.find((i: Logger) => i.type === 'error')
   clearEditor()
 
 

@@ -2,6 +2,6 @@ export type LogType = 'error' | 'message' | 'success';
 
 export interface Logger {
   type: LogType;
-  value: any;
+  value: string;
   ln: number;
 }
