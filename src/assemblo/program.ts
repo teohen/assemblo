@@ -80,7 +80,7 @@ function newProgram(inQ?: number[], outQ?: number[]): IProgram {
     nextLine: () => nextLine(p)
   }
 
-  return obj;
+  return obj
 }
 
 function test(p: TProgram, expectedOutput: number[]): void {
@@ -156,8 +156,8 @@ function convertLabels(operations: IOperation[]): IOperation[] {
 function prepareOperations(p: TProgram, code: string): void {
   try {
     p.status = status.PARSING
-    const parsedCode = p.parser.parse(code);
-    const operations = convertLabels(parsedCode);
+    const parsedCode = p.parser.parse(code)
+    const operations = convertLabels(parsedCode)
 
     p.evaluator.eva.operations = operations
     p.status = status.PARSED

@@ -7,7 +7,7 @@ export interface IOperation {
 }
 
 function createOperation(line: number, funcName: string, args: IArgument[]): IOperation {
-  return { line, funcName, args  } as IOperation;
+  return { line, funcName, args  } as IOperation
 }
 
 export default {

@@ -1,9 +1,9 @@
 import Chance from 'chance'
 import { IArgument } from '../../assemblo/argument'
 import operation, { IOperation } from '../../assemblo/operation'
-import fixtures from '.';
+import fixtures from '.'
 
-const chance = Chance();
+const chance = Chance()
 
 function newOperation(fnName: string, ln: number, args: IArgument[]): IOperation {
   return operation.createOperation(ln, fnName, args)

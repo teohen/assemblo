@@ -2,7 +2,7 @@
 import Evaluator from './evaluator'
 // import Operation, { IOperation } from './operation'
 // import Parser, { IParser } from './parser'
-import Program from './program'
+import _Program from './program'
 import tokens from './tokens'
 
 export {

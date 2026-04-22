@@ -52,7 +52,7 @@ function parseArgument(arg: string, lineNum: number): IArgument {
   }
 
   if (/^-?[0-9]\d*$/.test(arg)) {
-    const num = Argument.createNumberArgument(arg);
+    const num = Argument.createNumberArgument(arg)
     if (num) return num
   }
 
@@ -117,7 +117,7 @@ function setUp(p: TParser): void {
 }
 
 function parse(p: TParser, code: string): IOperation[] {
-  p.code = code;
+  p.code = code
 
   setUp(p)
 
@@ -148,7 +148,7 @@ function newParser(
   flow?: string[]
 ): IParser {
 
-  const newCode = code || "";
+  const newCode = code || ''
 
   const parser: TParser = {
     code: newCode,

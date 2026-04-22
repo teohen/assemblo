@@ -1,13 +1,13 @@
 
 import { describe, it, expect } from 'bun:test'
-import Chance from 'chance';
+import Chance from 'chance'
 import fixtures from './fixtures'
-import { Evaluator } from '../assemblo';
-import { EvaluatorFixture } from './fixtures/evaluator';
-import { newMemory, newRegisters } from './fixtures/maps';
-import lists from '../assemblo/lists';
+import { Evaluator } from '../assemblo'
+import { EvaluatorFixture } from './fixtures/evaluator'
+import { newMemory, newRegisters } from './fixtures/maps'
+import lists from '../assemblo/lists'
 
-const chance = new Chance();
+const chance = new Chance()
 
 interface TestCase {
   evaluator: EvaluatorFixture
@@ -50,7 +50,7 @@ describe.only('EVALUATOR SUITE', () => {
         const newLine = evaluator.tick(line)
 
 
-        expect(t.expValue).toBe(evaluator.eva.registers.get("R0X"));
+        expect(t.expValue).toBe(evaluator.eva.registers.get('R0X'))
         expect(1).toBe(newLine)
       }
     })
@@ -73,7 +73,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([{
               value: randNumber,
-              name: "R0X"
+              name: 'R0X'
             }])
           }),
           expValue: randNumber
@@ -124,7 +124,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([{
               value: -1,
-              name: "R0X"
+              name: 'R0X'
             }]),
           }),
           expValue: randNumber
@@ -140,7 +140,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([{
               value: 1,
-              name: "R0X"
+              name: 'R0X'
             }]),
           }),
           expValue: 1
@@ -155,7 +155,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([{
               value: -1,
-              name: "R0X"
+              name: 'R0X'
             }]),
           }),
           expValue: 1
@@ -170,7 +170,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([{
               value: 1,
-              name: "R0X"
+              name: 'R0X'
             }]),
           }),
           expValue: randNumber
@@ -185,7 +185,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([{
               value: -1,
-              name: "R0X"
+              name: 'R0X'
             }]),
           }),
           expValue: 1
@@ -200,7 +200,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([{
               value: 0,
-              name: "R0X"
+              name: 'R0X'
             }]),
           }),
           expValue: randNumber
@@ -221,7 +221,7 @@ describe.only('EVALUATOR SUITE', () => {
         )
 
         const newLine = evaluator.tick(line)
-        expect(t.expValue).toBe(newLine);
+        expect(t.expValue).toBe(newLine)
       }
 
     })
@@ -243,7 +243,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([{
               value: randNumber,
-              name: "R0X"
+              name: 'R0X'
             }]),
           }),
           expValue: randNumber
@@ -264,7 +264,7 @@ describe.only('EVALUATOR SUITE', () => {
         )
 
         evaluator.tick(line)
-        expect(t.expValue).toBe(t.evaluator.memory.get("MX0"))
+        expect(t.expValue).toBe(t.evaluator.memory.get('MX0'))
       }
     })
 
@@ -283,7 +283,7 @@ describe.only('EVALUATOR SUITE', () => {
               ]),
             ],
             memory: newMemory([{
-              name: "MX0",
+              name: 'MX0',
               value: randNumber,
             }]),
           }),
@@ -304,7 +304,7 @@ describe.only('EVALUATOR SUITE', () => {
         )
 
         evaluator.tick(line)
-        expect(t.expValue).toBe(t.evaluator.registers.get("R0X"));
+        expect(t.expValue).toBe(t.evaluator.registers.get('R0X'))
       }
     })
 
@@ -326,11 +326,11 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([
               {
-                name: "R0X",
+                name: 'R0X',
                 value: randNumber1
               },
               {
-                name: "R1X",
+                name: 'R1X',
                 value: randNumber2
               },
 
@@ -348,7 +348,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([
               {
-                name: "R0X",
+                name: 'R0X',
                 value: randNumber1
               }
             ]),
@@ -365,7 +365,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([
               {
-                name: "R0X",
+                name: 'R0X',
                 value: randNumber1
               }
             ]),
@@ -373,7 +373,7 @@ describe.only('EVALUATOR SUITE', () => {
           expValue: randNumber1 + randNumber2
         }
 
-      ];
+      ]
 
 
 
@@ -390,7 +390,7 @@ describe.only('EVALUATOR SUITE', () => {
         )
 
         evaluator.tick(line)
-        expect(t.evaluator.registers.get("R0X")).toBe(t.expValue);
+        expect(t.evaluator.registers.get('R0X')).toBe(t.expValue)
 
       }
     })
@@ -414,11 +414,11 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([
               {
-                name: "R0X",
+                name: 'R0X',
                 value: randNumber1
               },
               {
-                name: "R1X",
+                name: 'R1X',
                 value: randNumber2
               },
 
@@ -436,7 +436,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([
               {
-                name: "R0X",
+                name: 'R0X',
                 value: randNumber1
               }
             ]),
@@ -453,7 +453,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([
               {
-                name: "R0X",
+                name: 'R0X',
                 value: randNumber1
               }
             ]),
@@ -461,7 +461,7 @@ describe.only('EVALUATOR SUITE', () => {
           expValue: randNumber1 - randNumber2
         }
 
-      ];
+      ]
 
 
 
@@ -478,7 +478,7 @@ describe.only('EVALUATOR SUITE', () => {
         )
 
         evaluator.tick(line)
-        expect(t.evaluator.registers.get("R0X")).toBe(t.expValue);
+        expect(t.evaluator.registers.get('R0X')).toBe(t.expValue)
 
       }
     })
@@ -499,7 +499,7 @@ describe.only('EVALUATOR SUITE', () => {
             ],
             registers: newRegisters([
               {
-                name: "R0X",
+                name: 'R0X',
                 value: randNumber1
               }
             ]),
@@ -530,9 +530,9 @@ describe.only('EVALUATOR SUITE', () => {
 
 
 
-describe("ERROR", () => {
+describe('ERROR', () => {
   it('should return error to unknown instructions', () => {
-    const randFName = chance.word();
+    const randFName = chance.word()
 
     const tests: TestCase[] = [
       {
@@ -547,9 +547,9 @@ describe("ERROR", () => {
       }
     ]
 
-    const t = tests[0];
-    const expValue = `Instruction (${randFName}) does not exist.`;
-    const line = 1;
+    const t = tests[0]
+    const expValue = `Instruction (${randFName}) does not exist.`
+    const line = 1
 
     const evaluator = Evaluator.newEvaluator(
       t.evaluator.input,
@@ -565,7 +565,7 @@ describe("ERROR", () => {
     expect(t.evaluator.logger).toEqual([
       { type: 'error', value: expValue, ln: t.expValue }
     ])
-  });
+  })
 
   it.only('Should not allow the JMP instructions to lines outside of the range', () => {
     const tests: TestCase[] = [
@@ -579,7 +579,7 @@ describe("ERROR", () => {
           ],
           registers: newRegisters([{
             value: -1,
-            name: "R0X"
+            name: 'R0X'
           }]),
         }),
         expValue: -1

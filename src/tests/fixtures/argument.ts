@@ -59,7 +59,7 @@ function newListArgument(literal?: string): ListArgument {
 
 function newNumberArgument(literal?: number): NumberArgument {
   if (typeof literal === 'number') {
-    return Argument.createNumberArgument(literal);
+    return Argument.createNumberArgument(literal)
   }
   if (!literal) {
     literal = chance.integer({ min: -1000, max: 1000 })

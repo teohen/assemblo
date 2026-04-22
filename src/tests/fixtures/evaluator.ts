@@ -1,10 +1,10 @@
-import { IOperation } from "../../assemblo/operation"
-import { LabelType } from "../../assemblo/labels";
-import List, { IListInput, IListOutput } from "../../assemblo/lists";
-import { Logger } from "../../assemblo/logger";
-import { MemoryType } from "../../assemblo/memory";
-import { RegistersType } from "../../assemblo/registers";
-import { newRegisters, newMemory, newLabels, newLogger } from "./maps";
+import { IOperation } from '../../assemblo/operation'
+import { LabelType } from '../../assemblo/labels'
+import List, { IListInput, IListOutput } from '../../assemblo/lists'
+import { Logger } from '../../assemblo/logger'
+import { MemoryType } from '../../assemblo/memory'
+import { RegistersType } from '../../assemblo/registers'
+import { newRegisters, newMemory, newLabels, newLogger } from './maps'
 
 type EvaluatorArgFixture = {
   input?: IListInput,
@@ -37,7 +37,7 @@ function newEvaluator(arg: EvaluatorArgFixture): EvaluatorFixture {
     operations: arg.operations ?? []
   }
 
-  return fixEva;
+  return fixEva
 }
 
 export default {

@@ -49,7 +49,7 @@ const FUNCTION_LIST: Array<(arg: InstructionArgument) => number> = [
   addFn,
   subFn,
   prtFn
-];
+]
 
 function addError(eva: TEvaluator, value: string): void {
   eva.logger.push({ ln: eva.line, type: 'error', value })
@@ -84,7 +84,7 @@ function getValue(eva: TEvaluator, argument: RegisterArgument | NumberArgument):
     return argument.intern
   }
 
-  return eva.registers.get(argument.intern);
+  return eva.registers.get(argument.intern)
 }
 
 function popFn(arg: InstructionArgument): number {
@@ -187,14 +187,14 @@ function jmpFn(arg: InstructionArgument): number {
   const { eva, args } = arg
 
 
-  const firstArgument = Argument.createNumberArgument(args[0].literal);
+  const firstArgument = Argument.createNumberArgument(args[0].literal)
   if (!firstArgument) return -1
 
   if (typeof args[1].intern !== 'function') {
     return -1
   }
 
-  const secondArgument = Argument.createConditionalArgument(args[1].intern);
+  const secondArgument = Argument.createConditionalArgument(args[1].intern)
 
   if (!secondArgument) return -1
 
@@ -208,18 +208,18 @@ function jmpFn(arg: InstructionArgument): number {
 function jmpNegFn(arg: InstructionArgument): number {
   const { eva, args } = arg
 
-  const firstArgument = Argument.createNumberArgument(args[0].literal);
+  const firstArgument = Argument.createNumberArgument(args[0].literal)
   if (!firstArgument) return -1
 
-  const secondArgument = Argument.createNumberArgument(args[1].literal) || Argument.createRegisterArgument(args[1].literal);
+  const secondArgument = Argument.createNumberArgument(args[1].literal) || Argument.createRegisterArgument(args[1].literal)
   if (!secondArgument) return -1
 
   if (firstArgument.intern < 0 || firstArgument.intern > eva.operations.length) {
-    addError(eva, `Can't jump to a invalid line: ${firstArgument.intern}`);
+    addError(eva, `Can't jump to a invalid line: ${firstArgument.intern}`)
     return -1
   }
 
-  const valueToCheck = getValue(eva, secondArgument);
+  const valueToCheck = getValue(eva, secondArgument)
   const condArgumet = Argument.createConditionalArgument(() => valueToCheck < 0)
 
   return jmpFn({ eva: eva, args: [firstArgument, condArgumet] })
@@ -228,14 +228,14 @@ function jmpNegFn(arg: InstructionArgument): number {
 function jmpPosFn(arg: InstructionArgument): number {
   const { eva, args } = arg
 
-  const firstArgument = Argument.createNumberArgument(args[0].literal);
+  const firstArgument = Argument.createNumberArgument(args[0].literal)
   if (!firstArgument) return -1
 
   const secondArgument = Argument.createNumberArgument(args[1].literal) || Argument.createRegisterArgument(args[1].literal)
 
   if (!secondArgument) return -1
 
-  const valueToCheck = getValue(eva, secondArgument);
+  const valueToCheck = getValue(eva, secondArgument)
   const condArgumet = Argument.createConditionalArgument(() => valueToCheck > 0)
   return jmpFn({ eva: eva, args: [firstArgument, condArgumet] })
 }
@@ -243,14 +243,14 @@ function jmpPosFn(arg: InstructionArgument): number {
 function jmpZeroFn(arg: InstructionArgument): number {
   const { eva, args } = arg
 
-  const firstArgument = Argument.createNumberArgument(args[0].literal);
+  const firstArgument = Argument.createNumberArgument(args[0].literal)
   if (!firstArgument) return -1
 
   const secondArgument = Argument.createNumberArgument(args[1].literal) || Argument.createRegisterArgument(args[1].literal)
 
   if (!secondArgument) return -1
 
-  const valueToCheck = getValue(eva, secondArgument);
+  const valueToCheck = getValue(eva, secondArgument)
   const condArgumet = Argument.createConditionalArgument(() => valueToCheck == 0)
   return jmpFn({ eva: eva, args: [firstArgument, condArgumet] })
 }
@@ -307,7 +307,6 @@ function prtFn(arg: InstructionArgument): number {
 }
 
 function tick(eva: TEvaluator, line: number): number {
-  line = line
   const op = eva.operations[line - 1]
 
   if (!op) {
@@ -340,7 +339,7 @@ function newEvaluator(
   const eva: TEvaluator = {
     inQ: inQ || Lists.createList('INPUT'),
     outQ: outQ || Lists.createList('OUTPUT'),
-    registers: registers || Register.createRegister("registers"),
+    registers: registers || Register.createRegister('registers'),
     memory: memory || Memory.createMemory(),
     operations: operations || [],
     logger: logger || [],

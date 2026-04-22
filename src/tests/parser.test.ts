@@ -2,7 +2,7 @@ import { describe, it, expect } from 'bun:test'
 import { IOperation } from '../assemblo/operation'
 
 import fixtures from './fixtures'
-import Parser from '../assemblo/parser';
+import Parser from '../assemblo/parser'
 
 
 interface TestCase {
@@ -188,7 +188,7 @@ describe('Parser suite', () => {
           operation: fixtures.Operation.newOperation('addFn', 1,
             [
               fixtures.Argument.newRegisterArgument('r0'),
-              fixtures.Argument.newNumberArgument("1")
+              fixtures.Argument.newNumberArgument('1')
             ]
           )
         },
@@ -221,7 +221,7 @@ describe('Parser suite', () => {
           operation: fixtures.Operation.newOperation('subFn', 1,
             [
               fixtures.Argument.newRegisterArgument('r0'),
-              fixtures.Argument.newNumberArgument("1")
+              fixtures.Argument.newNumberArgument('1')
             ]
           )
         },

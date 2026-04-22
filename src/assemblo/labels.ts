@@ -1,4 +1,4 @@
-import { IArgument } from "./argument";
+import { IArgument } from './argument'
 
 export type LabelInternal = string;
 export type LabelLiteral = string;
@@ -12,21 +12,21 @@ interface IMap {
 }
 
 function get(rg: Map<string, number>, key: string): number {
-  const value = rg.get(key) || 0;
-  return value;
+  const value = rg.get(key) || 0
+  return value
 }
 
 function set(rg: Map<string, number>, key: string, value: number): void {
   if (/^-?[0-9]\d*$/.test(value.toString())) {
-    rg.set(key, value);
+    rg.set(key, value)
     return
   }
 
-  rg.set(key, 0);
+  rg.set(key, 0)
 }
 
-export function createMap(name: string): IMap {
-  const map = new Map<string, number>();
+export function createMap(_name: string): IMap {
+  const map = new Map<string, number>()
 
 
   const obj: IMap = {
@@ -36,7 +36,7 @@ export function createMap(name: string): IMap {
     set: (key: string, value: number) => set(map, key, value),
   }
 
-  return obj;
+  return obj
 }
 
 
@@ -48,5 +48,5 @@ export interface LabelArgument extends IArgument {
 }
 
 export default {
-  createLabels: () => createMap("labels")
+  createLabels: () => createMap('labels')
 }

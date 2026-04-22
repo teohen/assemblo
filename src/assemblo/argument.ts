@@ -74,7 +74,7 @@ function createLabelArgument(literal: string): LabelArgument {
 function createNumberArgument(value: number): NumberArgument;
 function createNumberArgument(value: string): NumberArgument | null;
 function createNumberArgument(value: string | number): NumberArgument | null {
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     return { type: 'NUM', literal: value.toString(), intern: value }
   }
 

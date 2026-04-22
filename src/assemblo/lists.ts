@@ -1,4 +1,4 @@
-import { IArgument } from "./argument";
+import { IArgument } from './argument'
 
 const INTERNALS = ['INP_LIST', 'OUTPUT_LST'] as const
 const LITERALS = ['INPUT', 'OUTPUT'] as const
@@ -31,7 +31,7 @@ export interface IListOutput {
 
 function listPop(l: ListInput): number {
   const res = l.pop()
-  return res || 0;
+  return res || 0
 }
 
 function listPush(l: ListOutput, item: number): void {
@@ -57,29 +57,29 @@ export interface ListArgument extends IArgument {
 }
 
 function newInputList(lst?: number[]): IListInput {
-  const items: ListInput = lst || [];
+  const items: ListInput = lst || []
 
-    return {
-      type: 'INPUT',
-      items,
-      pop: () => listPop(items)
-    }
+  return {
+    type: 'INPUT',
+    items,
+    pop: () => listPop(items)
+  }
 }
 
 function newOutputList(lst?: number[]): IListOutput {
-  const items: ListOutput = lst || [];
+  const items: ListOutput = lst || []
 
-    return {
-      type: 'OUTPUT',
-      items,
-      push: (item: number) => listPush(items, item)
-    }
+  return {
+    type: 'OUTPUT',
+    items,
+    push: (item: number) => listPush(items, item)
+  }
 }
 
 function newList(name: 'INPUT', lst?: number[]): IListInput
 function newList(name: 'OUTPUT', lst?: number[]):  IListOutput
 function newList(name: ListLiteral, lst?: number[]): IListInput | IListOutput {
-  return name === 'INPUT' ? newInputList(lst) : newOutputList(lst);
+  return name === 'INPUT' ? newInputList(lst) : newOutputList(lst)
 }
 
 export default {

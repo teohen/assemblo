@@ -1,4 +1,4 @@
-import { IArgument } from "./argument";
+import { IArgument } from './argument'
 
 const INTERNALS = ['R0X', 'R1X', 'R2X'] as const
 const LITERALS = ['r0', 'r1', 'r2'] as const
@@ -17,21 +17,21 @@ interface IMap {
 }
 
 function get(rg: Map<string, number>, key: string): number {
-  const value = rg.get(key) || 0;
-  return value;
+  const value = rg.get(key) || 0
+  return value
 }
 
 function set(rg: Map<string, number>, key: string, value: number): void {
   if (/^-?[0-9]\d*$/.test(value.toString())) {
-    rg.set(key, value);
+    rg.set(key, value)
     return
   }
 
-  rg.set(key, 0);
+  rg.set(key, 0)
 }
 
-export function createMap(name: string): IMap {
-  const map = new Map<string, number>();
+export function createMap(_name: string): IMap {
+  const map = new Map<string, number>()
 
 
   const obj: IMap = {
@@ -41,14 +41,14 @@ export function createMap(name: string): IMap {
     set: (key: string, value: number) => set(map, key, value),
   }
 
-  return obj;
+  return obj
 }
 
 export const REGISTERSMAP: Map<RegisterLiteral, RegisterInternal> = new Map([
   [LITERALS[0], INTERNALS[0]],
   [LITERALS[1], INTERNALS[1]],
   [LITERALS[2], INTERNALS[2]],
-]);
+])
 
 
 
@@ -63,5 +63,5 @@ export interface RegisterArgument extends IArgument {
 }
 
 export default {
-  createRegister: (name?: string) => name ? createMap(name) : createMap("registers")
+  createRegister: (name?: string) => name ? createMap(name) : createMap('registers')
 }

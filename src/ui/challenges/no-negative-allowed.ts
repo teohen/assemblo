@@ -10,7 +10,7 @@ SUB: r0, 1
 JMP_Z: .output, r0
 LBL: .end`
 
-const q = [0, 1, -2, 3, -4, 5];
+const q = [0, 1, -2, 3, -4, 5]
 
 const p = Program.newProgram(q)
 
