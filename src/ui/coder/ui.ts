@@ -1,4 +1,4 @@
-import { status } from '../../assemblo/program'
+import { IProgram, status } from '../../assemblo/program'
 import editor from './codemirror'
 
 const consoleElem = document.getElementById('consoleOutput')
@@ -13,28 +13,30 @@ const restoreBtn = document.getElementById('restoreBtn')
 const submitBtn = document.getElementById('submitBtn')
 const runDelay = document.getElementById('runDelay')
 
-function renderCodeInfo(p: any, inputStack: any) {
-  if (codeInfo) codeInfo.children[0].innerHTML = p.line || '_'
-  if (codeInfo) codeInfo.children[1].innerHTML = p.status || '_'
+function renderCodeInfo(p: IProgram, inputStack: number[]) {
+  if (codeInfo) codeInfo.children[0].innerHTML = p.program.line.toString() || '_'
+  if (codeInfo) codeInfo.children[1].innerHTML = p.program.status || '_'
   if (codeInfo) codeInfo.children[2].innerHTML = '0'
   if (codeInfo) codeInfo.children[3].innerHTML = inputStack ? '[' + inputStack + ']' : '[]'
-  if (codeInfo) codeInfo.children[4].innerHTML = p.outQ ? '[' + p.outQ + ']' : '[]'
+  if (codeInfo) codeInfo.children[4].innerHTML = p.program.outQ ? '[' + p.program.outQ + ']' : '[]'
 }
 
-function renderRegistersMemoryInfo(p: any) {
-  if (memoryTable) memoryTable.children[0].innerHTML = p.memory.get('MX0') !== undefined ? p.memory.get('MX0') : '_'
-  if (memoryTable) memoryTable.children[1].innerHTML = p.memory.get('MX1') !== undefined ? p.memory.get('MX1') : '_'
-  if (memoryTable) memoryTable.children[2].innerHTML = p.memory.get('MX2') !== undefined ? p.memory.get('MX2') : '_'
+function renderRegistersMemoryInfo(p: IProgram) {
+  if (!p.program.memory || !p.program.registers) return
+  if (memoryTable) memoryTable.children[0].innerHTML = p.program.memory.get('MX0') !== undefined ? p.program.memory.get('MX0').toString() : '_'
+  if (memoryTable) memoryTable.children[1].innerHTML = p.program.memory.get('MX1') !== undefined ? p.program.memory.get('MX1').toString() : '_'
+  if (memoryTable) memoryTable.children[2].innerHTML = p.program.memory.get('MX2') !== undefined ? p.program.memory.get('MX2').toString() : '_'
 
-  if (registersTable) registersTable.children[0].innerHTML = p.registers.get('R0X') !== undefined ? p.registers.get('R0X') : '_'
-  if (registersTable) registersTable.children[1].innerHTML = p.registers.get('R1X') !== undefined ? p.registers.get('R1X') : '_'
-  if (registersTable) registersTable.children[2].innerHTML = p.registers.get('R2X') !== undefined ? p.registers.get('R2X') : '_'
+  if (registersTable) registersTable.children[0].innerHTML = p.program.registers.get('R0X') !== undefined ? p.program.registers.get('R0X').toString() : '_'
+  if (registersTable) registersTable.children[1].innerHTML = p.program.registers.get('R1X') !== undefined ? p.program.registers.get('R1X').toString() : '_'
+  if (registersTable) registersTable.children[2].innerHTML = p.program.registers.get('R2X') !== undefined ? p.program.registers.get('R2X').toString() : '_'
 
 }
 
-function renderConsoleOutput(p: any) {
+function renderConsoleOutput(p: IProgram) {
+  if (!p.program.logger) return
   consoleElem?.replaceChildren()
-  for (const log of p.logger) {
+  for (const log of p.program.logger) {
     consoleElem?.appendChild(createConsoleOuput(log))
   }
   if (consoleElem) consoleElem.scrollTop = consoleElem.scrollHeight
@@ -64,15 +66,15 @@ function createConsoleOuput(log: any) {
   output.role = 'alert'
 
   switch (log.type) {
-  case 'error':
-    output.classList.add('alert-danger')
-    break
-  case 'message':
-    output.classList.add('alert-secondary')
-    break
+    case 'error':
+      output.classList.add('alert-danger')
+      break
+    case 'message':
+      output.classList.add('alert-secondary')
+      break
 
-  default:
-    output.classList.add('alert-success')
+    default:
+      output.classList.add('alert-success')
   }
 
   output.innerText = log.value
@@ -106,14 +108,14 @@ function resetIcons() {
   updateIcon(debugBtn, 'Debug', 'bug')
 }
 
-function updateButtons(p: any) {
-  if (p.status === status.FINISHED) {
+function updateButtons(p: IProgram) {
+  if (p.program.status === status.FINISHED) {
     if (runBtn) runBtn.hidden = true
     if (debugBtn) debugBtn.hidden = true
     if (submitBtn) submitBtn.hidden = true
     if (runDelay) runDelay.hidden = true
     if (restoreBtn) restoreBtn.hidden = false
-  } else if (p.status === status.READY) {
+  } else if (p.program.status === status.READY) {
     resetIcons()
     if (runBtn) runBtn.hidden = false
     if (debugBtn) debugBtn.hidden = false
@@ -121,7 +123,7 @@ function updateButtons(p: any) {
     if (runDelay) runDelay.hidden = false
     if (restoreBtn) restoreBtn.hidden = false
     if (nextLineBtn) nextLineBtn.hidden = true
-  } else if (p.status === status.RUNNING) {
+  } else if (p.program.status === status.RUNNING) {
     if (editor.options.readOnly) {
       debugging()
       if (runBtn) runBtn.hidden = true
@@ -135,7 +137,7 @@ function updateButtons(p: any) {
     if (submitBtn) submitBtn.hidden = true
     if (runDelay) runDelay.hidden = true
     if (restoreBtn) restoreBtn.hidden = true
-  } else if (p.status === status.PARSED) {
+  } else if (p.program.status === status.PARSED) {
     if (runBtn) runBtn.hidden = true
     if (debugBtn) debugBtn.hidden = false
     if (submitBtn) submitBtn.hidden = true
@@ -152,29 +154,30 @@ function clearEditor() {
   }
 }
 
-function updateUI(p: any, inputStack: any) {
+function updateUI(p: IProgram, inputStack: any) {
   renderCodeInfo(p, inputStack)
   renderRegistersMemoryInfo(p)
   renderConsoleOutput(p)
   updateButtons(p)
 }
 
-function updateEditor(p: any) {
-  if (p.status === status.READY) {
+function updateEditor(p: IProgram) {
+  if (p.program.status === status.READY) {
     editor.setOption('readOnly', false)
   }
 
-  const errors = p.logger.find((i: any) => i.type === 'error')
+  console.log()
+  const errors = p.program.logger.find((i: any) => i.type === 'error')
   clearEditor()
 
 
 
 
-  editor.addLineClass(p.line - 1, 'background', 'yellow-line')
+  editor.addLineClass(p.program.line - 1, 'background', 'yellow-line')
   if (errors) editor.addLineClass(errors.ln - 1, 'background', 'red-line')
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const themeToggle = document.getElementById('themeToggle')
   const htmlElement = document.documentElement
 
@@ -187,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
 
-  themeToggle?.addEventListener('click', function() {
+  themeToggle?.addEventListener('click', function () {
     if (htmlElement.getAttribute('data-bs-theme') === 'dark') {
       htmlElement.setAttribute('data-bs-theme', 'light')
       editor.setOption('theme', 'default')

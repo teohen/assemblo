@@ -39,7 +39,7 @@ type TProgram = {
   labels: LabelType
 }
 
-interface IProgram {
+export interface IProgram {
   program: TProgram,
 
   test: (answer: number[]) => void

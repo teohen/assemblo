@@ -38,6 +38,8 @@ export interface IEvaluator {
 }
 
 const FUNCTION_LIST: Array<(arg: InstructionArgument) => number> = [
+  startFn,
+  endFn,
   popFn,
   pushFn,
   cpyFn,
@@ -85,6 +87,14 @@ function getValue(eva: TEvaluator, argument: RegisterArgument | NumberArgument):
   }
 
   return eva.registers.get(argument.intern)
+}
+
+function startFn(_arg: InstructionArgument): number {
+  return _arg.eva.line
+}
+
+function endFn(_arg: InstructionArgument): number {
+  return -1
 }
 
 function popFn(arg: InstructionArgument): number {
@@ -307,6 +317,7 @@ function prtFn(arg: InstructionArgument): number {
 }
 
 function tick(eva: TEvaluator, line: number): number {
+  eva.line = line
   const op = eva.operations[line - 1]
 
   if (!op) {

@@ -20,7 +20,7 @@ const FUNCTIONS = {
   ADD: 'addFn',
   SUB: 'subFn',
   LOAD: 'loadFn',
-  PRT: 'printFn',
+  PRT: 'prtFn',
   LBL: 'labelFn'
 } as const
 
