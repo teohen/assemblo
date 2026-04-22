@@ -60,7 +60,7 @@
         </div>
       </div>
 
-      <div class="row editor-container">
+<div class="row editor-container">
         <div class="col-4 col-lg">
           <label id="runDelay">Delay: <input type="range" min="1" max="101" value="1" step="10"></label>
           <button id="runBtn">
@@ -81,31 +81,10 @@
           </button>
         </div>
 
-        <div class="row editor-container">
-          <div class="col-4 col-lg">
-            <label id="runDelay">Delay: <input type="range" min="1" max="101" value="1" step="10"></label>
-            <button id="runBtn">
-              <i class="fas fa-play"></i> Run
-            </button>
-            <button hidden="true" id="nextLineBtn">
-              <i class="fas fa-play"></i> Next line
-            </button>
-            <button id="debugBtn">
-              <i class="fas fa-bug"></i> Debug
-            </button>
-            <button id="restoreBtn">
-              <i class="fas fa-refresh"></i> Restore
-            </button>
+        <div id="editor-code-mirror"></div>
+      </div>
 
-            <button id="submitBtn" hidden="true">
-              <i class="fas fa-check-circle"></i> Submit
-            </button>
-          </div>
-
-          <div id="editor-code-mirror"></div>
-        </div>
-
-        <div class="row flex-nowrap overflow-auto scrollable-row">
+      <div class="row flex-nowrap overflow-auto scrollable-row">
           <div class="col-12 col-lg">
             <div class="console-container border rounded shadow">
               <div class="console-header text-black p-3 d-flex justify-content-between align-items-center">

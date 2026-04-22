@@ -20,7 +20,7 @@ function renderCodeInfo(p: IProgram) {
   if (codeInfo) codeInfo.children[1].innerHTML = p.program.status || '_'
   if (codeInfo) codeInfo.children[2].innerHTML = '0'
   if (codeInfo) codeInfo.children[3].innerHTML = p.program.inQ ? '[' + p.program.inQ.items + ']' : '[]'
-  if (codeInfo) codeInfo.children[4].innerHTML = p.program.outQ ? '[' + p.program.outQ + ']' : '[]'
+  if (codeInfo) codeInfo.children[4].innerHTML = p.program.outQ ? '[' + p.program.outQ.items + ']' : '[]'
 }
 
 function renderRegistersMemoryInfo(p: IProgram) {

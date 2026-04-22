@@ -2,7 +2,7 @@ import pluginJs from '@eslint/js'
 import tseslint from 'typescript-eslint'
 
 export default [
-  { ignores: ['dist/**', 'node_modules/**', 'bin/**'] },
+  { ignores: ['dist/**', 'built/**', 'node_modules/**', 'bin/**'] },
   { files: ['src/**/*.{js,mjs,cjs,ts}'], },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
