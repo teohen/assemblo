@@ -28,7 +28,7 @@ if (ch) {
 
 ui.renderChallengeInfo(challenge)
 p.reset(inputStack)
-ui.updateUI(p, inputStack)
+ui.updateUI(p)
 
 runBtn?.addEventListener('click', function() {
   if (p.program.status === status.RUNNING) return
@@ -37,11 +37,11 @@ runBtn?.addEventListener('click', function() {
   p.reset(inputStack)
   p.run(code,
     () => {
-      ui.updateUI(p, inputStack)
+      ui.updateUI(p)
       ui.updateEditor(p)
     },
     () => {
-      ui.updateUI(p, inputStack)
+      ui.updateUI(p)
     },
     parseInt(runDelay?.value)
   )
@@ -54,19 +54,19 @@ debugBtn?.addEventListener('click', function() {
     p.reset(inputStack)
   }
 
-  ui.updateUI(p, inputStack)
+  ui.updateUI(p)
   editor.setOption('readOnly', !editor.options.readOnly)
 })
 
 nextLineBtn?.addEventListener('click', () => {
   p.nextLine()
-  ui.updateUI(p, inputStack)
+  ui.updateUI(p)
   ui.updateEditor(p)
 })
 
 restoreBtn?.addEventListener('click', () => {
   p.reset(inputStack)
-  ui.updateUI(p, inputStack)
+  ui.updateUI(p)
   ui.updateEditor(p)
 })
 
@@ -75,10 +75,10 @@ submitBtn?.addEventListener('click', () => {
   p.reset(inputStack)
 
   p.run(code, () => {
-    ui.updateUI(p, inputStack)
+    ui.updateUI(p)
   }, () => {
     p.test(expected)
-    ui.updateUI(p, inputStack)
+    ui.updateUI(p)
   }, 1)
 })
 

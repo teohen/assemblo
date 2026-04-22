@@ -13,11 +13,11 @@ const restoreBtn = document.getElementById('restoreBtn')
 const submitBtn = document.getElementById('submitBtn')
 const runDelay = document.getElementById('runDelay')
 
-function renderCodeInfo(p: IProgram, inputStack: number[]) {
+function renderCodeInfo(p: IProgram) {
   if (codeInfo) codeInfo.children[0].innerHTML = p.program.line.toString() || '_'
   if (codeInfo) codeInfo.children[1].innerHTML = p.program.status || '_'
   if (codeInfo) codeInfo.children[2].innerHTML = '0'
-  if (codeInfo) codeInfo.children[3].innerHTML = inputStack ? '[' + inputStack + ']' : '[]'
+  if (codeInfo) codeInfo.children[3].innerHTML = p.program.inQ ? '[' + p.program.inQ.items + ']' : '[]'
   if (codeInfo) codeInfo.children[4].innerHTML = p.program.outQ ? '[' + p.program.outQ + ']' : '[]'
 }
 
@@ -154,8 +154,8 @@ function clearEditor() {
   }
 }
 
-function updateUI(p: IProgram, inputStack: any) {
-  renderCodeInfo(p, inputStack)
+function updateUI(p: IProgram) {
+  renderCodeInfo(p)
   renderRegistersMemoryInfo(p)
   renderConsoleOutput(p)
   updateButtons(p)
