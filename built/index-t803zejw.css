@@ -1,0 +1,42 @@
+/* styles.css */
+.scrollable-list {
+  overflow-y: auto;
+  min-height: 500px;
+  max-height: 600px;
+}
+
+.black-color {
+  color: #000;
+}
+
+footer {
+  border-top: 1px solid #dee2e6;
+  margin-top: 3rem;
+}
+
+.social-link {
+  display: inline-flex;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+  border-radius: 50%;
+  justify-content: center;
+  align-items:  center;
+  width: 36px;
+  height: 36px;
+  transition: all .3s;
+}
+
+.social-link:hover {
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.footer-link {
+  color: #6c757d;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: #0d6efd;
+  text-decoration: underline;
+}

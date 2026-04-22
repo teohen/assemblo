@@ -1,0 +1,14 @@
+/* coder/styles.css */
+.scrollable-row {
+  max-height: 300px;
+}
+
+.yellow-line {
+  opacity: .5;
+  background-color: #ff0;
+}
+
+.red-line {
+  opacity: .5;
+  background-color: #f10;
+}
