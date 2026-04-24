@@ -1,6 +1,6 @@
 const list = [
   {
-    name: 'START',
+    name: '.start',
     description: `<p>
     Starts the program setting <a href="docs?item=registers">registers</a>, <a href="docs?item=memory">memory</a>, line counter, etc and represents the starting point of the program.
 </p>
@@ -8,21 +8,18 @@ const list = [
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>START</pre>
+<pre>LBL: .start</pre>
 
 <hr>
 
 <h3>Example</h3>
 
-<pre>START<br>...<br>...</pre>
-
-
-<code>//program:<br>// line = line of the START<br>// status = RUNNING</code>
+<pre>LBL: .start<br>...<br>...</pre>
 `
 
   },
   {
-    name: 'END',
+    name: '.end',
     description: `<p>
     Ends the program setting the program status to ENDED and the line counter to -1.
 </p>
@@ -30,16 +27,13 @@ const list = [
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>END</pre>
+<pre>LBL: .end</pre>
 
 <hr>
 
 <h3>Example</h3>
 
-<pre>...<br>...<br>END</pre>
-
-
-<code>//program:<br>// line = -1<br>// status = ENDED</code>
+<pre>...<br>...<br>LBL: .end</pre>
 `
   },
   {

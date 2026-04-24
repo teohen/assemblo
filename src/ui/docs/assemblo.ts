@@ -5,14 +5,14 @@ const doc = {
 <h4>examples</h4>
 <pre>
 // prints all items from INPUT = [3, 2, 1]
-  START
+  .start
     POP: r0, INPUT
     PRT: r0
     POP: r0, INPUT
     PRT: r0
     POP: r0, INPUT
     PRT: r0
-  END
+  .end
 </pre>
 <code>//system console:<br>1<br>2<br>3</code>
     `
