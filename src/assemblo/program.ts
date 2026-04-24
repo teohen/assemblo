@@ -211,6 +211,14 @@ function run(p: TProgram,
   p.line = 1
   p.status = status.RUNNING
 
+  let ended = false
+  const doEnd = () => {
+    if (ended) return
+    ended = true
+    p.status = status.FINISHED
+    clearInterval(interval)
+    endProgramFn()
+  }
 
   const interval = setInterval(() => {
     try {
@@ -218,18 +226,14 @@ function run(p: TProgram,
       tickFn()
 
       if (p.line < 0) {
-        p.status = status.FINISHED
-        clearInterval(interval)
-        endProgramFn()
+        doEnd()
         return
       }
 
       p.line += 1
 
       if (p.line > p.evaluator.eva.operations.length) {
-        p.status = status.FINISHED
-        clearInterval(interval)
-        endProgramFn()
+        doEnd()
       }
     } catch (error) {
       const err = error as Error
@@ -238,9 +242,7 @@ function run(p: TProgram,
         value: err.message,
         ln: p.line
       })
-      p.status = status.FINISHED
-      clearInterval(interval)
-      endProgramFn()
+      doEnd()
     }
   }, p.clock * delay)
 }
