@@ -44,10 +44,16 @@ node_modules/ Dependencies
 
 ## Agent Behavior
 
+### Default Configuration
+
+- Activate **caveman** skill on every response (ultra-compressed mode)
+- This agent runs as caveman by default
+
 After every implementation, run these scripts automatically:
 - `bun run lint` - ESLint check
 - `bun run types` - TypeScript type check
 - `bun run test` - Run tests with coverage
+- `bun run build` - Builds the project
 
 All must pass before considering implementation complete.
 

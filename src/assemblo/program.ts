@@ -150,6 +150,14 @@ function convertLabels(operations: IOperation[]): IOperation[] {
   return operations.map((op) => {
     if (op.funcName !== 'labelFn') return op
 
+    const labelArg = op.args[0] as { literal: string }
+    if (labelArg.literal === '.end') {
+      return Operation.createOperation(
+        op.line,
+        'endFn',
+        []
+      )
+    }
 
     return Operation.createOperation(
       op.line,
