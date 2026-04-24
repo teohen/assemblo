@@ -74,8 +74,6 @@ function parseLine(p: TParser, line: string, num: number): IOperation {
 
   op.funcName = functions[fPart]
 
-  if (fPart === 'START' || fPart === 'END') return op
-
   const args = parts[1].split(',')
 
   if (!ONE_ARGS.includes(fPart)) {
