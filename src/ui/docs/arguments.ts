@@ -20,12 +20,15 @@ const doc = {
         <li>
             <strong><a href="docs?item=list">List</a>:</strong> A special entity that's used to take data from and to in a specific order. (<code>INPUT, OUTPUT</code>)
         </li>
+        <li>
+            <strong><a href="docs?item=labels">Label</a>:</strong> A named reference to a line in the program, written as a dot followed by a name (eg. <code>.start</code>, <code>.end</code>, <code>.loop</code>). Used by <a href="docs?item=instructions">instructions</a> like <code>JMP_N</code> and <code>JMP_Z</code> as a jump target.
+        </li>
     </ul>
     <hr>
 
     <h4>Argument examples</h4>
     <pre>LOAD: r0, mx0</pre>
-    <pre>JPM_N: 2, r0</pre>`
+    <pre>JMP_N: .end, r0</pre>`
 }
 
 export default doc

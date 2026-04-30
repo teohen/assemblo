@@ -171,19 +171,19 @@ const list = [
   {
     name: 'JMP_N',
     description: `<p>
-    Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>NEGATIVE</b>.
+    Jumps to the <a href="docs?item=labels">label</a> if the value of the provided <a href="docs?item=registers">register</a> is <b>NEGATIVE</b>.
 </p>
 
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>JMP_N: TARGET_LINE_NUMBER, SOURCE</pre>
+<pre>JMP_N: TARGET_LABEL, SOURCE</pre>
 <ul>
     <li>
-        <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
+        <strong>TARGET_LABEL:</strong> a <a href="docs?item=labels">label</a> defined in the program (eg. <code>.end</code>, <code>.loop</code>).
     </li>
     <li>
-        <strong>SOURCE :</strong> a <a href="docs?item=registers">register</a> OR a integer number.
+        <strong>SOURCE:</strong> a <a href="docs?item=registers">register</a> or an integer number.
     </li>
 </ul>
 
@@ -196,34 +196,35 @@ const list = [
 <br>
 
 <pre>
-1] JMP_N: 3, r0
+1] JMP_N: .end, r0
 2] PRT: r1
-3] PRT: r0
+3] LBL: .end
+4] PRT: r0
 </pre>
 
 
 <code>//system console:<br>-5</code>
 
 <p>
-    <em>(The program's console will only print the value of <code>r0</code>: -5)</em>
+    <em>(The program jumps to label <code>.end</code> because <code>r0</code> is negative. Only <code>-5</code> is printed.)</em>
 </p>`
   },
   {
     name: 'JMP_P',
     description: `<p>
-    Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>POSITIVE</b>.
+    Jumps to the <a href="docs?item=labels">label</a> if the value of the provided <a href="docs?item=registers">register</a> is <b>POSITIVE</b>.
 </p>
 
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>JMP_P: TARGET_LINE_NUMBER, SOURCE</pre>
+<pre>JMP_P: TARGET_LABEL, SOURCE</pre>
 <ul>
     <li>
-        <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
+        <strong>TARGET_LABEL:</strong> a <a href="docs?item=labels">label</a> defined in the program (eg. <code>.end</code>, <code>.loop</code>).
     </li>
     <li>
-        <strong>SOURCE :</strong> a <a href="docs?item=registers">register</a> OR a integer number.
+        <strong>SOURCE:</strong> a <a href="docs?item=registers">register</a> or an integer number.
     </li>
 </ul>
 
@@ -236,33 +237,34 @@ const list = [
 <br>
 
 <pre>
-1] JMP_P: 3, r0
+1] JMP_P: .end, r0
 2] PRT: r1
-3] PRT: r0
+3] LBL: .end
+4] PRT: r0
 </pre>
 
 <code>//system console:<br>5</code>
 
 <p>
-    <em>(The program's console will only print the value of <code>r0</code>: 5)</em>
+    <em>(The program jumps to label <code>.end</code> because <code>r0</code> is positive. Only <code>5</code> is printed.)</em>
 </p>`
   },
   {
     name: 'JMP_Z',
     description: `<p>
-    Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>ZERO</b>.
+    Jumps to the <a href="docs?item=labels">label</a> if the value of the provided <a href="docs?item=registers">register</a> is <b>ZERO</b>.
 </p>
 
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>JMP_Z: TARGET_LINE_NUMBER, SOURCE</pre>
+<pre>JMP_Z: TARGET_LABEL, SOURCE</pre>
 <ul>
     <li>
-        <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
+        <strong>TARGET_LABEL:</strong> a <a href="docs?item=labels">label</a> defined in the program (eg. <code>.end</code>, <code>.loop</code>).
     </li>
     <li>
-        <strong>SOURCE :</strong> a available <a href="docs?item=registers">registers</a> OR integer number.
+        <strong>SOURCE:</strong> a <a href="docs?item=registers">register</a> or an integer number.
     </li>
 </ul>
 
@@ -275,33 +277,34 @@ const list = [
 <br>
 
 <pre>
-1] JMP_Z: 3, r0
+1] JMP_Z: .end, r0
 2] PRT: r1
-3] PRT: r0
+3] LBL: .end
+4] PRT: r0
 </pre>
 
 <code>//system console:<br>0</code>
 
 <p>
-    <em>(The program1s console will only print the value of <code>r0</code>: 0)</em>
+    <em>(The program jumps to label <code>.end</code> because <code>r0</code> is zero. Only <code>0</code> is printed.)</em>
 </p>`
   },
   {
     name: 'JMP_U',
     description: `<p>
-    Jumps to the line if the value of the provided <a href="docs?item=registers">register</a> is <b>UNDEFINED</b>.
+    Jumps to the <a href="docs?item=labels">label</a> if the value of the provided <a href="docs?item=registers">register</a> is <b>UNDEFINED</b>.
 </p>
 
 <hr>
 
 <h3>Structure and Arguments</h3>
-<pre>JMP_U: TARGET_LINE_NUMBER, SOURCE</pre>
+<pre>JMP_U: TARGET_LABEL, SOURCE</pre>
 <ul>
     <li>
-        <strong>TARGET_LINE_NUMBER :</strong> a integer number (from <code>0</code> up to the program's last line).
+        <strong>TARGET_LABEL:</strong> a <a href="docs?item=labels">label</a> defined in the program (eg. <code>.end</code>, <code>.loop</code>).
     </li>
     <li>
-        <strong>SOURCE :</strong> a <a href="docs?item=registers">register</a> or a integer number.
+        <strong>SOURCE:</strong> a <a href="docs?item=registers">register</a> or an integer number.
     </li>
 </ul>
 
@@ -314,15 +317,16 @@ const list = [
 <br>
 
 <pre>
-1] JMP_U: 3, r0
+1] JMP_U: .end, r0
 2] PRT: r1
-3] PRT: r0
+3] LBL: .end
+4] PRT: r0
 </pre>
 
 <code>//system console:<br>undefined</code>
 
 <p>
-    <em>(The program1s console will only print the value of <code>r0</code>: 0)</em>
+    <em>(The program jumps to label <code>.end</code> because <code>r0</code> is undefined. Only <code>undefined</code> is printed.)</em>
 </p>`
   },
   {

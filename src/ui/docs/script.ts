@@ -4,6 +4,7 @@ import arg from './arguments'
 import register from './registers'
 import memory from './memory'
 import list from './lists'
+import labels from './labels'
 import err from './errors'
 import assemblo from './assemblo'
 import allinstructions from './instructions-set'
@@ -15,6 +16,7 @@ docs[arg.name] = arg
 docs[register.name] = register
 docs[memory.name] = memory
 docs[list.name] = list
+docs[labels.name] = labels
 docs[err.name] = err
 docs[assemblo.name] = assemblo
 
@@ -31,6 +33,7 @@ ui.renderDocList(docs['assemblo'])
 ui.renderDocList(docs['registers'])
 ui.renderDocList(docs['memory'])
 ui.renderDocList(docs['arguments'])
+ui.renderDocList(docs['labels'])
 ui.renderDocList(docs['lists'])
 ui.renderDocList(docs['errors'])
 ui.renderDocList(docs['instructions'])
