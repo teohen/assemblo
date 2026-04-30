@@ -13,6 +13,7 @@ const FUNCTIONS = {
   POP: 'popFn',
   PUSH: 'pushFn',
   CPY: 'cpyFn',
+  JMP: 'jmpUndFn',
   JMP_N: 'jmpNegFn',
   JMP_P: 'jmpPosFn',
   JMP_Z: 'jmpZeroFn',

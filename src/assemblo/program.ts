@@ -71,7 +71,7 @@ function newProgram(inQ?: number[], outQ?: number[]): IProgram {
   const obj: IProgram = {
     program: p,
 
-    test: (answer: []) => test(p, answer),
+    test: (answer: number[]) => test(p, answer),
     reset: (inputQ: number[]) => reset(p, inputQ),
     convertLabels: (operations: IOperation[]) => convertLabels(operations),
     prepareOperations: (code: string) => prepareOperations(p, code),
@@ -175,7 +175,7 @@ function resolveLabelReference(arg: IArgument, p: TProgram): IArgument {
 }
 
 function resolveLabels(operations: IOperation[], p: TProgram): IOperation[] {
-  const jmpFuncs = ['jmpNegFn', 'jmpPosFn', 'jmpZeroFn', 'jmpUndFn']
+  const jmpFuncs = ['jmpFn', 'jmpNegFn', 'jmpPosFn', 'jmpZeroFn', 'jmpUndFn']
 
   return operations.map((op) => {
     if (!jmpFuncs.includes(op.funcName)) return op
@@ -193,11 +193,13 @@ function resolveLabels(operations: IOperation[], p: TProgram): IOperation[] {
 }
 
 function convertLabels(operations: IOperation[]): IOperation[] {
+  const endLabels = ['.end', '.done', '.exit', '.finish']
+
   return operations.map((op) => {
     if (op.funcName !== 'labelFn') return op
 
     const labelArg = op.args[0] as { literal: string }
-    if (labelArg && labelArg.literal === '.end') {
+    if (labelArg && endLabels.includes(labelArg.literal)) {
       return Operation.createOperation(op.line, 'endFn', [])
     }
 

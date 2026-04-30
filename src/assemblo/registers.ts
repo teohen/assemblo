@@ -13,7 +13,7 @@ export type RegistersType = IMap;
 interface IMap {
   map: Map<string, number>,
   get: (key: string) => number,
-  set: (key: string, val: number | undefined) => void,
+  set: (key: string, value: number) => void,
 }
 
 function get(rg: Map<string, number>, key: string): number {
