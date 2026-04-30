@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'bun:test'
 import Program, { status } from '../assemblo/program'
-import List from '../assemblo/lists'
+
 import { Logger } from '../assemblo/logger'
 
 interface ProgramSnapshot {
@@ -125,7 +125,7 @@ LBL: .end
       compareSnapshots(runSnap, debugSnap, 'PUSH OUTPUT, 42')
     })
 
-it('POP r0, INPUT → should match final state', () => {
+    it('POP r0, INPUT → should match final state', () => {
       const code = `
 LBL: .start
 POP: r0, INPUT
@@ -182,7 +182,7 @@ LBL: .end
   })
 
   describe('I/O operations', () => {
-it('input/output flow → should match final state', () => {
+    it('input/output flow → should match final state', () => {
       const code = `
 LBL: .start
 POP: r0, INPUT

@@ -48,16 +48,22 @@ const FUNCTION_LIST: Array<(arg: InstructionArgument) => number> = [
   jmpNegFn,
   jmpPosFn,
   jmpZeroFn,
+  jmpUndFn,
   addFn,
   subFn,
-  prtFn
+  prtFn,
+  labelFn
 ]
+
+function labelFn(arg: InstructionArgument): number {
+  return arg.eva.line
+}
 
 function addError(eva: TEvaluator, value: string): void {
   eva.logger.push({ ln: eva.line, type: 'error', value })
 }
 
-function addMessage(eva: TEvaluator, value?: string | number): void {
+function addMessage(eva: TEvaluator, value: string | number): void {
   eva.logger.push({ ln: eva.line, type: 'message', value })
 }
 
@@ -263,6 +269,15 @@ function jmpZeroFn(arg: InstructionArgument): number {
   const valueToCheck = getValue(eva, secondArgument)
   const condArgumet = Argument.createConditionalArgument(() => valueToCheck == 0)
   return jmpFn({ eva: eva, args: [firstArgument, condArgumet] })
+}
+
+function jmpUndFn(arg: InstructionArgument): number {
+  const { args } = arg
+
+  const firstArgument = Argument.createNumberArgument(args[0].literal)
+  if (!firstArgument) return -1
+
+  return firstArgument.intern
 }
 
 function addFn(arg: InstructionArgument): number {

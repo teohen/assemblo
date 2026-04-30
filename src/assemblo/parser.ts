@@ -61,7 +61,8 @@ function parseArgument(arg: string, lineNum: number): IArgument {
 
 function parseLine(p: TParser, line: string, num: number): IOperation {
   const op = Operation.createOperation(num, '', [])
-  const ONE_ARGS = ['PRT', 'LBL']
+  const ONE_ARGS = ['PRT', 'LBL', 'JMP']
+  const TWO_ARGS = ['JMP_N', 'JMP_P', 'JMP_Z', 'JMP_U']
   const parts = line.split(':')
 
   const fPart = parts[0]
@@ -76,12 +77,12 @@ function parseLine(p: TParser, line: string, num: number): IOperation {
 
   const args = parts[1].split(',')
 
-  if (!ONE_ARGS.includes(fPart)) {
-    validateArgsLength(args, 2, num, fPart)
-  }
-
   if (ONE_ARGS.includes(fPart)) {
     validateArgsLength(args, 1, num, fPart)
+  } else if (TWO_ARGS.includes(fPart)) {
+    validateArgsLength(args, 2, num, fPart)
+  } else {
+    validateArgsLength(args, 2, num, fPart)
   }
 
   for (const arg of args) {

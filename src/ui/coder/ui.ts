@@ -79,7 +79,7 @@ function createConsoleOuput(log: Logger) {
     output.classList.add('alert-success')
   }
 
-  output.innerText = log.value
+  output.innerText = String(log.value)
 
   return output
 }

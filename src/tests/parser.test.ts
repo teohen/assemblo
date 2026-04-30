@@ -51,7 +51,7 @@ describe('Parser suite', () => {
           operation: fixtures.Operation.newOperation('pushFn', 1,
             [
               fixtures.Argument.newListArgument('OUTPUT'),
-              fixtures.Argument.newNumberArgument('1'),
+              fixtures.Argument.newNumberArgument(1),
             ],
           )
         },
@@ -133,7 +133,7 @@ describe('Parser suite', () => {
           operation: fixtures.Operation.newOperation('cpyFn', 1,
             [
               fixtures.Argument.newMemoryArgument('mx0'),
-              fixtures.Argument.newNumberArgument('2')
+              fixtures.Argument.newNumberArgument(2)
             ]
           )
         },
@@ -188,7 +188,7 @@ describe('Parser suite', () => {
           operation: fixtures.Operation.newOperation('addFn', 1,
             [
               fixtures.Argument.newRegisterArgument('r0'),
-              fixtures.Argument.newNumberArgument('1')
+              fixtures.Argument.newNumberArgument(1)
             ]
           )
         },
@@ -221,7 +221,7 @@ describe('Parser suite', () => {
           operation: fixtures.Operation.newOperation('subFn', 1,
             [
               fixtures.Argument.newRegisterArgument('r0'),
-              fixtures.Argument.newNumberArgument('1')
+              fixtures.Argument.newNumberArgument(1)
             ]
           )
         },
