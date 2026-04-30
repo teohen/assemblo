@@ -44,4 +44,38 @@ describe('Integration test suite', () => {
       },
       1)
   })
+
+
+  it('should run program with label-based JMP correctly', (done) => {
+    const code =
+      `LBL: .start
+        ADD: r1, 3
+        LBL: .loop
+        SUB: r1, 1
+        PRT: r1
+        JMP_P: .loop, r1
+        LBL: .end`
+
+    const inQ = Lists.createList('INPUT', [])
+    const outQ = Lists.createList('OUTPUT', [])
+
+    const p: IProgram = Program.newProgram(inQ.items, outQ.items)
+
+    p.reset(inQ.items)
+    p.run(
+      code,
+      () => { },
+      () => {
+        expect(p.program.status).toBe(status.FINISHED)
+        expect(p.program.outQ.items).toEqual([])
+        expect(p.program.registers.get('r1')).toBe(0)
+        expect(p.program.logger).toEqual([
+          { type: 'message', value: 2, ln: 5 },
+          { type: 'message', value: 1, ln: 5 },
+          { type: 'message', value: 0, ln: 5 }
+        ])
+        done()
+      },
+      1)
+  })
 })

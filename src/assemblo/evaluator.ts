@@ -50,8 +50,13 @@ const FUNCTION_LIST: Array<(arg: InstructionArgument) => number> = [
   jmpZeroFn,
   addFn,
   subFn,
-  prtFn
+  prtFn,
+  labelFn
 ]
+
+function labelFn(arg: InstructionArgument): number {
+  return arg.eva.line
+}
 
 function addError(eva: TEvaluator, value: string): void {
   eva.logger.push({ ln: eva.line, type: 'error', value })

@@ -3,7 +3,7 @@ import tokens from './tokens'
 import Parser, { IParser } from './parser'
 import Evaluator, { IEvaluator } from './evaluator'
 import Operation, { IOperation } from './operation'
-import Argument from './argument'
+import Argument, { IArgument } from './argument'
 import Register, { RegistersType } from './registers'
 import Lists, { IListInput, IListOutput } from './lists'
 import Label, { LabelType } from './labels'
@@ -146,27 +146,62 @@ function reset(p: TProgram, inQ: number[]): void {
   )
 }
 
+function collectLabels(operations: IOperation[], p: TProgram): void {
+  for (const op of operations) {
+    if (op.funcName !== 'labelFn') continue
+
+    const labelArg = op.args[0] as { literal: string }
+    const labelName = labelArg.literal
+
+    if (p.labels.map.has(labelName)) {
+      throw new Error(`Duplicate label defined: ${labelName}`)
+    }
+
+    p.labels.set(labelName, op.line)
+  }
+}
+
+function resolveLabelReference(arg: IArgument, p: TProgram): IArgument {
+  if (arg.type !== 'LBL') return arg
+
+  const labelName = arg.literal
+  const lineNumber = p.labels.get(labelName)
+
+  if (lineNumber === undefined) {
+    throw new Error(`Undefined label referenced: ${labelName}`)
+  }
+
+  return Argument.createNumberArgument(lineNumber)
+}
+
+function resolveLabels(operations: IOperation[], p: TProgram): IOperation[] {
+  const jmpFuncs = ['jmpNegFn', 'jmpPosFn', 'jmpZeroFn', 'jmpUndFn']
+
+  return operations.map((op) => {
+    if (!jmpFuncs.includes(op.funcName)) return op
+
+    if (op.args.length === 0) return op
+
+    const resolvedFirstArg = resolveLabelReference(op.args[0], p)
+
+    return Operation.createOperation(
+      op.line,
+      op.funcName,
+      [resolvedFirstArg, ...op.args.slice(1)]
+    )
+  })
+}
+
 function convertLabels(operations: IOperation[]): IOperation[] {
   return operations.map((op) => {
     if (op.funcName !== 'labelFn') return op
 
     const labelArg = op.args[0] as { literal: string }
-    if (labelArg.literal === '.end') {
-      return Operation.createOperation(
-        op.line,
-        'endFn',
-        []
-      )
+    if (labelArg && labelArg.literal === '.end') {
+      return Operation.createOperation(op.line, 'endFn', [])
     }
 
-    return Operation.createOperation(
-      op.line,
-      'jmpFn',
-      [
-        Argument.createNumberArgument(op.line),
-        Argument.createConditionalArgument(() => true),
-      ]
-    )
+    return op
   })
 }
 
@@ -174,7 +209,15 @@ function prepareOperations(p: TProgram, code: string): void {
   try {
     p.status = status.PARSING
     const parsedCode = p.parser.parse(code)
-    const operations = convertLabels(parsedCode)
+
+    // First pass: collect all labels
+    collectLabels(parsedCode, p)
+
+    // Second pass: convert label operations (like .end -> endFn)
+    const convertedOps = convertLabels(parsedCode)
+
+    // Third pass: resolve label references in JMP instructions
+    const operations = resolveLabels(convertedOps, p)
 
     p.evaluator.eva.operations = operations
     p.status = status.PARSED
@@ -216,7 +259,7 @@ function run(p: TProgram,
 
   if (p.status !== status.PARSED) return
 
-  p.line = 1
+  p.line = p.labels.get('.start') || 1
   p.status = status.RUNNING
 
   let ended = false
